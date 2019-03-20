@@ -54,7 +54,7 @@ module.exports = {
         })
         .then(function(hash) {
           return db.query(
-            'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) returning id',
+            'INSERT INTO users (name, email, hashedPassword) VALUES ($1, $2, $3) returning id',
             [data.name, data.email, hash]);
         })
         .then(function(result) {
@@ -126,7 +126,7 @@ module.exports = {
             return hashPassword(data.password);
           })
           .then(function(hash) {
-            return db.query('UPDATE users SET password = $2 WHERE id = $1 returning id', [data.id, hash]);
+            return db.query('UPDATE users SET hashedPAssword = $2 WHERE id = $1 returning id', [data.id, hash]);
           })
           .then(function(result) {
             resolve(result.rows[0]);

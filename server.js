@@ -1,19 +1,22 @@
 var express = require("express");
-const https = require("https"),
-  fs = require("fs");
-
-const options = {
-  key: fs.readFileSync("/etc/letsencrypt/live/kgcoe-st-project.se.rit.edu/privkey.pem"),
-  cert: fs.readFileSync("/etc/letsencrypt/live/kgcoe-st-project.se.rit.edu/fullchain.pem")
-};
-
+var routes = require("./routes/routes");
+require('dotenv').config();
 const app = express();
 
-app.use((req, res) => {
-  res.writeHead(200);
-  res.end("hello world\n");
-});
+routes(app);
 
 app.listen(8000);
 
-https.createServer(options, app).listen(8080);
+if (process.env.USE_HTTPS) {
+  const https = require("https"),
+    fs = require("fs");
+  const options = {
+    key: fs.readFileSync(process.env.SSL_PRIVATE_KEY),
+    cert: fs.readFileSync(process.env.SSL_PUBLIC_KEY)
+  };
+  https.createServer(options, app).listen(process.env.PORT);
+} else {
+  const http = require('http');
+  http.createServer(app).listen(process.env.PORT);
+}
+console.log('Server started on port ' + process.env.PORT);

@@ -5,7 +5,7 @@ var jwt = require('jsonwebtoken');
 router.use(require('./auth.routes'));
 
 // API v1
-router.use('/v1', require('./apiv1/users.routes'));
+router.use('/v1', require('./v1/users.routes'));
 
 // API Error routes
 router.use(function(req, res) {
