@@ -13,7 +13,8 @@ router.post('/auth/authenticate', function(req, res) {
   User.authenticate(req.body)
     .then(function(result) {
       if (result.isAuthorized === true) {
-        jwt.sign({ sub: result.id }, config.SECRET, { expiresIn: config.JWT_EXPIRATION, issuer: 'masterLord' }, function(token) {
+        console.log(result);
+        jwt.sign({ sub: result.id }, config.SECRET, { expiresIn: config.JWT_EXPIRATION, issuer: 'edcs' }, function(err, token) {
           return res.status(200).json({
             message: 'authenticated, token attached',
             token: token
@@ -27,6 +28,7 @@ router.post('/auth/authenticate', function(req, res) {
       }
     })
     .catch(function(err) {
+      console.log(err);
       return res.status(400).json({
         message: err
       });

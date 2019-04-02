@@ -71,8 +71,8 @@ module.exports = {
   getOneUser: function(req, res) {
     User.findOne({ id: req.params.id })
       .then(function(result) {
-        delete result.last_login_attempt;
-        delete result.login_attempts;
+        /*delete result.last_login_attempt;
+        delete result.login_attempts;*/
         return res.status(200).json(result);
       })
       .catch(function(err) {
@@ -85,8 +85,8 @@ module.exports = {
   getSelfUser: function(req, res) {
     User.findOne({ id: req.decoded.sub })
       .then(function(result) {
-        delete result.last_login_attempt;
-        delete result.login_attempts;
+        /*delete result.last_login_attempt;
+        delete result.login_attempts;*/
         return res.status(200).json(result);
       })
       .catch(function(err) {

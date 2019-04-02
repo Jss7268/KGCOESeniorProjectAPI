@@ -47,6 +47,7 @@ module.exports = {
   },
 
   create: function(data) {
+    var time = new Date().getTime();
     return new Promise(function(resolve, reject) {
       validateUserData(data)
         .then(function() {
@@ -54,13 +55,14 @@ module.exports = {
         })
         .then(function(hash) {
           return db.query(
-            'INSERT INTO users (name, email, hashedPassword) VALUES ($1, $2, $3) returning id',
-            [data.name, data.email, hash]);
+            'INSERT INTO users (name, email, hashedPassword, createdAt) VALUES ($1, $2, $3, $4) returning id',
+            [data.name, data.email, hash, time]);
         })
         .then(function(result) {
           resolve(result.rows[0]);
         })
         .catch(function(err) {
+          console.log(err);
           reject(err);
         });
     });
@@ -146,7 +148,7 @@ module.exports = {
       else {
         // change all of this to one transaction?
         findOneByEmail(data.email)
-          .then(function(user) {
+          /*.then(function(user) {
             // Reset login attempts if more than 15 minutes have passed
             if (Date.now() - user.last_login_attempt >= 900000) {
               user.login_attempts = -1;
@@ -163,7 +165,7 @@ module.exports = {
             else {
               reject('error: attempting to login too frequently, try again in 15 minutes');
             }
-          })
+          })*/
           .then(function(user) {
             return verifyPassword(data.password, user);
           })
@@ -285,7 +287,7 @@ function validatePassword(password, minCharacters) {
 
 function verifyPassword(password, user) {
   return new Promise(function(resolve, reject) {
-    bcrypt.compare(password, user.password, function(err, result) {
+    bcrypt.compare(password, user.hashedpassword, function(err, result) {
       if (err) {
         reject(err);
       }
