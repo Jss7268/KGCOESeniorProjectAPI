@@ -1,11 +1,13 @@
+require('dotenv').config();
 const {Pool} = require('pg');
+
 
 const pool = new Pool({
 	host: process.env.DB_HOST,
 	user: process.env.DB_USER,
 	password: process.env.DB_PASS,
 	database: process.env.DB_DATABASE,
-	port: 5432,
+	port: process.env.PORT,
 });
 
 const getExperiments = (request, response) => {
@@ -21,16 +23,34 @@ const getExperiments = (request, response) => {
 // const getExperimentsDates = (request, response) => {
 // 	pool.query('SELECT DATE FROM experiments WHERE ')
 // }
+// "build": "babel server.js --out-dir build",
 
 const getExperimentDataById = (request, response) => {
-	const id = parseInt(request.params.id)
-
-  pool.query('SELECT * FROM device_outputs WHERE id = $1', [id], (error, results) => {
-    if (error) {
-      throw error;
-    }
-    response.status(200).json(results.rows);
-  });
+	const id = request.params.id;
+	//todo: validate id
+	 try{
+		pool.query('SELECT * FROM device_outputs WHERE experiment_id = $1', [id], (error, results) => {
+			 if (error) {
+				console.log(error.status);
+				//todo: group error codes found https://www.enterprisedb.com/docs/en/9.2/pg/errcodes-appendix.html
+				if(error.code == "0A000"){
+					response.status(400).json({
+						error: {
+							message: error.message,
+							code: error.code
+						}
+					});
+				}
+			}
+			else{
+				response.status(200).json(results.rows);
+			}
+		});
+	 }
+	 catch(ex){
+	 	console.log(error);
+	// 	callback(new Error('something happened'));
+	 }
 }
 
 pool.setMaxListeners(0);

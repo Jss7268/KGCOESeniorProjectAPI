@@ -3,6 +3,7 @@ const https = require("https"),
   fs = require("fs");
 
 const db = require('./db.js');
+const morgan = require('morgan');
 
 const options = {
   key: fs.readFileSync("/etc/letsencrypt/live/kgcoe-st-project.se.rit.edu/privkey.pem"),
@@ -10,6 +11,8 @@ const options = {
 };
 
 const app = express();
+app.use(morgan('dev'));
+//app.use(morgan);
 
 var bodyParser = require('body-parser');
 
@@ -38,6 +41,45 @@ router.get('/getexperiments', db.getExperiments);
 router.get('/getexperimentdata/:id', db.getExperimentDataById);
 
 app.use('/api', router);
+
+app.get('/',() => {
+  var err = {};
+  err.message = 'Not found'
+  err.status = 404;
+  next(err)
+});
+
+app.get('/api',function (){
+  var err = {};
+  err.message = 'Not found'
+  err.status = 404;
+  next(err)
+})
+
+app.use((req, res, next) => {
+  const error = new Error('Not Found');
+  error.status = 404;
+  next(error);
+});
+
+//todo: why doesn't this work?
+app.use((error, req, res, next) => {
+  res.status(err.status || 500);
+  res.json({
+    error: {
+      message: error.message
+    }
+  })
+})
+
+// app.use((error, req, res, next), function() {
+//   res.status(error.status || 500);
+//   res.json({
+//     error: {
+//       message: error.message,
+//     },
+//   });
+// });
 
 //start server
 app.listen(8000);
