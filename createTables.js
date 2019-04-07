@@ -16,7 +16,7 @@ async function createTables(){
 		console.log(err);
 	}
 	try {
-		await db.query("CREATE TABLE experiments (id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (), creator users NOT NULL, createdAt bigint NOT NULL, updatedAt bigint, deletedAt bigint, startTime bigint)");
+		await db.query("CREATE TABLE experiments (id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (), creatorId uuid, createdAt bigint NOT NULL, updatedAt bigint, deletedAt bigint, startTime bigint, FOREIGN KEY (creator) REFERENCES users (id))");
 	} catch (err) {
 		console.log(err);
 	}
