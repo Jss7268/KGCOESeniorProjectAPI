@@ -1,17 +1,22 @@
 require('dotenv').config();
 
-const db = require('./db.js');
+const db = require('./config/db.js');
 
 createTables();
 
 async function createTables(){
 	try {
-		await db.query("CREATE TABLE users (id uuid PRIMARY KEY, name VARCHAR (100) NOT NULL, email VARCHAR (255) UNIQUE NOT NULL, hashedPassword VARCHAR (255) NOT NULL, createdAt bigint NOT NULL, updateAt bigint, deletedAt bigint)");
+		await db.query("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";");
 	} catch (err) {
 		console.log(err);
 	}
 	try {
-		await db.query("CREATE TABLE experiments (id uuid PRIMARY KEY, creator users NOT NULL, createdAt bigint NOT NULL, updateAt bigint, deletedAt bigint, startTime bigint)");
+		await db.query("CREATE TABLE users (id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (), name VARCHAR (100) NOT NULL, email VARCHAR (255) UNIQUE NOT NULL, hashedPassword VARCHAR (255) NOT NULL, access smallint NOT NULL DEFAULT 0, createdAt bigint NOT NULL, updatedAt bigint, deletedAt bigint)");
+	} catch (err) {
+		console.log(err);
+	}
+	try {
+		await db.query("CREATE TABLE experiments (id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (), creator users NOT NULL, createdAt bigint NOT NULL, updatedAt bigint, deletedAt bigint, startTime bigint)");
 	} catch (err) {
 		console.log(err);
 	}
@@ -21,7 +26,7 @@ async function createTables(){
 		console.log(err);
 	}
 	try {
-		await db.query("CREATE TABLE supported_devices (id uuid PRIMARY KEY, permission BOOLEAN, createdAt bigint NOT NULL, updatedAt bigint, deletedAt bigint)");
+		await db.query("CREATE TABLE supported_devices (id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (), permission BOOLEAN, createdAt bigint NOT NULL, updatedAt bigint, deletedAt bigint)");
 	} catch (err) {
 		console.log(err);
 	}
@@ -31,7 +36,7 @@ async function createTables(){
 		console.log(err);
 	}
 	try {
-		await db.query("CREATE TABLE output_types (id uuid PRIMARY KEY, name VARCHAR (100) NOT NULL, units VARCHAR (100) NOT NULL, createdAt bigint NOT NULL, updateAt bigint, deletedAt bigint)");
+		await db.query("CREATE TABLE output_types (id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (), name VARCHAR (100) NOT NULL, units VARCHAR (100) NOT NULL, createdAt bigint NOT NULL, updatedAt bigint, deletedAt bigint)");
 	} catch (err) {
 		console.log(err);
 	}

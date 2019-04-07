@@ -1,19 +1,39 @@
 var express = require("express");
-const https = require("https"),
-  fs = require("fs");
+var routes = require("./routes/routes");
+var cors = require('cors');
+var bodyParser = require('body-parser')
 
-const options = {
-  key: fs.readFileSync("/etc/letsencrypt/live/kgcoe-st-project.se.rit.edu/privkey.pem"),
-  cert: fs.readFileSync("/etc/letsencrypt/live/kgcoe-st-project.se.rit.edu/fullchain.pem")
-};
-
+require('dotenv').config();
 const app = express();
 
-app.use((req, res) => {
-  res.writeHead(200);
-  res.end("hello world\n");
-});
+var corsOptions = {
+  origin: process.env.REDIRECT_FRONTEND_BASE,
+  credentials: true,
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
+
+app.use(cors(corsOptions));
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+
+// parse application/json
+app.use(bodyParser.json())
+
+routes(app);
 
 app.listen(8000);
 
-https.createServer(options, app).listen(8080);
+if (process.env.USE_HTTPS) {
+  const https = require("https"),
+    fs = require("fs");
+  const options = {
+    key: fs.readFileSync(process.env.SSL_PRIVATE_KEY),
+    cert: fs.readFileSync(process.env.SSL_PUBLIC_KEY)
+  };
+  https.createServer(options, app).listen(process.env.PORT);
+} else {
+  const http = require('http');
+  http.createServer(app).listen(process.env.PORT);
+}
+console.log('Server started on port ' + process.env.PORT);
