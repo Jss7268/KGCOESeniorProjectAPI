@@ -11,7 +11,7 @@ async function createTables(){
 		console.log(err);
 	}
 	try {
-		await db.query("CREATE TABLE users (id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (), name VARCHAR (100) NOT NULL, email VARCHAR (255) UNIQUE NOT NULL, hashedPassword VARCHAR (255) NOT NULL, access smallint NOT NULL DEFAULT 0, createdAt bigint NOT NULL, updatedAt bigint, deletedAt bigint)");
+		await db.query("CREATE TABLE users (id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (), name VARCHAR (100) NOT NULL, email VARCHAR (255), hashedPassword VARCHAR (255) NOT NULL, access smallint NOT NULL DEFAULT 0, createdAt bigint NOT NULL, updatedAt bigint, deletedAt bigint)");
 	} catch (err) {
 		console.log(err);
 	}
@@ -26,27 +26,17 @@ async function createTables(){
 		console.log(err);
 	}
 	try {
-		await db.query("CREATE TABLE supported_devices (id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (), permission BOOLEAN, createdAt bigint NOT NULL, updatedAt bigint, deletedAt bigint)");
-	} catch (err) {
-		console.log(err);
-	}
-	try {
-		await db.query("CREATE TABLE devices_experiments (experiment experiments NOT NULL, device supported_devices NOT NULL, createdAt bigint NOT NULL, updatedAt bigint, deletedAt bigint)");
-	} catch (err) {
-		console.log(err);
-	}
-	try {
 		await db.query("CREATE TABLE output_types (id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (), name VARCHAR (100) NOT NULL, units VARCHAR (100) NOT NULL, createdAt bigint NOT NULL, updatedAt bigint, deletedAt bigint)");
 	} catch (err) {
 		console.log(err);
 	}
 	try {
-		await db.query("CREATE TABLE device_outputs (output_type output_types NOT NULL, experiment_id experiments NOT NULL, device_id supported_devices NOT NULL, output_value decimal NOT NULL, timestamp bigint NOT NULL, createdAT bigint NOT NULL, updatedAt bigint, deletedAt bigint)");
+		await db.query("CREATE TABLE device_outputs (output_type output_types NOT NULL, experiment_id experiments NOT NULL, device_id uuid NOT NULL uuid_generate_v4 (), output_value decimal NOT NULL, timestamp bigint NOT NULL, createdAT bigint NOT NULL, updatedAt bigint, deletedAt bigint)");
 	} catch (err) {
 		console.log(err);
 	}
 	try {
-		await db.query("CREATE TABLE user_inputs (description VARCHAR (255) NOT NULL, timestamp bigint NOT NULL, experiment_id experiments NOT NULL, device_id supported_devices NOT NULL, username users NOT NULL, createdAT bigint NOT NULL, updatedAt bigint, deletedAt bigint)");
+		await db.query("CREATE TABLE user_inputs (description VARCHAR (255) NOT NULL, timestamp bigint NOT NULL, experiment_id experiments NOT NULL, device_id uuid NOT NULL uuid_generate_v4 (), username users NOT NULL, createdAT bigint NOT NULL, updatedAt bigint, deletedAt bigint)");
 	} catch (err) {
 		console.log(err);
 	}
