@@ -40,6 +40,8 @@ router.get('/getexperiments', db.getExperiments);
 
 router.get('/getexperimentdata/:id', db.getExperimentDataById);
 
+router.post('/createexperiment', db.createexperiment);
+
 app.use('/api', router);
 
 app.get('/',() => {
@@ -64,7 +66,7 @@ app.use((req, res, next) => {
 
 //todo: why doesn't this work?
 app.use((error, req, res, next) => {
-  res.status(err.status || 500);
+  res.status(error.status || 500);
   res.json({
     error: {
       message: error.message
