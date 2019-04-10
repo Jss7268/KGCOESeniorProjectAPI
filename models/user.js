@@ -55,7 +55,7 @@ module.exports = {
         })
         .then(function(hash) {
           return db.query(
-            'INSERT INTO users (name, email, hashedPassword, createdAt) VALUES ($1, $2, $3, $4) returning id',
+            'INSERT INTO users (name, email, hashed_password, created_at, updated_At) VALUES ($1, $2, $3, $4, $4) returning id',
             [data.name, data.email, hash, time]);
         })
         .then(function(result) {
@@ -81,12 +81,13 @@ module.exports = {
   },
 
   updateName: function(data) {
+    var time = new Date().getTime();
     return new Promise(function(resolve, reject) {
       if (!data.id || !data.name) {
         reject('error: id and/or name missing')
       }
       else {
-        db.query('UPDATE users SET name = $2 WHERE id = $1 returning name', [data.id, data.name])
+        db.query('UPDATE users SET name = $2, updated_at = $3 WHERE id = $1 returning name', [data.id, data.name, time])
           .then(function(result) {
             resolve(result.rows[0]);
           })
@@ -98,6 +99,7 @@ module.exports = {
   },
 
   updateEmail: function(data) {
+    var time = new Date().getTime();
     return new Promise(function(resolve, reject) {
       if (!data.id || !data.email) {
         reject('error: id and/or email missing')
@@ -105,7 +107,7 @@ module.exports = {
       else {
         validateEmail(data.email)
           .then(function() {
-            return db.query('UPDATE users SET email = $2 WHERE id = $1 returning email', [data.id, data.email]);
+            return db.query('UPDATE users SET email = $2, updated_at = $3 WHERE id = $1 returning email', [data.id, data.email, time]);
           })
           .then(function(result) {
             resolve(result.rows[0]);
@@ -118,6 +120,7 @@ module.exports = {
   },
 
   updatePassword: function(data) {
+    var time = new Date().getTime();
     return new Promise(function(resolve, reject) {
       if (!data.id || !data.password) {
         reject('error: id and/or password missing')
@@ -128,7 +131,7 @@ module.exports = {
             return hashPassword(data.password);
           })
           .then(function(hash) {
-            return db.query('UPDATE users SET hashedPAssword = $2 WHERE id = $1 returning id', [data.id, hash]);
+            return db.query('UPDATE users SET hashed_password = $2, updated_at = $3 WHERE id = $1 returning id', [data.id, hash, time]);
           })
           .then(function(result) {
             resolve(result.rows[0]);
@@ -148,24 +151,6 @@ module.exports = {
       else {
         // change all of this to one transaction?
         findOneByEmail(data.email)
-          /*.then(function(user) {
-            // Reset login attempts if more than 15 minutes have passed
-            if (Date.now() - user.last_login_attempt >= 900000) {
-              user.login_attempts = -1;
-            }
-            return db.query(
-              'UPDATE users SET last_login_attempt = now(), login_attempts = $2 WHERE email = $1 returning *',
-              [data.email, user.login_attempts + 1]
-            );
-          })
-          .then(function(result) {
-            if (result.rows[0].login_attempts < 10) {
-              return result.rows[0];
-            }
-            else {
-              reject('error: attempting to login too frequently, try again in 15 minutes');
-            }
-          })*/
           .then(function(user) {
             return verifyPassword(data.password, user);
           })
@@ -287,7 +272,7 @@ function validatePassword(password, minCharacters) {
 
 function verifyPassword(password, user) {
   return new Promise(function(resolve, reject) {
-    bcrypt.compare(password, user.hashedpassword, function(err, result) {
+    bcrypt.compare(password, user.hashed_password, function(err, result) {
       if (err) {
         reject(err);
       }
