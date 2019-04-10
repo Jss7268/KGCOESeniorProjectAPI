@@ -32,7 +32,7 @@ async function createTables() {
  			"created_at bigint NOT NULL, " + 
 			"updated_at bigint, " + 
 			"deleted_at bigint NOT NULL DEFAULT 0, " + 
-			"startTime bigint, " + 
+			"start_time bigint, " + 
 			"FOREIGN KEY (creator_id) REFERENCES users (id))");
 	} catch (err) {
 		console.log(err);
@@ -80,7 +80,7 @@ async function createTables() {
 	}
 	try {
 		await db.query("CREATE TABLE IF NOT EXISTS user_inputs " +
-			"(description VARCHAR (255) NOT NULL, " +
+			"(description text NOT NULL, " +
 			"timestamp bigint NOT NULL, " +
 			"experiment_id uuid NOT NULL, " +
 			"device_id uuid NOT NULL, " + 
