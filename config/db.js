@@ -32,8 +32,10 @@ const getExperimentDataById = (request, response) => {
 		pool.query('SELECT * FROM device_outputs WHERE experiment_id = $1', [id], (error, results) => {
 			 if (error) {
 				console.log(error.status);
+				console.log('error is ', error);
 				//todo: group error codes found https://www.enterprisedb.com/docs/en/9.2/pg/errcodes-appendix.html
 				if(error.code == ("0A000" || error.code)){
+					console.log(error);
 					response.status(400).json({
 						error: {
 							message: error.message,

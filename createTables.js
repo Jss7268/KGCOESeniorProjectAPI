@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const db = require('./db.js');
+const db = require('./config/db.js');
 
 createTables();
 
@@ -11,7 +11,7 @@ async function createTables(){
 		console.log(err);
 	}
 	try {
-		await db.query("CREATE TABLE users (id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (), name VARCHAR (100) NOT NULL, email VARCHAR (255), hashedPassword VARCHAR (255) NOT NULL, access smallint NOT NULL DEFAULT 0, createdAt bigint NOT NULL, updatedAt bigint, deletedAt bigint)");
+		await db.query("CREATE TABLE users (id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (), name VARCHAR (100) NOT NULL, email VARCHAR (255) UNIQUE NOT NULL, hashedPassword VARCHAR (255) NOT NULL, access smallint NOT NULL DEFAULT 0, createdAt bigint NOT NULL, updatedAt bigint, deletedAt bigint)");
 	} catch (err) {
 		console.log(err);
 	}
