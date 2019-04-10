@@ -25,7 +25,7 @@ module.exports = {
         if (data.id) {
           findOneById(data.id)
             .then(function(result) {
-              delete result.password;
+              delete result.hashed_password;
               resolve(result);
             })
             .catch(function(err) {

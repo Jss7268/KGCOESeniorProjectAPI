@@ -21,11 +21,10 @@ module.exports = {
   findOne: function (data) {
     return new Promise(function (resolve, reject) {
       if (!data.id) {
-        reject('error: must provide id or email')
+        reject('error: must provide id')
       } else {
         findOneById(data.id)
           .then(function (result) {
-            delete result.password;
             resolve(result);
           })
           .catch(function (err) {
@@ -41,7 +40,7 @@ module.exports = {
       validateExperimentData(data)
         .then(function () {
           return db.query(
-            'INSERT INTO experiments (creator_id, start_time, created_at) VALUES ($1, $2, $3) returning id',
+            'INSERT INTO experiments (creator_id, start_time, created_at, updated_at) VALUES ($1, $2, $3, $3) returning id',
             [data.creator_id, data.start_time, time]);
         })
         .then(function (result) {
