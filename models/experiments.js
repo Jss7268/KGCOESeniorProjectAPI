@@ -10,7 +10,7 @@ module.exports = {
         validateExperimentData(data)
         .then(function() {
             return db.query(
-            'INSERT INTO experiments (creator_id, notes, description, created_at, updated_At) VALUES ($1, $2, $3, $4, $4) returning id',
+            'INSERT INTO experiments (creator_id, notes, description, created_at, updated_at) VALUES ($1, $2, $3, $4, $4) returning id',
             [data.creator_id, data.notes, data.description, time]);
         })
         .then(function(result) {
