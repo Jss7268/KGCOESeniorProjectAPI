@@ -48,8 +48,9 @@ module.exports = {
     },
 
     delete: function (table, data) {
+        var time = new Date().getTime();
         return new Promise(function (resolve, reject) {
-            db.query('DELETE FROM ' + table + ' WHERE id = $1 returning id', [data.id])
+            db.query('UPDATE ' + table + ' SET deleted_at = $2 WHERE id = $1 returning id', [data.id, time])
                 .then(function (result) {
                     resolve(result.rows[0]);
                 })

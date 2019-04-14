@@ -1,8 +1,6 @@
 var Promise = require('promise');
 var db = require('../config/db');
-var User = require('../models/user');
-var Experiment = require('../models/experiment');
-var OutputType = require('../models/output_type');
+var Validator = require('../validators/validator');
 
 module.exports = {
     findAll: function () {
@@ -39,8 +37,12 @@ module.exports = {
             validateDeviceOutputData(data)
                 .then(function () {
                     return db.query(
-                        'INSERT INTO device_outputs (creator_id, start_time, created_at, updated_at) VALUES ($1, $2, $3, $4) returning id',
-                        [data.creator_id, data.start_time, time]);
+                        'INSERT INTO device_outputs ' +
+                        '(experiment_id, device_id, output_type_id, ' +
+                        'output_value, timestamp, created_at, updated_at) ' +
+                        'VALUES ($1, $2, $3, $3) returning id',
+                        [data.experiment_id, data.device_id, data.output_type_id,
+                        data.output_value, data.timestamp, time]);
                 })
                 .then(function (result) {
                     resolve(result.rows[0]);
@@ -53,8 +55,9 @@ module.exports = {
     },
 
     delete: function (data) {
+        var time = new Date().getTime();
         return new Promise(function (resolve, reject) {
-            db.query('DELETE FROM device_outputs WHERE id = $1 returning id', [data.id])
+            db.query('UPDATE device_outputs SET deleted_at = $2 WHERE id = $1 returning id', [data.id, time])
                 .then(function (result) {
                     resolve(result.rows[0]);
                 })
@@ -101,59 +104,21 @@ function findOneById(id) {
 }
 function validateDeviceOutputData(data) {
     return new Promise(function (resolve, reject) {
-        if (!data.device_id || !data.output_type_id || !data.experiment_id) {
-            reject('experiment_id, device_id, and/or output_type_id missing')
-        }
-        else {
-            validateDeviceId(data.device_id)
-                .then(function () {
-                    return validateExperimentId(data.experiment_id);
-                })
-                .then(function () {
-                    return validateOutputTypeId(data.output_type_id);
-                })
-                .then(function () {
-                    resolve();
-                })
-                .catch(function (err) {
-                    reject(err);
-                });
-        }
-    });
-}
-
-function validateDeviceId(id) {
-    return new Promise(function (resolve, reject) {
-        User.findOne({ id: id })
-            .then(function (result) {
-                resolve(result);
+        Validator.validateColumns(data, ['device_id', 'output_type_id', 'experiment_id', 'output_value', 'timestamp'])
+            .then(function () {
+                return Validator.validateDeviceId(data.device_id)
+            })
+            .then(function () {
+                return Validator.validateExperimentId(data.experiment_id);
+            })
+            .then(function () {
+                return Validator.validateOutputTypeId(data.output_type_id);
+            })
+            .then(function () {
+                resolve();
             })
             .catch(function (err) {
                 reject(err);
-            });
-    });
-}
-
-function validateExperimentId(id) {
-    return new Promise(function (resolve, reject) {
-        Experiment.findOne({ id: id })
-            .then(function (result) {
-                resolve(result);
             })
-            .catch(function (err) {
-                reject(err);
-            });
-    });
-}
-
-function validateOutputTypeId(id) {
-    return new Promise(function (resolve, reject) {
-        OutputType.findOne({ id: id })
-            .then(function (result) {
-                resolve(result);
-            })
-            .catch(function (err) {
-                reject(err);
-            });
     });
 }

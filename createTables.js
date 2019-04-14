@@ -64,9 +64,9 @@ async function createTables() {
 	}
 	try {
 		await db.query("CREATE TABLE IF NOT EXISTS device_outputs " +
-			"(device_id uuid NOT NULL, " + 
+			"(experiment_id uuid NOT NULL, " + 
+			"device_id uuid NOT NULL, " + 
 			"output_type_id uuid NOT NULL, " + 
-			"experiment_id uuid NOT NULL, " + 
 			"output_value decimal NOT NULL, " + 
 			"timestamp bigint NOT NULL, " + 
 			"created_at bigint NOT NULL, " + 

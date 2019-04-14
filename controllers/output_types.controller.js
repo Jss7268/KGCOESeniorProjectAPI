@@ -18,8 +18,20 @@ module.exports = {
       });
   },
 
-  changeStartTime: function(req, res) {
-    OutputType.updateStartTime({ id: req.params.id, start_time: req.body.start_time })
+  changeUnits: function(req, res) {
+    OutputType.updateUnits({ id: req.params.id, units: req.body.units })
+      .then(function(result) {
+        return res.status(200).json(result);
+      })
+      .catch(function(err) {
+        return res.status(400).json({
+          message: err
+        });
+      });
+  },
+
+  changeUnitsName: function(req, res) {
+    OutputType.updateUnits({ name: req.params.name, units: req.body.units })
       .then(function(result) {
         return res.status(200).json(result);
       })
@@ -44,8 +56,34 @@ module.exports = {
       });
   },
 
+  deleteOutputTypeName: function(req, res) {
+    OutputType.delete({ name: req.params.name })
+      .then(function(result) {
+        return res.status(200).json({
+          message: 'deleted output_type with id: ' + result.id
+        });
+      })
+      .catch(function(err) {
+        return res.status(400).json({
+          message: err
+        });
+      });
+  },
+
   getOneOutputType: function(req, res) {
     OutputType.findOne({ id: req.params.id })
+      .then(function(result) {
+        return res.status(200).json(result);
+      })
+      .catch(function(err) {
+        return res.status(400).json({
+          message: err
+        });
+      });
+  },
+
+  getOneOutputTypeName: function(req, res) {
+    OutputType.findOne({ name: req.params.name })
       .then(function(result) {
         return res.status(200).json(result);
       })

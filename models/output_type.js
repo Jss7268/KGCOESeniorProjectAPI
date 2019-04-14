@@ -16,16 +16,26 @@ module.exports = {
 
     findOne: function (data) {
         return new Promise(function (resolve, reject) {
-            if (!data.id) {
-                reject('error: must provide id')
+            if (!data.id && !data.name) {
+                reject('error: must provide id or name')
             } else {
-                findOneById(data.id)
-                    .then(function (result) {
-                        resolve(result);
-                    })
-                    .catch(function (err) {
-                        reject(err);
-                    });
+                if (data.id) {
+                    findOneById(data.id)
+                        .then(function (result) {
+                            resolve(result);
+                        })
+                        .catch(function (err) {
+                            reject(err);
+                        });
+                } else {
+                    findOneByName(data.name)
+                        .then(function (result) {
+                            resolve(result);
+                        })
+                        .catch(function (err) {
+                            reject(err);
+                        });
+                }
             }
         });
     },
@@ -52,31 +62,53 @@ module.exports = {
     },
 
     delete: function (data) {
+        var time = new Date().getTime();
         return new Promise(function (resolve, reject) {
-            db.query('DELETE FROM output_types WHERE id = $1 returning id', [data.id])
+            if (data.id) {
+            db.query('UPDATE output_types SET deleted_at = $2 WHERE id = $1 returning id', [data.id, time])
                 .then(function (result) {
                     resolve(result.rows[0]);
                 })
                 .catch(function (err) {
                     reject(err);
                 });
+            } else {
+                db.query('UPDATE output_types SET deleted_at = $2 WHERE name = $1 and deleted_at = 0 returning id', [data.name, time])
+                .then(function (result) {
+                    resolve(result.rows[0]);
+                })
+                .catch(function (err) {
+                    reject(err);
+                });
+            }
         });
     },
 
-    updateStartTime: function (data) {
+    updateUnits: function (data) {
         var time = new Date().getTime();
         return new Promise(function (resolve, reject) {
-            if (!data.id || !data.start_time) {
-                reject('error: id and/or start_time missing')
+            if ((!data.id && !data.name) || !data.units) {
+                reject('error: id or name and/or units missing')
             }
             else {
-                db.query('UPDATE output_types SET start_time = $2, updated_at = $3 WHERE id = $1 returning start_time', [data.id, data.name, time])
-                    .then(function (result) {
-                        resolve(result.rows[0]);
-                    })
-                    .catch(function (err) {
-                        reject(err);
-                    });
+                if (data.id) {
+                    db.query('UPDATE output_types SET units = $2, updated_at = $3 WHERE id = $1 returning units', [data.id, data.units, time])
+                        .then(function (result) {
+                            resolve(result.rows[0]);
+                        })
+                        .catch(function (err) {
+                            reject(err);
+                        });
+                } else {
+                    db.query('UPDATE output_types SET units = $2, updated_at = $3 WHERE name = $1 and delted_at = 0 returning units', [data.name, data.units, time])
+                        .then(function (result) {
+                            resolve(result.rows[0]);
+                        })
+                        .catch(function (err) {
+                            reject(err);
+                        });
+                }
+
             }
         });
     }
@@ -85,6 +117,24 @@ module.exports = {
 function findOneById(id) {
     return new Promise(function (resolve, reject) {
         db.query('SELECT * FROM output_types WHERE id = $1', [id])
+            .then(function (result) {
+                if (result.rows[0]) {
+                    resolve(result.rows[0]);
+                }
+                else {
+                    reject('no output_type found')
+                }
+            })
+            .catch(function (err) {
+                reject(err);
+            });
+    });
+}
+
+
+function findOneByName(name) {
+    return new Promise(function (resolve, reject) {
+        db.query('SELECT * FROM output_types WHERE name = $1 and deleted_at = 0', [name])
             .then(function (result) {
                 if (result.rows[0]) {
                     resolve(result.rows[0]);

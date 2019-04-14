@@ -52,8 +52,9 @@ module.exports = {
   },
 
   delete: function (data) {
+    var time = new Date().getTime();
     return new Promise(function (resolve, reject) {
-      db.query('DELETE FROM experiments WHERE id = $1 returning id', [data.id])
+      db.query('UPDATE experiments SET deleted_at = $2 WHERE id = $1 returning id', [data.id, time])
         .then(function (result) {
           resolve(result.rows[0]);
         })
@@ -120,12 +121,12 @@ function validateExperimentData(data) {
 
 function validateCreatorId(creatorId) {
   return new Promise(function (resolve, reject) {
-  User.findOne({ id: creatorId })
-      .then(function(result) {
+    User.findOne({ id: creatorId })
+      .then(function (result) {
         resolve(result);
       })
-      .catch(function(err) {
+      .catch(function (err) {
         reject(err);
       });
-    });
+  });
 }
