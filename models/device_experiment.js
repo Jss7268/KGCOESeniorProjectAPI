@@ -6,7 +6,7 @@ var Validator = require('../validators/validator');
 module.exports = {
     findAll: function () {
         return new Promise(function (resolve, reject) {
-            db.query('SELECT * FROM devices_experiments', [])
+            db.query('SELECT * FROM devices_experiments where deleted_at = 0', [])
                 .then(function (results) {
                     resolve(results.rows);
                 })
@@ -18,17 +18,22 @@ module.exports = {
 
     findOne: function (data) {
         return new Promise(function (resolve, reject) {
-            if (!data.id) {
-                reject('error: must provide id')
-            } else {
-                findOneById(data.id)
-                    .then(function (result) {
-                        resolve(result);
-                    })
-                    .catch(function (err) {
-                        reject(err);
-                    });
-            }
+            Validator.validateColumns(data, ['device_id', 'experiment_id'])
+            .then(function () {
+                return db.query('SELECT * FROM devices_experiments WHERE device_id = $1 and experiment_id = $2 and deleted_at = 0',
+                [data.device_id, data.experiment_id])
+            })
+            .then(function (result) {
+                if (result.rows[0]) {
+                    resolve(result.rows[0]);
+                }
+                else {
+                    reject('no experiment found')
+                }
+            })
+            .catch(function (err) {
+                reject(err);
+            });
         });
     },
 
@@ -84,7 +89,7 @@ module.exports = {
     delete: function (data) {
         var time = new Date().getTime();
         return new Promise(function (resolve, reject) {
-            db.query('UPDATE experiments SET deleted_at = $3 WHERE experiment_id = $1 and device_id = $2 returning experiment_id, device_id',
+            db.query('UPDATE devices_experiments SET deleted_at = $3 WHERE experiment_id = $1 and device_id = $2 returning experiment_id, device_id',
                 [data.experiment_id, data.device_id, time])
                 .then(function (result) {
                     resolve(result.rows[0]);
@@ -96,22 +101,6 @@ module.exports = {
     },
 };
 
-function findOneById(id) {
-    return new Promise(function (resolve, reject) {
-        db.query('SELECT * FROM experiments WHERE id = $1 and deleted_at = 0', [id])
-            .then(function (result) {
-                if (result.rows[0]) {
-                    resolve(result.rows[0]);
-                }
-                else {
-                    reject('no experiment found')
-                }
-            })
-            .catch(function (err) {
-                reject(err);
-            });
-    });
-}
 function validateDevicesExperimentsData(data) {
     return new Promise(function (resolve, reject) {
         Validator.validateColumns(data, ['experiment_id', 'device_id'])
@@ -123,18 +112,6 @@ function validateDevicesExperimentsData(data) {
             })
             .then(function () {
                 resolve();
-            })
-            .catch(function (err) {
-                reject(err);
-            });
-    });
-}
-
-function validateCreatorId(creatorId) {
-    return new Promise(function (resolve, reject) {
-        User.findOne({ id: creatorId })
-            .then(function (result) {
-                resolve(result);
             })
             .catch(function (err) {
                 reject(err);

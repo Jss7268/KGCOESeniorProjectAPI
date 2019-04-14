@@ -36,10 +36,11 @@ module.exports = {
   },
 
   getOneDeviceExperiment: function(req, res) {
-    DeviceExperiment.findOne({ id: req.params.id })
+    DeviceExperiment.findOne({
+        device_id: req.params.device_id,
+        experiment_id: req.params.experiment_id
+    })
       .then(function(result) {
-        /*delete result.last_login_attempt;
-        delete result.login_attempts;*/
         return res.status(200).json(result);
       })
       .catch(function(err) {
@@ -49,11 +50,12 @@ module.exports = {
       });
   },
 
-  getSelfDeviceExperimentExperiment: function(req, res) {
-    DeviceExperiment.findOne({ id: req.decoded.sub })
+  getOneDeviceExperiment: function(req, res) {
+    DeviceExperiment.findOne({
+        device_id: req.params.device_id,
+        experiment_id: req.params.experiment_id
+    })
       .then(function(result) {
-        /*delete result.last_login_attempt;
-        delete result.login_attempts;*/
         return res.status(200).json(result);
       })
       .catch(function(err) {

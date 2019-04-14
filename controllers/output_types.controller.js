@@ -94,18 +94,6 @@ module.exports = {
       });
   },
 
-  getSelfOutputType: function(req, res) {
-    OutputType.findOne({ id: req.decoded.sub })
-      .then(function(result) {
-        return res.status(200).json(result);
-      })
-      .catch(function(err) {
-        return res.status(400).json({
-          message: err
-        });
-      });
-  },
-
   listOutputTypes: function(req, res) {
     OutputType.findAll()
       .then(function(result) {

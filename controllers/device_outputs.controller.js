@@ -58,20 +58,6 @@ module.exports = {
       });
   },
 
-  getSelfDeviceOutput: function(req, res) {
-    DeviceOutput.findOne({ id: req.decoded.sub })
-      .then(function(result) {
-        /*delete result.last_login_attempt;
-        delete result.login_attempts;*/
-        return res.status(200).json(result);
-      })
-      .catch(function(err) {
-        return res.status(400).json({
-          message: err
-        });
-      });
-  },
-
   listDeviceOutputs: function(req, res) {
     DeviceOutput.findAll()
       .then(function(result) {
