@@ -4,7 +4,7 @@ var db = require('../config/db');
 module.exports = {
     findAll: function (table) {
         return new Promise(function (resolve, reject) {
-            db.query('SELECT * FROM ' + table, [])
+            db.query('SELECT * FROM ' + table + 'where deleted_at = 0', [])
                 .then(function (results) {
                     resolve(results.rows);
                 })
@@ -32,7 +32,7 @@ module.exports = {
 
     findOneByColumn: function (table, value, columnName) {
         return new Promise(function (resolve, reject) {
-            db.query('SELECT * FROM ' + table + ' WHERE ' + columnName + ' = $1', [value])
+            db.query('SELECT * FROM ' + table + ' WHERE ' + columnName + ' = $1 and deleted_at = 0', [value])
                 .then(function (result) {
                     if (result.rows[0]) {
                         resolve(result.rows[0]);
@@ -84,7 +84,7 @@ module.exports = {
                 reject('error: id and/or ' + column + ' missing')
             }
             else {
-                db.query('UPDATE ' + table + ' SET $2 = $3, updated_at = $4 WHERE id = $1 returning $2', [data.id, column, data[column], time])
+                db.query('UPDATE ' + table + ' SET $2 = $3, updated_at = $4 WHERE id = $1 and deleted_at = 0 returning $2', [data.id, column, data[column], time])
                     .then(function (result) {
                         resolve(result.rows[0]);
                     })
@@ -135,7 +135,7 @@ function getColumnNames(columns) {
 
 function findOneById(table, id) {
     return new Promise(function (resolve, reject) {
-        db.query('SELECT * FROM ' + table + ' WHERE id = $1', [id])
+        db.query('SELECT * FROM ' + table + ' WHERE id = $1 and deleted_at = 0', [id])
             .then(function (result) {
                 if (result.rows[0]) {
                     resolve(result.rows[0]);

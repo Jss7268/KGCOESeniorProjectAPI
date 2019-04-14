@@ -5,7 +5,7 @@ var Validator = require('../validators/validator');
 module.exports = {
     findAll: function () {
         return new Promise(function (resolve, reject) {
-            db.query('SELECT * FROM device_outputs', [])
+            db.query('SELECT * FROM device_outputs where deleted_at = 0', [])
                 .then(function (results) {
                     resolve(results.rows);
                 })
@@ -74,7 +74,7 @@ module.exports = {
                 reject('error: id and/or start_time missing')
             }
             else {
-                db.query('UPDATE device_outputs SET start_time = $2, updated_at = $3 WHERE id = $1 returning start_time', [data.id, data.name, time])
+                db.query('UPDATE device_outputs SET start_time = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning start_time', [data.id, data.name, time])
                     .then(function (result) {
                         resolve(result.rows[0]);
                     })
@@ -88,7 +88,7 @@ module.exports = {
 
 function findOneById(id) {
     return new Promise(function (resolve, reject) {
-        db.query('SELECT * FROM device_outputs WHERE id = $1', [id])
+        db.query('SELECT * FROM device_outputs WHERE id = $1 and deleted_at = 0', [id])
             .then(function (result) {
                 if (result.rows[0]) {
                     resolve(result.rows[0]);
@@ -104,7 +104,7 @@ function findOneById(id) {
 }
 function validateDeviceOutputData(data) {
     return new Promise(function (resolve, reject) {
-        columns =  ['device_id', 'experiment_id', 'output_value', 'timestamp']
+        columns =  ['device_id', 'output_value', 'timestamp']
         if (output_type_id in data) {
             columns.push('output_type_id');
         } else {
@@ -115,16 +115,23 @@ function validateDeviceOutputData(data) {
                 return Validator.validateDeviceId(data.device_id)
             })
             .then(function () {
-                return Validator.validateExperimentId(data.experiment_id);
+                if (experiment_id in data) {
+                    return Validator.validateExperimentId(data.experiment_id);
+                } else {
+                    // find the most recent experiment this device is assigned to
+                    return Validator.validateDeviceExperiment(data.device_id);
+                }
             })
-            .then(function () {
-                if (!output_type_id in data) {
+            .then(function (experiment) {
+                data.experiment_id = experiment.id;
+                if (output_type_id in data) {
                     return Validator.validateOutputTypeId(data.output_type_id);
                 } else {
                     return Validator.validateOutputTypeName(data.output_type_name);
                 }
             })
-            .then(function (output_type_id) {
+            .then(function (output_type) {
+                data.output_type_id = output_type.id;
                 resolve();
             })
             .catch(function (err) {

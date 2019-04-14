@@ -1,7 +1,7 @@
 var Promise = require('promise');
 var db = require('../config/db');
 var User = require('../models/user');
-
+var Validator = require('../validators/validator');
 
 module.exports = {
     findAll: function () {
@@ -37,7 +37,8 @@ module.exports = {
             db.query(`SELECT * FROM experiments 
                     LEFT OUTER JOIN devices_experiments on 
                     (experiments.id = devices_experiments.experiment_id and 
-                    devices_experiments.device_id = $1)
+                    devices_experiments.device_id = $1 and
+                    devices_experiments.deleted_at = 0)
                     ORDER BY experiments.start_time, experiments.updated_at DESC`,
                 [data.device_id])
                 .then(function (result) {
@@ -64,11 +65,11 @@ module.exports = {
     create: function (data) {
         var time = new Date().getTime();
         return new Promise(function (resolve, reject) {
-            validateExperimentData(data)
+            validateDevicesExperimentsData(data)
                 .then(function () {
                     return db.query(
-                        'INSERT INTO experiments (creator_id, start_time, created_at, updated_at) VALUES ($1, $2, $3, $3) returning id',
-                        [data.creator_id, data.start_time, time]);
+                        'INSERT INTO devices_experiments (experiment_id, device_id, created_at, updated_at) VALUES ($1, $2, $3, $3) returning id',
+                        [data.experiment_id, data.device_id, time]);
                 })
                 .then(function (result) {
                     resolve(result.rows[0]);
@@ -83,7 +84,8 @@ module.exports = {
     delete: function (data) {
         var time = new Date().getTime();
         return new Promise(function (resolve, reject) {
-            db.query('UPDATE experiments SET deleted_at = $2 WHERE id = $1 returning id', [data.id, time])
+            db.query('UPDATE experiments SET deleted_at = $3 WHERE experiment_id = $1 and device_id = $2 returning experiment_id, device_id',
+                [data.experiment_id, data.device_id, time])
                 .then(function (result) {
                     resolve(result.rows[0]);
                 })
@@ -92,29 +94,11 @@ module.exports = {
                 });
         });
     },
-
-    updateStartTime: function (data) {
-        var time = new Date().getTime();
-        return new Promise(function (resolve, reject) {
-            if (!data.id || !data.start_time) {
-                reject('error: id and/or start_time missing')
-            }
-            else {
-                db.query('UPDATE experiments SET start_time = $2, updated_at = $3 WHERE id = $1 returning start_time', [data.id, data.name, time])
-                    .then(function (result) {
-                        resolve(result.rows[0]);
-                    })
-                    .catch(function (err) {
-                        reject(err);
-                    });
-            }
-        });
-    }
 };
 
 function findOneById(id) {
     return new Promise(function (resolve, reject) {
-        db.query('SELECT * FROM experiments WHERE id = $1', [id])
+        db.query('SELECT * FROM experiments WHERE id = $1 and deleted_at = 0', [id])
             .then(function (result) {
                 if (result.rows[0]) {
                     resolve(result.rows[0]);
@@ -128,23 +112,21 @@ function findOneById(id) {
             });
     });
 }
-function validateExperimentData(data) {
+function validateDevicesExperimentsData(data) {
     return new Promise(function (resolve, reject) {
-        if (!data.creator_id) {
-            reject('creator_id missing')
-        }
-        if (!data.start_time) {
-            data.start_time = null;
-        }
-        else {
-            validateCreatorId(data.creator_id)
-                .then(function () {
-                    resolve();
-                })
-                .catch(function (err) {
-                    reject(err);
-                });
-        }
+        Validator.validateColumns(data, ['experiment_id', 'device_id'])
+            .then(function () {
+                return Validator.validateExperimentId(data.experiment_id)
+            })
+            .then(function () {
+                return Validator.validateDeviceId(data.experiment_id)
+            })
+            .then(function () {
+                resolve();
+            })
+            .catch(function (err) {
+                reject(err);
+            });
     });
 }
 

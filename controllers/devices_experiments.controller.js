@@ -1,14 +1,15 @@
 var Promise = require('promise');
 var config = require('./../config/config');
-var Experiment = require('./../models/experiment');
+var DeviceExperiment = require('./../models/device_experiment');
 
 module.exports = {
-  createExperiment: function(req, res) {
-    Experiment.create(req.body)
+  createDeviceExperiment: function(req, res) {
+    DeviceExperiment.create(req.body)
       .then(function(result) {
         return res.status(201).json({
-          message: 'success! created new experiment',
-          id: result.id
+          message: 'success! created new device experiment',
+          experiment_id: result.experiment_id,
+          device_id: result.device_id
         });
       })
       .catch(function(err) {
@@ -18,23 +19,13 @@ module.exports = {
       });
   },
 
-  changeStartTime: function(req, res) {
-    Experiment.updateStartTime({ id: req.params.id, start_time: req.body.start_time })
-      .then(function(result) {
-        return res.status(200).json(result);
-      })
-      .catch(function(err) {
-        return res.status(400).json({
-          message: err
-        });
-      });
-  },
-
-  deleteExperiment: function(req, res) {
-    Experiment.delete({ id: req.params.id })
+  deleteDeviceExperiment: function(req, res) {
+    DeviceExperiment.delete({ experiment_id: req.params.experiment_id,
+        device_id: req.params.device_id })
       .then(function(result) {
         return res.status(200).json({
-          message: 'deleted experiment with id: ' + result.id
+          message: 'deleted device experiment with experiment id: ' + result.experiment_id + 
+          ' and device id: ' + result.device_id
         });
       })
       .catch(function(err) {
@@ -44,8 +35,8 @@ module.exports = {
       });
   },
 
-  getOneExperiment: function(req, res) {
-    Experiment.findOne({ id: req.params.id })
+  getOneDeviceExperiment: function(req, res) {
+    DeviceExperiment.findOne({ id: req.params.id })
       .then(function(result) {
         /*delete result.last_login_attempt;
         delete result.login_attempts;*/
@@ -58,8 +49,8 @@ module.exports = {
       });
   },
 
-  getSelfExperiment: function(req, res) {
-    Experiment.findOne({ id: req.decoded.sub })
+  getSelfDeviceExperimentExperiment: function(req, res) {
+    DeviceExperiment.findOne({ id: req.decoded.sub })
       .then(function(result) {
         /*delete result.last_login_attempt;
         delete result.login_attempts;*/
@@ -72,8 +63,8 @@ module.exports = {
       });
   },
 
-  listExperiments: function(req, res) {
-    Experiment.findAll()
+  listDevicesExperiments: function(req, res) {
+    DeviceExperiment.findAll()
       .then(function(result) {
         return res.status(200).json(result);
       })

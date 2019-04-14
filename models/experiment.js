@@ -6,7 +6,7 @@ var User = require('../models/user');
 module.exports = {
   findAll: function () {
     return new Promise(function (resolve, reject) {
-      db.query('SELECT * FROM experiments', [])
+      db.query('SELECT * FROM experiments where deleted_at = 0', [])
         .then(function (results) {
           resolve(results.rows);
         })
@@ -71,7 +71,7 @@ module.exports = {
         reject('error: id and/or start_time missing')
       }
       else {
-        db.query('UPDATE experiments SET start_time = $2, updated_at = $3 WHERE id = $1 returning start_time', [data.id, data.name, time])
+        db.query('UPDATE experiments SET start_time = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning start_time', [data.id, data.name, time])
           .then(function (result) {
             resolve(result.rows[0]);
           })
@@ -85,7 +85,7 @@ module.exports = {
 
 function findOneById(id) {
   return new Promise(function (resolve, reject) {
-    db.query('SELECT * FROM experiments WHERE id = $1', [id])
+    db.query('SELECT * FROM experiments WHERE id = $1 and deleted_at = 0', [id])
       .then(function (result) {
         if (result.rows[0]) {
           resolve(result.rows[0]);

@@ -7,7 +7,7 @@ var Validator = require('../validators/validator');
 module.exports = {
   findAll: function () {
     return new Promise(function (resolve, reject) {
-      db.query('SELECT id, name, email FROM users', [])
+      db.query('SELECT id, name, email FROM users where deleted_at = 0', [])
         .then(function (results) {
           resolve(results.rows);
         })
@@ -87,7 +87,7 @@ module.exports = {
     return new Promise(function (resolve, reject) {
       Validator.validateColumns(data, ['id', 'name'])
         .then(function () {
-          return db.query('UPDATE users SET name = $2, updated_at = $3 WHERE id = $1 returning name', [data.id, data.name, time])
+          return db.query('UPDATE users SET name = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning name', [data.id, data.name, time])
         })
         .then(function (result) {
           resolve(result.rows[0]);
@@ -106,7 +106,7 @@ module.exports = {
           return validateEmail(data.email)
         })
         .then(function () {
-          return db.query('UPDATE users SET email = $2, updated_at = $3 WHERE id = $1 returning email', [data.id, data.email, time]);
+          return db.query('UPDATE users SET email = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning email', [data.id, data.email, time]);
         })
         .then(function (result) {
           resolve(result.rows[0]);
@@ -128,7 +128,7 @@ module.exports = {
           return hashPassword(data.password);
         })
         .then(function (hash) {
-          return db.query('UPDATE users SET hashed_password = $2, updated_at = $3 WHERE id = $1 returning id', [data.id, hash, time]);
+          return db.query('UPDATE users SET hashed_password = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning id', [data.id, hash, time]);
         })
         .then(function (result) {
           resolve(result.rows[0]);
@@ -160,7 +160,7 @@ module.exports = {
 
 function findOneById(id) {
   return new Promise(function (resolve, reject) {
-    db.query('SELECT * FROM users WHERE id = $1', [id])
+    db.query('SELECT * FROM users WHERE id = $1 and deleted_at = 0', [id])
       .then(function (result) {
         if (result.rows[0]) {
           resolve(result.rows[0]);

@@ -4,7 +4,7 @@ var db = require('../config/db');
 module.exports = {
     findAll: function () {
         return new Promise(function (resolve, reject) {
-            db.query('SELECT * FROM output_types', [])
+            db.query('SELECT * FROM output_types where deleted_at = 0', [])
                 .then(function (results) {
                     resolve(results.rows);
                 })
@@ -92,7 +92,7 @@ module.exports = {
             }
             else {
                 if (data.id) {
-                    db.query('UPDATE output_types SET units = $2, updated_at = $3 WHERE id = $1 returning units', [data.id, data.units, time])
+                    db.query('UPDATE output_types SET units = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning units', [data.id, data.units, time])
                         .then(function (result) {
                             resolve(result.rows[0]);
                         })
@@ -100,7 +100,7 @@ module.exports = {
                             reject(err);
                         });
                 } else {
-                    db.query('UPDATE output_types SET units = $2, updated_at = $3 WHERE name = $1 and delted_at = 0 returning units', [data.name, data.units, time])
+                    db.query('UPDATE output_types SET units = $2, updated_at = $3 WHERE name = $1 and deleted_at = 0 returning units', [data.name, data.units, time])
                         .then(function (result) {
                             resolve(result.rows[0]);
                         })
@@ -116,7 +116,7 @@ module.exports = {
 
 function findOneById(id) {
     return new Promise(function (resolve, reject) {
-        db.query('SELECT * FROM output_types WHERE id = $1', [id])
+        db.query('SELECT * FROM output_types WHERE id = $1 and deleted_at = 0', [id])
             .then(function (result) {
                 if (result.rows[0]) {
                     resolve(result.rows[0]);
