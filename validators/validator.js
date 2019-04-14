@@ -2,6 +2,7 @@ var OutputType = require('../models/output_type');
 var Experiment = require('./../models/experiment');
 var User = require('./../models/user');
 var DeviceOutput = require('./../models/device_output');
+var Generic = require('../models/generic');
 
 module.exports = {
     validateColumns(data, columns) {
@@ -69,6 +70,17 @@ module.exports = {
     validateDeviceOuputId(id) {
         return new Promise(function (resolve, reject) {
             DeviceOutput.findOne({ id: id })
+                .then(function (result) {
+                    resolve(result);
+                })
+                .catch(function (err) {
+                    reject(err);
+                });
+        });
+    },
+    validateGeneric(table, value, columnName) {
+        return new Promise(function (resolve, reject) {
+            Generic.findOneByColumn(table, value, columnName)
                 .then(function (result) {
                     resolve(result);
                 })

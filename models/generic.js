@@ -30,6 +30,23 @@ module.exports = {
         });
     },
 
+    findOneByColumn: function (table, value, columnName) {
+        return new Promise(function (resolve, reject) {
+            db.query('SELECT * FROM ' + table + ' WHERE ' + columnName + ' = $1', [value])
+                .then(function (result) {
+                    if (result.rows[0]) {
+                        resolve(result.rows[0]);
+                    }
+                    else {
+                        reject('no ' + table + ' found')
+                    }
+                })
+                .catch(function (err) {
+                    reject(err);
+                });
+        });
+    },
+
     create: function (table, columns, data) {
         populateTime(columns, data, true);
 
