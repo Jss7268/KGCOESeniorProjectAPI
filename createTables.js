@@ -51,7 +51,7 @@ async function createTables() {
 		console.log(err);
 	}
 	try {
-		await db.query("CREATE TABLE  IF NOT EXISTS output_types " +
+		await db.query("CREATE TABLE IF NOT EXISTS output_types " +
 			"(id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (), " + 
 			"name VARCHAR (100) NOT NULL, " + 
 			"units VARCHAR (100) NOT NULL, " + 

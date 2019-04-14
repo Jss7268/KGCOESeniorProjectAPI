@@ -1,14 +1,12 @@
 var Promise = require('promise');
-var config = require('../config/config');
 var db = require('../config/db');
-var bcrypt = require('bcrypt');
 var User = require('../models/user');
 
 
 module.exports = {
   findAll: function () {
     return new Promise(function (resolve, reject) {
-      db.query('SELECT id, creator_id, notes, description, start_time FROM experiments', [])
+      db.query('SELECT * FROM experiments', [])
         .then(function (results) {
           resolve(results.rows);
         })

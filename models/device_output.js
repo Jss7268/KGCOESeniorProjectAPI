@@ -1,7 +1,5 @@
 var Promise = require('promise');
-var config = require('../config/config');
 var db = require('../config/db');
-var bcrypt = require('bcrypt');
 var User = require('../models/user');
 var Experiment = require('../models/experiment');
 var OutputType = require('../models/output_type');
@@ -9,7 +7,7 @@ var OutputType = require('../models/output_type');
 module.exports = {
     findAll: function () {
         return new Promise(function (resolve, reject) {
-            db.query('SELECT id, creator_id, notes, description, start_time FROM device_outputs', [])
+            db.query('SELECT * FROM device_outputs', [])
                 .then(function (results) {
                     resolve(results.rows);
                 })
