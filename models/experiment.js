@@ -38,8 +38,8 @@ module.exports = {
       validateExperimentData(data)
         .then(function () {
           return db.query(
-            'INSERT INTO experiments (creator_id, start_time, created_at, updated_at) VALUES ($1, $2, $3, $3) returning id',
-            [data.creator_id, data.start_time, time]);
+            'INSERT INTO experiments (creator_id, notes, description, start_time, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $5) returning id',
+            [data.creator_id, data.notes, data.description, data.start_time, time]);
         })
         .then(function (result) {
           resolve(result.rows[0]);
@@ -101,8 +101,8 @@ function findOneById(id) {
 }
 function validateExperimentData(data) {
   return new Promise(function (resolve, reject) {
-    if (!data.creator_id) {
-      reject('creator_id missing')
+    if (!data.creator_id || !data.description) {
+      reject('creator_id or description missing')
     }
     if (!data.start_time) {
       data.start_time = null;

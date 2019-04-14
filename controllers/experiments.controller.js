@@ -6,7 +6,7 @@ module.exports = {
   createExperiment: function(req, res) {
     Experiment.create(req.body)
       .then(function(result) {
-        return res.status(200).json({
+        return res.status(201).json({
           message: 'success! created account for new experiment',
           id: result.id
         });
