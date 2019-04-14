@@ -1,11 +1,12 @@
 var Promise = require('promise');
 var db = require('../config/db');
-var Validator = require('../validators/validator');
+var User = require('../models/user');
+
 
 module.exports = {
     findAll: function () {
         return new Promise(function (resolve, reject) {
-            db.query('SELECT * FROM device_outputs', [])
+            db.query('SELECT * FROM devices_experiments', [])
                 .then(function (results) {
                     resolve(results.rows);
                 })
@@ -31,18 +32,43 @@ module.exports = {
         });
     },
 
+    findAllByDevice: function (data) {
+        return new Promise(function (resolve, reject) {
+            db.query(`SELECT * FROM experiments 
+                    LEFT OUTER JOIN devices_experiments on 
+                    (experiments.id = devices_experiments.experiment_id and 
+                    devices_experiments.device_id = $1)
+                    ORDER BY experiments.start_time, experiments.updated_at DESC`,
+                [data.device_id])
+                .then(function (result) {
+                    resolve(result);
+                })
+                .catch(function (err) {
+                    reject(err);
+                });
+        });
+    },
+
+    findOneByDevice: function (data) {
+        return new Promise(function (resolve, reject) {
+            findAllByDevice(data)
+                .then(function (result) {
+                    resolve(result.rows[0]);
+                })
+                .catch(function (err) {
+                    reject(err);
+                });
+        });
+    },
+
     create: function (data) {
         var time = new Date().getTime();
         return new Promise(function (resolve, reject) {
-            validateDeviceOutputData(data)
+            validateExperimentData(data)
                 .then(function () {
                     return db.query(
-                        'INSERT INTO device_outputs ' +
-                        '(experiment_id, device_id, output_type_id, ' +
-                        'output_value, timestamp, created_at, updated_at) ' +
-                        'VALUES ($1, $2, $3, $3) returning id',
-                        [data.experiment_id, data.device_id, data.output_type_id,
-                        data.output_value, data.timestamp, time]);
+                        'INSERT INTO experiments (creator_id, start_time, created_at, updated_at) VALUES ($1, $2, $3, $3) returning id',
+                        [data.creator_id, data.start_time, time]);
                 })
                 .then(function (result) {
                     resolve(result.rows[0]);
@@ -57,7 +83,7 @@ module.exports = {
     delete: function (data) {
         var time = new Date().getTime();
         return new Promise(function (resolve, reject) {
-            db.query('UPDATE device_outputs SET deleted_at = $2 WHERE id = $1 returning id', [data.id, time])
+            db.query('UPDATE experiments SET deleted_at = $2 WHERE id = $1 returning id', [data.id, time])
                 .then(function (result) {
                     resolve(result.rows[0]);
                 })
@@ -74,7 +100,7 @@ module.exports = {
                 reject('error: id and/or start_time missing')
             }
             else {
-                db.query('UPDATE device_outputs SET start_time = $2, updated_at = $3 WHERE id = $1 returning start_time', [data.id, data.name, time])
+                db.query('UPDATE experiments SET start_time = $2, updated_at = $3 WHERE id = $1 returning start_time', [data.id, data.name, time])
                     .then(function (result) {
                         resolve(result.rows[0]);
                     })
@@ -88,13 +114,13 @@ module.exports = {
 
 function findOneById(id) {
     return new Promise(function (resolve, reject) {
-        db.query('SELECT * FROM device_outputs WHERE id = $1', [id])
+        db.query('SELECT * FROM experiments WHERE id = $1', [id])
             .then(function (result) {
                 if (result.rows[0]) {
                     resolve(result.rows[0]);
                 }
                 else {
-                    reject('no device_output found')
+                    reject('no experiment found')
                 }
             })
             .catch(function (err) {
@@ -102,33 +128,34 @@ function findOneById(id) {
             });
     });
 }
-function validateDeviceOutputData(data) {
+function validateExperimentData(data) {
     return new Promise(function (resolve, reject) {
-        columns =  ['device_id', 'experiment_id', 'output_value', 'timestamp']
-        if (output_type_id in data) {
-            columns.push('output_type_id');
-        } else {
-            columns.push('output_type_name');
+        if (!data.creator_id) {
+            reject('creator_id missing')
         }
-        Validator.validateColumns(data, columns)
-            .then(function () {
-                return Validator.validateDeviceId(data.device_id)
-            })
-            .then(function () {
-                return Validator.validateExperimentId(data.experiment_id);
-            })
-            .then(function () {
-                if (!output_type_id in data) {
-                    return Validator.validateOutputTypeId(data.output_type_id);
-                } else {
-                    return Validator.validateOutputTypeName(data.output_type_name);
-                }
-            })
-            .then(function (output_type_id) {
-                resolve();
+        if (!data.start_time) {
+            data.start_time = null;
+        }
+        else {
+            validateCreatorId(data.creator_id)
+                .then(function () {
+                    resolve();
+                })
+                .catch(function (err) {
+                    reject(err);
+                });
+        }
+    });
+}
+
+function validateCreatorId(creatorId) {
+    return new Promise(function (resolve, reject) {
+        User.findOne({ id: creatorId })
+            .then(function (result) {
+                resolve(result);
             })
             .catch(function (err) {
                 reject(err);
-            })
+            });
     });
 }

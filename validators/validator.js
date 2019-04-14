@@ -3,6 +3,7 @@ var Experiment = require('./../models/experiment');
 var User = require('./../models/user');
 var DeviceOutput = require('./../models/device_output');
 var Generic = require('../models/generic');
+var DeviceExperiment = require('../models/device_experiment');
 
 module.exports = {
     validateColumns(data, columns) {
@@ -78,6 +79,18 @@ module.exports = {
                 });
         });
     },
+    validateDeviceExperiment(deviceId) {
+        return new Promise(function (resolve, reject) {
+            DeviceExperiment.findOneByDevice({ device_id: deviceId })
+                .then(function (result) {
+                    resolve(result);
+                })
+                .catch(function (err) {
+                    reject(err);
+                });
+        })
+    },
+
     validateGeneric(table, value, columnName) {
         return new Promise(function (resolve, reject) {
             Generic.findOneByColumn(table, value, columnName)
