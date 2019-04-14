@@ -19,7 +19,7 @@ async function createTables() {
 			"access smallint NOT NULL DEFAULT 0, " + 
 			"created_at bigint NOT NULL, " + 
 			"updated_at bigint, " + 
-			"deleted_At bigint NOT NULL DEFAULT 0)");
+			"deleted_at bigint NOT NULL DEFAULT 0)");
 	} catch (err) {
 		console.log(err);
 	}
@@ -88,7 +88,7 @@ async function createTables() {
 			"user_id uuid NOT NULL, " + 
 			"created_at bigint NOT NULL, " + 
 			"updated_at bigint, " + 
-			"deleted_At bigint NOT NULL DEFAULT 0, " + 
+			"deleted_at bigint NOT NULL DEFAULT 0, " + 
 			"FOREIGN KEY (experiment_id) REFERENCES experiments (id), " + 
 			"FOREIGN KEY (device_id) REFERENCES users (id), " + 
 			"FOREIGN KEY (user_id) REFERENCES users (id))");
