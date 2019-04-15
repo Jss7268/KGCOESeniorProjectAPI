@@ -11,6 +11,8 @@ router.use(require('./auth.routes'));
 router.use('/v1', require('./v1/users.routes'));
 router.use('/v1', require('./v1/experiments.routes'));
 router.use('/v1', require('./v1/device_outputs.routes'));
+router.use('/v1', require('./v1/output_types.routes'));
+router.use('/v1', require('./v1/devices_experiments.routes'));
 
 // API Error routes
 router.use(function(req, res) {

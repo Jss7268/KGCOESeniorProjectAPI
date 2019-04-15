@@ -1,7 +1,8 @@
 var Promise = require('promise');
 var db = require('../config/db');
-var User = require('../models/user');
-
+var User = require('./user');
+var Validator = require('../validators/validator');
+var DeviceExperiment = require('./device_experiment');
 
 module.exports = {
   findAll: function () {
@@ -71,7 +72,8 @@ module.exports = {
         reject('error: id and/or start_time missing')
       }
       else {
-        db.query('UPDATE experiments SET start_time = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning start_time', [data.id, data.name, time])
+        db.query('UPDATE experiments SET start_time = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning start_time',
+        [data.id, data.start_time, time])
           .then(function (result) {
             resolve(result.rows[0]);
           })

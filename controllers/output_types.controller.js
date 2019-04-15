@@ -7,7 +7,7 @@ module.exports = {
     OutputType.create(req.body)
       .then(function(result) {
         return res.status(200).json({
-          message: 'success! created account for new output_type',
+          message: 'success! created new output_type',
           id: result.id
         });
       })

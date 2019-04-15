@@ -1,22 +1,17 @@
-var OutputType = require('../models/output_type');
-var Experiment = require('./../models/experiment');
-var User = require('./../models/user');
-var DeviceOutput = require('./../models/device_output');
-var Generic = require('../models/generic');
-var DeviceExperiment = require('../models/device_experiment');
+var Generic = require('./../models/generic');
 
 module.exports = {
     validateColumns(data, columns) {
         return new Promise(function (resolve, reject) {
             var msg = 'missing: ';
-            var reject = false;
-            columns.array.forEach(column => {
-                if (!column in data) {
-                    reject = true;
+            var shouldReject = false;
+            columns.forEach(column => {
+                if (!(column in data)) {
+                    shouldReject = true;
                     msg += column + ', ';
                 }
             });
-            if (reject) {
+            if (shouldReject) {
                 reject(msg.substring(0, msg.length - 2)); // remove trailing comma
             } else {
                 resolve();
@@ -25,7 +20,7 @@ module.exports = {
     },
     validateDeviceId(id) {
         return new Promise(function (resolve, reject) {
-            User.findOne({ id: id })
+            Generic.findOne('users', { id: id })
                 .then(function (result) {
                     resolve(result);
                 })
@@ -37,7 +32,7 @@ module.exports = {
 
     validateExperimentId(id) {
         return new Promise(function (resolve, reject) {
-            Experiment.findOne({ id: id })
+            Generic.findOne('experiments', { id: id })
                 .then(function (result) {
                     resolve(result);
                 })
@@ -48,7 +43,7 @@ module.exports = {
     },
     validateOutputTypeId(id) {
         return new Promise(function (resolve, reject) {
-            OutputType.findOne({ id: id })
+            Generic.findOne('output_types', { id: id })
                 .then(function (result) {
                     resolve(result);
                 })
@@ -59,7 +54,7 @@ module.exports = {
     },
     validateOutputTypeName(name) {
         return new Promise(function (resolve, reject) {
-            OutputType.findOne({ name: name })
+            Generic.findOneByColumn('output_types', name, 'name')
                 .then(function (result) {
                     resolve(result);
                 })
@@ -70,7 +65,7 @@ module.exports = {
     },
     validateDeviceOuputId(id) {
         return new Promise(function (resolve, reject) {
-            DeviceOutput.findOne({ id: id })
+            Generic.findOne('device_outputs', { id: id })
                 .then(function (result) {
                     resolve(result);
                 })
@@ -78,17 +73,6 @@ module.exports = {
                     reject(err);
                 });
         });
-    },
-    validateDeviceExperiment(deviceId) {
-        return new Promise(function (resolve, reject) {
-            DeviceExperiment.findOneByDevice({ device_id: deviceId })
-                .then(function (result) {
-                    resolve(result);
-                })
-                .catch(function (err) {
-                    reject(err);
-                });
-        })
     },
 
     validateGeneric(table, value, columnName) {

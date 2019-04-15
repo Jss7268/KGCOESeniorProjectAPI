@@ -7,7 +7,7 @@ module.exports = {
     DeviceOutput.create(req.body)
       .then(function(result) {
         return res.status(200).json({
-          message: 'success! created account for new device_output',
+          message: 'success! created new device_output',
           id: result.id
         });
       })
@@ -18,8 +18,8 @@ module.exports = {
       });
   },
 
-  changeStartTime: function(req, res) {
-    DeviceOutput.updateStartTime({ id: req.params.id, start_time: req.body.start_time })
+  changeOutputValue: function(req, res) {
+    DeviceOutput.updateOutputValue({ id: req.params.id, output_value: req.body.output_value })
       .then(function(result) {
         return res.status(200).json(result);
       })

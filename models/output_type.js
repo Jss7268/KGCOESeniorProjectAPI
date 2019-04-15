@@ -1,5 +1,6 @@
 var Promise = require('promise');
 var db = require('../config/db');
+var Validator = require('../validators/validator');
 
 module.exports = {
     findAll: function () {
@@ -65,21 +66,21 @@ module.exports = {
         var time = new Date().getTime();
         return new Promise(function (resolve, reject) {
             if (data.id) {
-            db.query('UPDATE output_types SET deleted_at = $2 WHERE id = $1 returning id', [data.id, time])
-                .then(function (result) {
-                    resolve(result.rows[0]);
-                })
-                .catch(function (err) {
-                    reject(err);
-                });
+                db.query('UPDATE output_types SET deleted_at = $2 WHERE id = $1 returning id', [data.id, time])
+                    .then(function (result) {
+                        resolve(result.rows[0]);
+                    })
+                    .catch(function (err) {
+                        reject(err);
+                    });
             } else {
                 db.query('UPDATE output_types SET deleted_at = $2 WHERE name = $1 and deleted_at = 0 returning id', [data.name, time])
-                .then(function (result) {
-                    resolve(result.rows[0]);
-                })
-                .catch(function (err) {
-                    reject(err);
-                });
+                    .then(function (result) {
+                        resolve(result.rows[0]);
+                    })
+                    .catch(function (err) {
+                        reject(err);
+                    });
             }
         });
     },
@@ -149,7 +150,5 @@ function findOneByName(name) {
     });
 }
 function validateOutputTypeData(data) {
-    return new Promise(function (resolve, reject) {
-        resolve(); // don't do any validation for now
-    });
+    return Validator.validateColumns(data, ['name']);
 }

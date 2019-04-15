@@ -65,6 +65,35 @@ module.exports = {
       });
   },
 
+  listExperimentsByDevice: function(req, res) {
+    DeviceExperiment.findAllByDevice({
+        device_id: req.params.device_id
+    })
+      .then(function(result) {
+        return res.status(200).json(result);
+      })
+      .catch(function(err) {
+        return res.status(400).json({
+          message: err
+        });
+      });
+  },
+
+  listDevicesByExperiment: function(req, res) {
+    DeviceExperiment.findAllByExperiment({
+        experiment_id: req.params.experiment_id
+    })
+      .then(function(result) {
+        return res.status(200).json(result);
+      })
+      .catch(function(err) {
+        return res.status(400).json({
+          message: err
+        });
+      });
+  },
+
+
   listDevicesExperiments: function(req, res) {
     DeviceExperiment.findAll()
       .then(function(result) {
