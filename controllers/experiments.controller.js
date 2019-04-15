@@ -1,10 +1,14 @@
 var Promise = require('promise');
 var config = require('./../config/config');
 var Experiment = require('./../models/experiment');
+var Verifier = require('../validators/verifier');
 
 module.exports = {
   createExperiment: function(req, res) {
-    Experiment.create(req.body)
+    Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
+      .then(() => {
+        return Experiment.create(req.body)
+      })
       .then(function(result) {
         return res.status(201).json({
           message: 'success! created new experiment',
@@ -12,34 +16,40 @@ module.exports = {
         });
       })
       .catch(function(err) {
-        return res.status(400).json({
-          message: err
+        return res.status(err.status || 400).json({
+          message: err.message || err
         });
       });
   },
 
   changeStartTime: function(req, res) {
-    Experiment.updateStartTime({ id: req.params.id, start_time: req.body.start_time })
+    Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
+      .then(() => {
+        return Experiment.updateStartTime({ id: req.params.id, start_time: req.body.start_time })
+      })
       .then(function(result) {
         return res.status(200).json(result);
       })
       .catch(function(err) {
-        return res.status(400).json({
-          message: err
+        return res.status(err.status || 400).json({
+          message: err.message || err
         });
       });
   },
 
   deleteExperiment: function(req, res) {
-    Experiment.delete({ id: req.params.id })
+    Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
+      .then(() => {
+        return Experiment.delete({ id: req.params.id })
+      })
       .then(function(result) {
         return res.status(200).json({
           message: 'deleted experiment with id: ' + result.id
         });
       })
       .catch(function(err) {
-        return res.status(400).json({
-          message: err
+        return res.status(err.status || 400).json({
+          message: err.message || err
         });
       });
   },

@@ -1,10 +1,14 @@
 var Promise = require('promise');
 var config = require('./../config/config');
 var DeviceExperiment = require('./../models/device_experiment');
+var Verifier = require('../validators/verifier');
 
 module.exports = {
   createDeviceExperiment: function(req, res) {
-    DeviceExperiment.create(req.body)
+    Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
+      .then(() => {
+        return DeviceExperiment.create(req.body)
+      })
       .then(function(result) {
         return res.status(201).json({
           message: 'success! created new device experiment',
@@ -13,15 +17,18 @@ module.exports = {
         });
       })
       .catch(function(err) {
-        return res.status(400).json({
-          message: err
+        return res.status(err.status || 400).json({
+          message: err.message || err
         });
       });
   },
 
   deleteDeviceExperiment: function(req, res) {
-    DeviceExperiment.delete({ experiment_id: req.params.experiment_id,
+    Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
+      .then(() => {
+        return DeviceExperiment.delete({ experiment_id: req.params.experiment_id,
         device_id: req.params.device_id })
+      })
       .then(function(result) {
         return res.status(200).json({
           message: 'deleted device experiment with experiment id: ' + result.experiment_id + 
@@ -29,8 +36,8 @@ module.exports = {
         });
       })
       .catch(function(err) {
-        return res.status(400).json({
-          message: err
+        return res.status(err.status || 400).json({
+          message: err.message || err
         });
       });
   },
