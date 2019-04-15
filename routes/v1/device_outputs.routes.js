@@ -9,6 +9,6 @@ router.get('/device_outputs/:device_id/:experiment_id', deviceOutputsController.
 router.get('/device_outputs/:id', deviceOutputsController.getOneDeviceOutput);
 router.put('/device_outputs/:experiment_id/:device_id/:output_type_id/output_value', deviceOutputsController.changeOutputValue);
 router.get('/device_outputs/:experiment_id/:device_id/:output_type_id', deviceOutputsController.getOneDeviceOutput);
-router.delete('/device_outputs/:experiment_id/:device_id/:output_type_id', deviceOutputsController.deleteDeviceOutput);
+router.delete('/device_outputs/:id', deviceOutputsController.deleteDeviceOutput);
 
 module.exports = router;
