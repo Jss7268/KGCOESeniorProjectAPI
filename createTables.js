@@ -64,7 +64,8 @@ async function createTables() {
 	}
 	try {
 		await db.query(`CREATE TABLE IF NOT EXISTS device_outputs 
-			(experiment_id uuid NOT NULL, 
+			(id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (), 
+			experiment_id uuid NOT NULL, 
 			device_id uuid NOT NULL, 
 			output_type_id uuid NOT NULL, 
 			output_value decimal NOT NULL, 
@@ -72,7 +73,6 @@ async function createTables() {
 			created_at bigint NOT NULL, 
 			updated_at bigint, 
 			deleted_at bigint NOT NULL DEFAULT 0, 
-			PRIMARY KEY (device_id, output_type_id, experiment_id, deleted_at), 
 			FOREIGN KEY (device_id) REFERENCES users (id), 
 			FOREIGN KEY (output_type_id) REFERENCES output_types (id), 
 			FOREIGN KEY (experiment_id) REFERENCES experiments (id))`);

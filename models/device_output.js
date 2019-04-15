@@ -6,7 +6,63 @@ var DeviceExperiment = require('./device_experiment');
 module.exports = {
     findAll: function () {
         return new Promise(function (resolve, reject) {
-            db.query('SELECT * FROM device_outputs where deleted_at = 0', [])
+            db.query(`SELECT * FROM device_outputs where deleted_at = 0
+            ORDER BY timestamp ASC`, [])
+                .then(function (results) {
+                    resolve(results.rows);
+                })
+                .catch(function (err) {
+                    reject(err);
+                });
+        });
+    },
+
+    findAllByDevice: function (data) {
+        return new Promise(function (resolve, reject) {
+            Validator.validateColumns(data, ['device_id'])
+                .then(() => {
+                    return Validator.validateDeviceId(data.device_id);
+                })
+                .then((result) => {
+                    return db.query(`SELECT * FROM device_outputs where device_id = $1 and deleted_at = 0
+                    ORDER BY timestamp ASC`, [result.id])
+                })
+                .then(function (results) {
+                    resolve(results.rows);
+                })
+                .catch(function (err) {
+                    reject(err);
+                });
+        });
+    },
+
+    findAllByExperiment: function (data) {
+        return new Promise(function (resolve, reject) {
+            Validator.validateColumns(data, ['experiment_id'])
+                .then(() => {
+                    return Validator.validateExperimentId(data.experiment_id)
+                })
+                .then((result) => {
+                    return db.query(`SELECT * FROM device_outputs where experiment_id = $1 and deleted_at = 0
+                    ORDER BY timestamp ASC`, [result.id])
+                })
+                .then(function (results) {
+                    resolve(results.rows);
+                })
+                .catch(function (err) {
+                    reject(err);
+                });
+
+        });
+    },
+
+    findAllByDeviceExperiment: function (data) {
+        return new Promise(function (resolve, reject) {
+            DeviceExperiment.findOne(data)
+                .then((result) => {
+                    return db.query(`SELECT * FROM device_outputs where device_id = $1 and experiment_id = $2 and deleted_at = 0
+                    ORDER BY timestamp ASC`, [result.device_id, result.experiment_id])
+                })
                 .then(function (results) {
                     resolve(results.rows);
                 })
@@ -76,7 +132,7 @@ module.exports = {
             }
             else {
                 db.query('UPDATE device_outputs SET output_value = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning output_value',
-                [data.id, data.output_value, time])
+                    [data.id, data.output_value, time])
                     .then(function (result) {
                         resolve(result.rows[0]);
                     })
@@ -106,7 +162,7 @@ function findOneById(id) {
 }
 function validateDeviceOutputData(data) {
     return new Promise(function (resolve, reject) {
-        columns =  ['device_id', 'output_value', 'timestamp']
+        columns = ['device_id', 'output_value', 'timestamp']
         if ('output_type_id' in data) {
             columns.push('output_type_id');
         } else {
@@ -148,4 +204,5 @@ function validateDeviceOutputData(data) {
                 reject(err);
             })
     });
+
 }

@@ -47,8 +47,6 @@ module.exports = {
   getOneDeviceOutput: function(req, res) {
     DeviceOutput.findOne({ id: req.params.id })
       .then(function(result) {
-        /*delete result.last_login_attempt;
-        delete result.login_attempts;*/
         return res.status(200).json(result);
       })
       .catch(function(err) {
@@ -56,6 +54,42 @@ module.exports = {
           message: err
         });
       });
+  },
+
+  listDeviceOutputsByDeviceExperiment: (req, res) => {
+    DeviceOutput.findAllByDeviceExperiment(req.params)
+    .then(function(result) {
+      return res.status(200).json(result);
+    })
+    .catch(function(err) {
+      return res.status(400).json({
+        message: err
+      });
+    });
+  },
+
+  listDeviceOutputsByExperiment: (req, res) => {
+    DeviceOutput.findAllByExperiment(req.params)
+    .then(function(result) {
+      return res.status(200).json(result);
+    })
+    .catch(function(err) {
+      return res.status(400).json({
+        message: err
+      });
+    });
+  },
+
+  listDeviceOutputsByDevice: (req, res) => {
+    DeviceOutput.findAllByDevice(req.params)
+    .then(function(result) {
+      return res.status(200).json(result);
+    })
+    .catch(function(err) {
+      return res.status(400).json({
+        message: err
+      });
+    });
   },
 
   listDeviceOutputs: function(req, res) {
