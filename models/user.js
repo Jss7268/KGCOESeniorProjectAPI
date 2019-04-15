@@ -149,7 +149,7 @@ module.exports = {
           return verifyPassword(data.password, user);
         })
         .then(function (result) {
-          resolve({ isAuthorized: result.isValid, id: result.id });
+          resolve({ isAuthorized: result.isValid, id: result.id, accessLevel: result.accessLevel });
         })
         .catch(function (err) {
           reject(err);
@@ -268,7 +268,7 @@ function verifyPassword(password, user) {
         reject(err);
       }
       else {
-        resolve({ isValid: result, id: user.id });
+        resolve({ isValid: result, id: user.id, accessLevel: user.access_level });
       }
     });
   });

@@ -14,7 +14,7 @@ router.post('/auth/authenticate', function (req, res) {
     .then(function (result) {
       if (result.isAuthorized === true) {
         console.log(result);
-        jwt.sign({ sub: result.id }, config.SECRET, { expiresIn: config.JWT_EXPIRATION, issuer: 'edcs' }, function (err, token) {
+        jwt.sign({ sub: result.id, accessLevel: result.accessLevel }, config.SECRET, { expiresIn: config.JWT_EXPIRATION, issuer: 'edcs' }, function (err, token) {
           return res.status(200).json({
             message: 'authenticated, token attached',
             token: token
@@ -46,6 +46,7 @@ router.use(function (req, res, next) {
           message: 'failed authentication: invalid token'
         });
       }
+      console.log(decoded);
       User.findOne({ 'id': decoded.sub })
         .then(function (user) {
           req.decoded = decoded;

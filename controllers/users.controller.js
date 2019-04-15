@@ -4,7 +4,6 @@ var User = require('./../models/user');
 
 module.exports = {
   createUser: function(req, res) {
-    console.log(req.body);
     User.create(req.body)
       .then(function(result) {
         return res.status(200).json({

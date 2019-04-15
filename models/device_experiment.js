@@ -58,7 +58,7 @@ module.exports = {
             Validator.validateColumns(data, ['experiment_id'])
                 .then(function () {
                     // users table has devices in it as devices are a user sub-type
-                    return db.query(`SELECT users.id, users.name, users.email, users.access FROM users 
+                    return db.query(`SELECT users.id, users.name, users.email, users.access_level FROM users 
                     INNER JOIN devices_experiments on 
                     (users.id = devices_experiments.device_id and 
                     devices_experiments.experiment_id = $1 and
