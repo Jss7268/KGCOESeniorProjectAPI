@@ -113,6 +113,7 @@ async function createTables() {
 	} catch (err) {
 		console.log(err);
 	}
+	
 	console.log("Table creation finished properly");
 	process.exit();
 }

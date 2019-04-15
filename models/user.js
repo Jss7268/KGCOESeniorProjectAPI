@@ -3,11 +3,12 @@ var config = require('./../config/config');
 var db = require('./../config/db');
 var bcrypt = require('bcrypt');
 var Validator = require('../validators/validator');
+var UserAccess = require('./user_access');
 
 module.exports = {
   findAll: function () {
     return new Promise(function (resolve, reject) {
-      db.query('SELECT id, name, email FROM users where deleted_at = 0', [])
+      db.query('SELECT id, name, email, access_level FROM users where deleted_at = 0', [])
         .then(function (results) {
           resolve(results.rows);
         })
@@ -155,6 +156,25 @@ module.exports = {
           reject(err);
         });
     });
+  },
+
+  updateAccess: (data) => {
+    var time = new Date().getTime();
+    return new Promise(function (resolve, reject) {
+      Validator.validateColumns(data, ['id', 'access_level'])
+        .then(function () {
+          return validateAccessLevel(data)
+        })
+        .then(function () {
+          return db.query('UPDATE users SET access_level = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning access_level', [data.id, data.access_level, time]);
+        })
+        .then(function (result) {
+          resolve(result.rows[0]);
+        })
+        .catch(function (err) {
+          reject(err);
+        });
+    });
   }
 };
 
@@ -272,4 +292,16 @@ function verifyPassword(password, user) {
       }
     });
   });
+}
+
+function validateAccessLevel(data) {
+  return new Promise((resolve, reject) => {
+    UserAccess.findOne(data)
+    .then(() => {
+      resolve();
+    })
+    .catch((err) => {
+      reject(err); // todo better error message
+    })
+  })
 }

@@ -5,6 +5,7 @@ var Verifier = require('../validators/verifier');
 
 module.exports = {
   createDeviceOutput: function (req, res) {
+    hydrateReq(req);
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
       .then(() => {
         return DeviceOutput.create(req.body)
@@ -23,6 +24,7 @@ module.exports = {
   },
 
   changeOutputValue: function (req, res) {
+    hydrateReq(req);
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
       .then(() => {
         return DeviceOutput.updateOutputValue({ id: req.params.id, output_value: req.body.output_value })
@@ -38,6 +40,7 @@ module.exports = {
   },
 
   deleteDeviceOutput: function (req, res) {
+    hydrateReq(req);
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
       .then(() => {
         return DeviceOutput.delete({ id: req.params.id })
@@ -114,3 +117,11 @@ module.exports = {
       });
   },
 };
+
+function hydrateReq(req) {
+  // TODO don't hardcode 1 for authorized_device
+  if (req.accessLevel == 1) {
+    // devices can only manipulate data for themselves
+    req.body.device_id = req.decoded.uid
+  }
+}
