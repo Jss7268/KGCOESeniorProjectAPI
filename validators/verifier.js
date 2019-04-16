@@ -14,13 +14,13 @@ module.exports = {
     },
     verifyMinAccessName: (accessLevel, requiredName) => {
         return new Promise((resolve, reject) => {
-            UserAccess.findOneByName({ name: requiredName })
+            UserAccess.findOneByName({ access_name: requiredName })
                 .then((result) => {
                     if (!accessLevel || accessLevel < result.access_level) {
                         var msg = 'failed authorization. Needed access level of: ' + requiredName;
                         UserAccess.findOne({ access_level: accessLevel })
                             .then((access) => {
-                                reject({ status: 403, message: msg + ' but was: ' + access.name});
+                                reject({ status: 403, message: msg + ' but was: ' + access.access_name});
                             })
                             .catch(() => {
                                 reject({ status: 403, message: msg });

@@ -17,8 +17,8 @@ module.exports = {
 
     findOne: function (data) {
         return new Promise(function (resolve, reject) {
-            if (!data.id && !data.name) {
-                reject('error: must provide id or name')
+            if (!data.id && !data.output_type_name) {
+                reject('error: must provide id or output_type_name')
             } else {
                 if (data.id) {
                     findOneById(data.id)
@@ -29,7 +29,7 @@ module.exports = {
                             reject(err);
                         });
                 } else {
-                    findOneByName(data.name)
+                    findOneByName(data.output_type_name)
                         .then(function (result) {
                             resolve(result);
                         })
@@ -48,9 +48,9 @@ module.exports = {
                 .then(function () {
                     return db.query(
                         'INSERT INTO output_types ' +
-                        '(name, units, created_at, updated_at) ' +
+                        '(output_type_name, units, created_at, updated_at) ' +
                         'VALUES ($1, $2, $3, $3) returning id',
-                        [data.name, data.units, time]);
+                        [data.output_type_name, data.units, time]);
                 })
                 .then(function (result) {
                     resolve(result.rows[0]);
@@ -74,7 +74,7 @@ module.exports = {
                         reject(err);
                     });
             } else {
-                db.query('UPDATE output_types SET deleted_at = $2 WHERE name = $1 and deleted_at = 0 returning id', [data.name, time])
+                db.query('UPDATE output_types SET deleted_at = $2 WHERE output_type_name = $1 and deleted_at = 0 returning id', [data.output_type_name, time])
                     .then(function (result) {
                         resolve(result.rows[0]);
                     })
@@ -88,8 +88,8 @@ module.exports = {
     updateUnits: function (data) {
         var time = new Date().getTime();
         return new Promise(function (resolve, reject) {
-            if ((!data.id && !data.name) || !data.units) {
-                reject('error: id or name and/or units missing')
+            if ((!data.id && !data.output_type_name) || !data.units) {
+                reject('error: id or output_type_name and/or units missing')
             }
             else {
                 if (data.id) {
@@ -101,7 +101,7 @@ module.exports = {
                             reject(err);
                         });
                 } else {
-                    db.query('UPDATE output_types SET units = $2, updated_at = $3 WHERE name = $1 and deleted_at = 0 returning units', [data.name, data.units, time])
+                    db.query('UPDATE output_types SET units = $2, updated_at = $3 WHERE output_type_name = $1 and deleted_at = 0 returning units', [data.output_type_name, data.units, time])
                         .then(function (result) {
                             resolve(result.rows[0]);
                         })
@@ -133,9 +133,9 @@ function findOneById(id) {
 }
 
 
-function findOneByName(name) {
+function findOneByName(output_type_name) {
     return new Promise(function (resolve, reject) {
-        db.query('SELECT * FROM output_types WHERE name = $1 and deleted_at = 0', [name])
+        db.query('SELECT * FROM output_types WHERE output_type_name = $1 and deleted_at = 0', [output_type_name])
             .then(function (result) {
                 if (result.rows[0]) {
                     resolve(result.rows[0]);
@@ -150,5 +150,5 @@ function findOneByName(name) {
     });
 }
 function validateOutputTypeData(data) {
-    return Validator.validateColumns(data, ['name']);
+    return Validator.validateColumns(data, ['output_type_name']);
 }

@@ -6,8 +6,12 @@ var DeviceExperiment = require('./device_experiment');
 module.exports = {
     findAll: function () {
         return new Promise(function (resolve, reject) {
-            db.query(`SELECT * FROM device_outputs where deleted_at = 0
-            ORDER BY timestamp ASC`, [])
+            db.query(`SELECT * FROM device_outputs
+            LEFT JOIN output_types on device_outputs.output_type_id = output_types.id
+            LEFT JOIN sanitized_users on (device_outputs.device_id = sanitized_users.id)
+            LEFT JOIN experiments on (device_outputs.experiment_id = experiments.id)
+            where device_outputs.deleted_at = 0
+            ORDER BY device_outputs.timestamp ASC`, [])
                 .then(function (results) {
                     resolve(results.rows);
                 })
@@ -43,8 +47,12 @@ module.exports = {
                     return Validator.validateExperimentId(data.experiment_id)
                 })
                 .then((result) => {
-                    return db.query(`SELECT * FROM device_outputs where experiment_id = $1 and deleted_at = 0
-                    ORDER BY timestamp ASC`, [result.id])
+                    return db.query(`SELECT * FROM device_outputs
+                    LEFT JOIN output_types on (device_outputs.output_type_id = output_types.id)
+                    LEFT JOIN sanitized_users on (device_outputs.device_id = sanitized_users.id)
+                    LEFT JOIN experiments on (device_outputs.experiment_id = experiments.id)
+                    where device_outputs.experiment_id = $1 and device_outputs.deleted_at = 0
+                    ORDER BY device_outputs.timestamp ASC`, [result.id])
                 })
                 .then(function (results) {
                     resolve(results.rows);
@@ -60,8 +68,12 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             DeviceExperiment.findOne(data)
                 .then((result) => {
-                    return db.query(`SELECT * FROM device_outputs where device_id = $1 and experiment_id = $2 and deleted_at = 0
-                    ORDER BY timestamp ASC`, [result.device_id, result.experiment_id])
+                    return db.query(`SELECT * FROM device_outputs
+                    LEFT JOIN output_types on (device_outputs.output_type_id = output_types.id)
+                    LEFT JOIN sanitized_users on (device_outputs.device_id = sanitized_users.id)
+                    LEFT JOIN experiments on (device_outputs.experiment_id = experiments.id)
+                    where device_outputs.device_id = $1 and device_outputs.experiment_id = $2 and device_outputs.deleted_at = 0
+                    ORDER BY device_outputs.timestamp ASC`, [result.device_id, result.experiment_id])
                 })
                 .then(function (results) {
                     resolve(results.rows);

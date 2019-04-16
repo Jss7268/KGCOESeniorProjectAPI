@@ -148,6 +148,6 @@ function hydrateReq(req) {
         req.params.id = req.decoded.uid;
         resolve();
       })
-  })
+  });
 
 }

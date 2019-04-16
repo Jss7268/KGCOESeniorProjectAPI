@@ -40,7 +40,7 @@ module.exports = {
   changeUnitsName: function(req, res) {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
       .then(() => {
-        return OutputType.updateUnits({ name: req.params.name, units: req.body.units })
+        return OutputType.updateUnits({ output_type_name: req.params.output_type_name, units: req.body.units })
       })
       .then(function(result) {
         return res.status(200).json(result);
@@ -72,7 +72,7 @@ module.exports = {
   deleteOutputTypeName: function(req, res) {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
       .then(() => {
-        return OutputType.delete({ name: req.params.name })
+        return OutputType.delete({ output_type_name: req.params.output_type_name })
       })
       .then(function(result) {
         return res.status(200).json({
@@ -99,7 +99,7 @@ module.exports = {
   },
 
   getOneOutputTypeName: function(req, res) {
-    OutputType.findOne({ name: req.params.name })
+    OutputType.findOne({ output_type_name: req.params.output_type_name })
       .then(function(result) {
         return res.status(200).json(result);
       })
