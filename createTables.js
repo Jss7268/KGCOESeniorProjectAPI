@@ -29,6 +29,7 @@ async function createTables() {
 			created_at bigint NOT NULL, 
 			updated_at bigint, 
 			deleted_at bigint NOT NULL DEFAULT 0,
+			UNIQUE (email, deleted_at),
 			FOREIGN KEY (access_level) REFERENCES user_access (access_level))`);
 	} catch (err) {
 		console.log(err);
@@ -117,6 +118,12 @@ async function createTables() {
 		for (i = 0; i < accessLevels.length; i ++) {
 			await db.query(`INSERT INTO user_access (access_level, access_name, description) VALUES ($1, $2, $3) ON CONFLICT (access_level) DO NOTHING`, [i, accessLevels[i][0], accessLevels[i][1]]);
 		}
+	} catch (err) {
+		console.log(err);
+	}
+
+	try {
+		await db.query(`UPDATE users SET access_level = (SELECT access_level from user_access where access_name = $1) where email = $2 and deleted_at = 0`, ['admin_user', 'test@admin.com']);
 	} catch (err) {
 		console.log(err);
 	}

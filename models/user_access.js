@@ -35,7 +35,7 @@ module.exports = {
       Validator.validateColumns(data, ['access_name'])
 
       .then(() => {
-          return db.query('SELECT * from user_access where access_name = $1', [data.name])
+          return db.query('SELECT * from user_access where access_name = $1', [data.access_name])
       })
       .then(function (results) {
         resolve(results.rows[0]);

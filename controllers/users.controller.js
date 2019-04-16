@@ -141,6 +141,9 @@ function hydrateReq(req) {
   return new Promise((resolve, reject) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'admin_user')
       .then(() => {
+        if (!('id' in req.params)) {
+          req.params.id = req.decoded.uid;
+        }
         resolve();
       })
       .catch(() => {

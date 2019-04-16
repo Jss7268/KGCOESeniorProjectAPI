@@ -88,11 +88,14 @@ function hydrateReq(req) {
   return new Promise((resolve, reject) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'admin_user')
       .then(() => {
+        if (!('creator_id' in req.body)) {
+          req.body.creator_id = req.decoded.uid;
+        }
         resolve();
       })
       .catch(() => {
         // only an admin can fake different users
-        req.params.creator_id = req.decoded.uid;
+        req.body.creator_id = req.decoded.uid;
         resolve();
       })
   });
