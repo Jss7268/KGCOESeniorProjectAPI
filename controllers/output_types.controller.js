@@ -1,14 +1,13 @@
 var Promise = require('promise');
 var config = require('./../config/config');
-var User = require('./../models/user');
+var OutputType = require('./../models/output_type');
 
 module.exports = {
-  createUser: function(req, res) {
-    console.log(req.body);
-    User.create(req.body)
+  createOutputType: function(req, res) {
+    OutputType.create(req.body)
       .then(function(result) {
         return res.status(200).json({
-          message: 'success! created account for new user',
+          message: 'success! created new output_type',
           id: result.id
         });
       })
@@ -19,8 +18,8 @@ module.exports = {
       });
   },
 
-  changeName: function(req, res) {
-    User.updateName({ id: req.params.id, name: req.body.name })
+  changeUnits: function(req, res) {
+    OutputType.updateUnits({ id: req.params.id, units: req.body.units })
       .then(function(result) {
         return res.status(200).json(result);
       })
@@ -31,8 +30,8 @@ module.exports = {
       });
   },
 
-  changeEmail: function(req, res) {
-    User.updateEmail({ id: req.params.id, email: req.body.email })
+  changeUnitsName: function(req, res) {
+    OutputType.updateUnits({ name: req.params.name, units: req.body.units })
       .then(function(result) {
         return res.status(200).json(result);
       })
@@ -43,23 +42,11 @@ module.exports = {
       });
   },
 
-  changePassword: function(req, res) {
-    User.updatePassword({ id: req.params.id, password: req.body.password })
-      .then(function(result) {
-        return res.status(200).json(result);
-      })
-      .catch(function(err) {
-        return res.status(400).json({
-          message: err
-        });
-      });
-  },
-
-  deleteUser: function(req, res) {
-    User.delete({ id: req.params.id })
+  deleteOutputType: function(req, res) {
+    OutputType.delete({ id: req.params.id })
       .then(function(result) {
         return res.status(200).json({
-          message: 'deleted user with id: ' + result.id
+          message: 'deleted output_type with id: ' + result.id
         });
       })
       .catch(function(err) {
@@ -69,11 +56,23 @@ module.exports = {
       });
   },
 
-  getOneUser: function(req, res) {
-    User.findOne({ id: req.params.id })
+  deleteOutputTypeName: function(req, res) {
+    OutputType.delete({ name: req.params.name })
       .then(function(result) {
-        /*delete result.last_login_attempt;
-        delete result.login_attempts;*/
+        return res.status(200).json({
+          message: 'deleted output_type with id: ' + result.id
+        });
+      })
+      .catch(function(err) {
+        return res.status(400).json({
+          message: err
+        });
+      });
+  },
+
+  getOneOutputType: function(req, res) {
+    OutputType.findOne({ id: req.params.id })
+      .then(function(result) {
         return res.status(200).json(result);
       })
       .catch(function(err) {
@@ -83,11 +82,9 @@ module.exports = {
       });
   },
 
-  getSelfUser: function(req, res) {
-    User.findOne({ id: req.decoded.sub })
+  getOneOutputTypeName: function(req, res) {
+    OutputType.findOne({ name: req.params.name })
       .then(function(result) {
-        /*delete result.last_login_attempt;
-        delete result.login_attempts;*/
         return res.status(200).json(result);
       })
       .catch(function(err) {
@@ -97,8 +94,8 @@ module.exports = {
       });
   },
 
-  listUsers: function(req, res) {
-    User.findAll()
+  listOutputTypes: function(req, res) {
+    OutputType.findAll()
       .then(function(result) {
         return res.status(200).json(result);
       })

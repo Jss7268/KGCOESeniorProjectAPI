@@ -2,43 +2,44 @@ var Promise = require('promise');
 var config = require('./../config/config');
 var db = require('./../config/db');
 var bcrypt = require('bcrypt');
+var Validator = require('../validators/validator');
 
 module.exports = {
-  findAll: function() {
-    return new Promise(function(resolve, reject) {
-      db.query('SELECT id, name, email FROM users', [])
-        .then(function(results) {
+  findAll: function () {
+    return new Promise(function (resolve, reject) {
+      db.query('SELECT id, name, email FROM users where deleted_at = 0', [])
+        .then(function (results) {
           resolve(results.rows);
         })
-        .catch(function(err) {
+        .catch(function (err) {
           reject(err);
         });
     });
   },
 
-  findOne: function(data) {
-    return new Promise(function(resolve, reject) {
+  findOne: function (data) {
+    return new Promise(function (resolve, reject) {
       if (!data.id && !data.email) {
         reject('error: must provide id or email')
       }
       else {
         if (data.id) {
           findOneById(data.id)
-            .then(function(result) {
-              delete result.password;
+            .then(function (result) {
+              delete result.hashed_password;
               resolve(result);
             })
-            .catch(function(err) {
+            .catch(function (err) {
               reject(err);
             });
         }
         else if (data.email) {
           findOneByEmail(data.email)
-            .then(function(result) {
+            .then(function (result) {
               delete result.password;
               resolve(result);
             })
-            .catch(function(err) {
+            .catch(function (err) {
               reject(err);
             });
         }
@@ -46,129 +47,121 @@ module.exports = {
     });
   },
 
-  create: function(data) {
+  create: function (data) {
     var time = new Date().getTime();
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       validateUserData(data)
-        .then(function() {
+        .then(function () {
           return hashPassword(data.password);
         })
-        .then(function(hash) {
+        .then(function (hash) {
           return db.query(
-            'INSERT INTO users (name, email, hashed_password, created_at, updated_At) VALUES ($1, $2, $3, $4, $4) returning id',
+            'INSERT INTO users (name, email, hashed_password, created_at, updated_at) VALUES ($1, $2, $3, $4, $4) returning id',
             [data.name, data.email, hash, time]);
         })
-        .then(function(result) {
+        .then(function (result) {
           resolve(result.rows[0]);
         })
-        .catch(function(err) {
+        .catch(function (err) {
           console.log(err);
           reject(err);
         });
     });
   },
 
-  delete: function(data) {
-    return new Promise(function(resolve, reject) {
-      db.query('DELETE FROM users WHERE id = $1 returning id', [data.id])
-        .then(function(result) {
+  delete: function (data) {
+    var time = new Date().getTime();
+    return new Promise(function (resolve, reject) {
+      db.query('UPDATE users SET deleted_at = $2 WHERE id = $1 returning id', [data.id, time])
+        .then(function (result) {
           resolve(result.rows[0]);
         })
-        .catch(function(err) {
+        .catch(function (err) {
           reject(err);
         });
     });
   },
 
-  updateName: function(data) {
+  updateName: function (data) {
     var time = new Date().getTime();
-    return new Promise(function(resolve, reject) {
-      if (!data.id || !data.name) {
-        reject('error: id and/or name missing')
-      }
-      else {
-        db.query('UPDATE users SET name = $2, updated_at = $3 WHERE id = $1 returning name', [data.id, data.name, time])
-          .then(function(result) {
-            resolve(result.rows[0]);
-          })
-          .catch(function(err) {
-            reject(err);
-          });
-      }
+    return new Promise(function (resolve, reject) {
+      Validator.validateColumns(data, ['id', 'name'])
+        .then(function () {
+          return db.query('UPDATE users SET name = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning name', [data.id, data.name, time])
+        })
+        .then(function (result) {
+          resolve(result.rows[0]);
+        })
+        .catch(function (err) {
+          reject(err);
+        });
     });
   },
 
-  updateEmail: function(data) {
+  updateEmail: function (data) {
     var time = new Date().getTime();
-    return new Promise(function(resolve, reject) {
-      if (!data.id || !data.email) {
-        reject('error: id and/or email missing')
-      }
-      else {
-        validateEmail(data.email)
-          .then(function() {
-            return db.query('UPDATE users SET email = $2, updated_at = $3 WHERE id = $1 returning email', [data.id, data.email, time]);
-          })
-          .then(function(result) {
-            resolve(result.rows[0]);
-          })
-          .catch(function(err) {
-            reject(err);
-          });
-      }
+    return new Promise(function (resolve, reject) {
+      Validator.validateColumns(data, ['id', 'email'])
+        .then(function () {
+          return validateEmail(data.email)
+        })
+        .then(function () {
+          return db.query('UPDATE users SET email = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning email', [data.id, data.email, time]);
+        })
+        .then(function (result) {
+          resolve(result.rows[0]);
+        })
+        .catch(function (err) {
+          reject(err);
+        });
     });
   },
 
-  updatePassword: function(data) {
+  updatePassword: function (data) {
     var time = new Date().getTime();
-    return new Promise(function(resolve, reject) {
-      if (!data.id || !data.password) {
-        reject('error: id and/or password missing')
-      }
-      else {
-        validatePassword(data.password, 6)
-          .then(function() {
-            return hashPassword(data.password);
-          })
-          .then(function(hash) {
-            return db.query('UPDATE users SET hashed_password = $2, updated_at = $3 WHERE id = $1 returning id', [data.id, hash, time]);
-          })
-          .then(function(result) {
-            resolve(result.rows[0]);
-          })
-          .catch(function(err) {
-            reject(err);
-          });
-      }
+    return new Promise(function (resolve, reject) {
+      Validator.validateColumns(data, ['id', 'password'])
+        .then(function () {
+          return validatePassword(data.password, 6)
+        })
+        .then(function () {
+          return hashPassword(data.password);
+        })
+        .then(function (hash) {
+          return db.query('UPDATE users SET hashed_password = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning id', [data.id, hash, time]);
+        })
+        .then(function (result) {
+          resolve(result.rows[0]);
+        })
+        .catch(function (err) {
+          reject(err);
+        });
     });
   },
 
-  authenticate: function(data) {
-    return new Promise(function(resolve, reject) {
-      if (!data.email || !data.password) {
-        reject('error: email and/or password missing')
-      }
-      else {
-        // change all of this to one transaction?
-        findOneByEmail(data.email)
-          .then(function(user) {
-            return verifyPassword(data.password, user);
-          })
-          .then(function(result) {
-            resolve({ isAuthorized: result.isValid, id: result.id });
-          })
-          .catch(function(err) {
-            reject(err);
-          });
-      }
+  authenticate: function (data) {
+    return new Promise(function (resolve, reject) {
+      Validator.validateColumns(data, ['email', 'password'])
+        .then(function () {
+          return findOneByEmail(data.email)
+        })
+        .then(function (user) {
+          return verifyPassword(data.password, user);
+        })
+        .then(function (result) {
+          resolve({ isAuthorized: result.isValid, id: result.id });
+        })
+        .catch(function (err) {
+          reject(err);
+        });
     });
   }
 };
 
 function findOneById(id) {
-  return new Promise(function(resolve, reject) {
-    db.query('SELECT * FROM users WHERE id = $1', [id])
-      .then(function(result) {
+  return new Promise(function (resolve, reject) {
+    db.query('SELECT * FROM users WHERE id = $1 and deleted_at = 0', [id])
+      .then(function (result) {
         if (result.rows[0]) {
           resolve(result.rows[0]);
         }
@@ -176,16 +169,16 @@ function findOneById(id) {
           reject('no user found')
         }
       })
-      .catch(function(err) {
+      .catch(function (err) {
         reject(err);
       });
   });
 }
 
 function findOneByEmail(email) {
-  return new Promise(function(resolve, reject) {
-    db.query('SELECT * FROM users WHERE email = $1', [email])
-      .then(function(result) {
+  return new Promise(function (resolve, reject) {
+    db.query('SELECT * FROM users WHERE email = $1 and deleted_at = 0', [email])
+      .then(function (result) {
         if (result.rows[0]) {
           resolve(result.rows[0]);
         }
@@ -193,20 +186,20 @@ function findOneByEmail(email) {
           reject('no user found')
         }
       })
-      .catch(function(err) {
+      .catch(function (err) {
         reject(err);
       });
   });
 }
 
 function hashPassword(password) {
-  return new Promise(function(resolve, reject) {
-    bcrypt.genSalt(10, function(err, salt) {
+  return new Promise(function (resolve, reject) {
+    bcrypt.genSalt(10, function (err, salt) {
       if (err) {
         reject(err);
       }
       else {
-        bcrypt.hash(password, salt, function(err, hash) {
+        bcrypt.hash(password, salt, function (err, hash) {
           if (err) {
             reject(err);
           }
@@ -220,27 +213,25 @@ function hashPassword(password) {
 }
 
 function validateUserData(data) {
-  return new Promise(function(resolve, reject) {
-    if (!data.password || !data.email) {
-      reject('email and/or password missing')
-    }
-    else {
-      validatePassword(data.password, 6)
-        .then(function() {
-          return validateEmail(data.email);
-        })
-        .then(function() {
-          resolve();
-        })
-        .catch(function(err) {
-          reject(err);
-        });
-    }
+  return new Promise(function (resolve, reject) {
+    Validator.validateColumns(data, ['email', 'password'])
+      .then(function () {
+        return validatePassword(data.password, 6)
+      })
+      .then(function () {
+        return validateEmail(data.email);
+      })
+      .then(function () {
+        resolve();
+      })
+      .catch(function (err) {
+        reject(err);
+      });
   });
 }
 
 function validateEmail(email) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     if (typeof (email) !== 'string') {
       reject('email must be a string');
     }
@@ -257,7 +248,7 @@ function validateEmail(email) {
 }
 
 function validatePassword(password, minCharacters) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     if (typeof (password) !== 'string') {
       reject('password must be a string');
     }
@@ -271,8 +262,8 @@ function validatePassword(password, minCharacters) {
 }
 
 function verifyPassword(password, user) {
-  return new Promise(function(resolve, reject) {
-    bcrypt.compare(password, user.hashed_password, function(err, result) {
+  return new Promise(function (resolve, reject) {
+    bcrypt.compare(password, user.hashed_password, function (err, result) {
       if (err) {
         reject(err);
       }
