@@ -4,118 +4,118 @@ var OutputType = require('./../models/output_type');
 var Verifier = require('../validators/verifier');
 
 module.exports = {
-  createOutputType: function(req, res) {
+  createOutputType: (req, res) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
       .then(() => {
         return OutputType.create(req.body)
       })
-      .then(function(result) {
+      .then((result) => {
         return res.status(200).json({
           message: 'success! created new output_type',
           id: result.id
         });
       })
-      .catch(function(err) {
+      .catch((err) => {
         return res.status(err.status || 400).json({
           message: err.message || err
         });
       });
   },
 
-  changeUnits: function(req, res) {
+  changeUnits: (req, res) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
       .then(() => {
         return OutputType.updateUnits({ id: req.params.id, units: req.body.units })
       })
-      .then(function(result) {
+      .then((result) => {
         return res.status(200).json(result);
       })
-      .catch(function(err) {
+      .catch((err) => {
         return res.status(err.status || 400).json({
           message: err.message || err
         });
       });
   },
 
-  changeUnitsName: function(req, res) {
+  changeUnitsName: (req, res) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
       .then(() => {
         return OutputType.updateUnits({ output_type_name: req.params.output_type_name, units: req.body.units })
       })
-      .then(function(result) {
+      .then((result) => {
         return res.status(200).json(result);
       })
-      .catch(function(err) {
+      .catch((err) => {
         return res.status(err.status || 400).json({
           message: err.message || err
         });
       });
   },
 
-  deleteOutputType: function(req, res) {
+  deleteOutputType: (req, res) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
       .then(() => {
         return OutputType.delete({ id: req.params.id })
       })
-      .then(function(result) {
+      .then((result) => {
         return res.status(200).json({
           message: 'deleted output_type with id: ' + result.id
         });
       })
-      .catch(function(err) {
+      .catch((err) => {
         return res.status(err.status || 400).json({
           message: err.message || err
         });
       });
   },
 
-  deleteOutputTypeName: function(req, res) {
+  deleteOutputTypeName: (req, res) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
       .then(() => {
         return OutputType.delete({ output_type_name: req.params.output_type_name })
       })
-      .then(function(result) {
+      .then((result) => {
         return res.status(200).json({
           message: 'deleted output_type with id: ' + result.id
         });
       })
-      .catch(function(err) {
+      .catch((err) => {
         return res.status(err.status || 400).json({
           message: err.message || err
         });
       });
   },
 
-  getOneOutputType: function(req, res) {
+  getOneOutputType: (req, res) => {
     OutputType.findOne({ id: req.params.id })
-      .then(function(result) {
+      .then((result) => {
         return res.status(200).json(result);
       })
-      .catch(function(err) {
+      .catch((err) => {
         return res.status(400).json({
           message: err
         });
       });
   },
 
-  getOneOutputTypeName: function(req, res) {
+  getOneOutputTypeName: (req, res) => {
     OutputType.findOne({ output_type_name: req.params.output_type_name })
-      .then(function(result) {
+      .then((result) => {
         return res.status(200).json(result);
       })
-      .catch(function(err) {
+      .catch((err) => {
         return res.status(400).json({
           message: err
         });
       });
   },
 
-  listOutputTypes: function(req, res) {
+  listOutputTypes: (req, res) => {
     OutputType.findAll()
-      .then(function(result) {
+      .then((result) => {
         return res.status(200).json(result);
       })
-      .catch(function(err) {
+      .catch((err) => {
         return res.status(400).json({
           message: err
         });

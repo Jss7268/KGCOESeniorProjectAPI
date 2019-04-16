@@ -9,12 +9,12 @@ var usersController = require('./../controllers/users.controller');
 router.post('/auth/register', usersController.createUser);
 
 // Authentication to obtain a token
-router.post('/auth/authenticate', function (req, res) {
+router.post('/auth/authenticate', (req, res) => {
   User.authenticate(req.body)
-    .then(function (result) {
+    .then((result) => {
       if (result.isAuthorized === true) {
         console.log(result);
-        jwt.sign({ uid: result.id, accessLevel: result.accessLevel }, config.SECRET, { expiresIn: config.JWT_EXPIRATION, issuer: 'edcs' }, function (err, token) {
+        jwt.sign({ uid: result.id, accessLevel: result.accessLevel }, config.SECRET, { expiresIn: config.JWT_EXPIRATION, issuer: 'edcs' }, (err, token) => {
           return res.status(200).json({
             message: 'authenticated, token attached',
             token: token
@@ -27,7 +27,7 @@ router.post('/auth/authenticate', function (req, res) {
         });
       }
     })
-    .catch(function (err) {
+    .catch((err) => {
       console.log(err);
       return res.status(400).json({
         message: err
@@ -36,22 +36,22 @@ router.post('/auth/authenticate', function (req, res) {
 });
 
 // Any route past this point requires a valid auth token
-router.use(function (req, res, next) {
+router.use((req, res, next) => {
   var token = (req.body.token || req.query.token || req.headers['authorization'])
     .replace('Bearer ', '');
   if (token) {
-    jwt.verify(token, config.SECRET, function (err, decoded) {
+    jwt.verify(token, config.SECRET, (err, decoded) => {
       if (err) {
         return res.status(401).json({
           message: 'failed authentication: invalid token'
         });
       }
       User.findOne({ 'id': decoded.uid })
-        .then(function (user) {
+        .then((user) => {
           req.decoded = decoded;
           next();
         })
-        .catch(function (err) {
+        .catch((err) => {
           return res.status(401).json({
             message: 'failed authentication: ' + err
           });

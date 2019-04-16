@@ -5,25 +5,25 @@ var Validator = require('../validators/validator');
 
 module.exports = {
     findAll: function () {
-        return new Promise(function (resolve, reject) {
+        return new Promise((resolve, reject) => {
             db.query('SELECT * FROM devices_experiments where deleted_at = 0', [])
-                .then(function (results) {
+                .then((results) => {
                     resolve(results.rows);
                 })
-                .catch(function (err) {
+                .catch((err) => {
                     reject(err);
                 });
         });
     },
 
-    findOne: function (data) {
-        return new Promise(function (resolve, reject) {
+    findOne: (data) => {
+        return new Promise((resolve, reject) => {
             Validator.validateColumns(data, ['device_id', 'experiment_id'])
                 .then(function () {
                     return db.query('SELECT * FROM devices_experiments WHERE device_id = $1 and experiment_id = $2 and deleted_at = 0',
                         [data.device_id, data.experiment_id])
                 })
-                .then(function (result) {
+                .then((result) => {
                     if (result.rows[0]) {
                         resolve(result.rows[0]);
                     }
@@ -31,7 +31,7 @@ module.exports = {
                         reject('no device experiment found')
                     }
                 })
-                .catch(function (err) {
+                .catch((err) => {
                     reject(err);
                 });
         });
@@ -41,20 +41,20 @@ module.exports = {
         return findAllByDevice(data);
     },
 
-    findOneByDevice: function (data) {
-        return new Promise(function (resolve, reject) {
+    findOneByDevice: (data) => {
+        return new Promise((resolve, reject) => {
             findAllByDevice(data)
-                .then(function (rows) {
+                .then((rows) => {
                     resolve(rows[0]);
                 })
-                .catch(function (err) {
+                .catch((err) => {
                     reject(err);
                 });
         });
     },
 
-    findAllByExperiment: function (data) {
-        return new Promise(function (resolve, reject) {
+    findAllByExperiment: (data) => {
+        return new Promise((resolve, reject) => {
             Validator.validateColumns(data, ['experiment_id'])
                 .then(function () {
                     // users table has devices in it as devices are a user sub-type
@@ -66,18 +66,18 @@ module.exports = {
                     ORDER BY users.updated_at DESC`,
                         [data.experiment_id])
                 })
-                .then(function (result) {
+                .then((result) => {
                     resolve(result.rows);
                 })
-                .catch(function (err) {
+                .catch((err) => {
                     reject(err);
                 });
         });
     },
 
-    create: function (data) {
+    create: (data) => {
         var time = new Date().getTime();
-        return new Promise(function (resolve, reject) {
+        return new Promise((resolve, reject) => {
             validateDevicesExperimentsData(data)
                 .then(function () {
                     return db.query(
@@ -87,25 +87,25 @@ module.exports = {
                         returning experiment_id, device_id`,
                         [data.experiment_id, data.device_id, time]);
                 })
-                .then(function (result) {
+                .then((result) => {
                     resolve(result.rows[0]);
                 })
-                .catch(function (err) {
+                .catch((err) => {
                     console.log(err);
                     reject(err);
                 });
         });
     },
 
-    delete: function (data) {
+    delete: (data) => {
         var time = new Date().getTime();
-        return new Promise(function (resolve, reject) {
+        return new Promise((resolve, reject) => {
             db.query('UPDATE devices_experiments SET deleted_at = $3 WHERE experiment_id = $1 and device_id = $2 returning experiment_id, device_id',
                 [data.experiment_id, data.device_id, time])
-                .then(function (result) {
+                .then((result) => {
                     resolve(result.rows[0]);
                 })
-                .catch(function (err) {
+                .catch((err) => {
                     reject(err);
                 });
         });
@@ -113,7 +113,7 @@ module.exports = {
 };
 
 function validateDevicesExperimentsData(data) {
-    return new Promise(function (resolve, reject) {
+    return new Promise((resolve, reject) => {
         Validator.validateColumns(data, ['experiment_id', 'device_id'])
             .then(function () {
                 return Validator.validateExperimentId(data.experiment_id)
@@ -124,14 +124,14 @@ function validateDevicesExperimentsData(data) {
             .then(function () {
                 resolve();
             })
-            .catch(function (err) {
+            .catch((err) => {
                 reject(err);
             });
     });
 }
 
 function findAllByDevice(data) {
-    return new Promise(function (resolve, reject) {
+    return new Promise((resolve, reject) => {
         Validator.validateColumns(data, ['device_id'])
             .then(function () {
                 return db.query(`SELECT * FROM experiments 
@@ -142,10 +142,10 @@ function findAllByDevice(data) {
                 ORDER BY experiments.start_time, experiments.updated_at DESC`,
                     [data.device_id])
             })
-            .then(function (result) {
+            .then((result) => {
                 resolve(result.rows);
             })
-            .catch(function (err) {
+            .catch((err) => {
                 reject(err);
             });
     });

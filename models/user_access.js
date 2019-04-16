@@ -4,43 +4,43 @@ var Validator = require('../validators/validator');
 
 module.exports = {
   findAll: function () {
-    return new Promise(function (resolve, reject) {
+    return new Promise((resolve, reject) => {
       db.query('SELECT * from user_access', [])
-        .then(function (results) {
+        .then((results) => {
           resolve(results.rows);
         })
-        .catch(function (err) {
+        .catch((err) => {
           reject(err);
         });
     });
   },
 
-  findOne: function (data) {
-    return new Promise(function (resolve, reject) {
+  findOne: (data) => {
+    return new Promise((resolve, reject) => {
       Validator.validateColumns(data, ['access_level'])
       .then(() => {
           return db.query('SELECT * from user_access where access_level = $1', [data.access_level])
       })
-      .then(function (results) {
+      .then((results) => {
         resolve(results.rows[0]);
       })
-      .catch(function (err) {
+      .catch((err) => {
         reject(err);
       });
     });
   },
 
-  findOneByName: function (data) {
-    return new Promise(function (resolve, reject) {
+  findOneByName: (data) => {
+    return new Promise((resolve, reject) => {
       Validator.validateColumns(data, ['access_name'])
 
       .then(() => {
           return db.query('SELECT * from user_access where access_name = $1', [data.access_name])
       })
-      .then(function (results) {
+      .then((results) => {
         resolve(results.rows[0]);
       })
-      .catch(function (err) {
+      .catch((err) => {
 
         reject(err);
       });

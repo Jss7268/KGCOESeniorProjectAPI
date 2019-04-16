@@ -4,60 +4,60 @@ var User = require('./../models/user');
 var Verifier = require('./../validators/verifier');
 
 module.exports = {
-  createUser: function (req, res) {
+  createUser: (req, res) => {
     User.create(req.body)
-      .then(function (result) {
+      .then((result) => {
         return res.status(200).json({
           message: 'success! created account for new user',
           id: result.id
         });
       })
-      .catch(function (err) {
+      .catch((err) => {
         return res.status(400).json({
           message: err
         });
       });
   },
 
-  changeName: function (req, res) {
+  changeName: (req, res) => {
     hydrateReq(req)
       .then(() => {
         return User.updateName({ id: req.params.id, name: req.body.name })
       })
-      .then(function (result) {
+      .then((result) => {
         return res.status(200).json(result);
       })
-      .catch(function (err) {
+      .catch((err) => {
         return res.status(400).json({
           message: err
         });
       });
   },
 
-  changeEmail: function (req, res) {
+  changeEmail: (req, res) => {
     hydrateReq(req)
       .then(() => {
         return User.updateEmail({ id: req.params.id, email: req.body.email })
       })
-      .then(function (result) {
+      .then((result) => {
         return res.status(200).json(result);
       })
-      .catch(function (err) {
+      .catch((err) => {
         return res.status(400).json({
           message: err
         });
       });
   },
 
-  changePassword: function (req, res) {
+  changePassword: (req, res) => {
     hydrateReq(req)
       .then(() => {
         return User.updatePassword({ id: req.params.id, password: req.body.password })
       })
-      .then(function (result) {
+      .then((result) => {
         return res.status(200).json(result);
       })
-      .catch(function (err) {
+      .catch((err) => {
         return res.status(400).json({
           message: err
         });
@@ -69,67 +69,67 @@ module.exports = {
       .then(() => {
         return User.updateAccess({id: req.params.id, access_level: req.body.access_level})
       })
-      .then(function (result) {
+      .then((result) => {
         return res.status(200).json(result);
       })
-      .catch(function (err) {
+      .catch((err) => {
         return res.status(err.status || 400).json({
           message: err.message || err
         });
       });
   },
 
-  deleteUser: function (req, res) {
+  deleteUser: (req, res) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'admin_user')
       .then(() => {
         return User.delete({ id: req.params.id })
       })
-      .then(function (result) {
+      .then((result) => {
         return res.status(200).json({
           message: 'deleted user with id: ' + result.id
         });
       })
-      .catch(function (err) {
+      .catch((err) => {
         return res.status(400).json({
           message: err
         });
       });
   },
 
-  getOneUser: function (req, res) {
+  getOneUser: (req, res) => {
     User.findOne({ id: req.params.id })
-      .then(function (result) {
+      .then((result) => {
         /*delete result.last_login_attempt;
         delete result.login_attempts;*/
         return res.status(200).json(result);
       })
-      .catch(function (err) {
+      .catch((err) => {
         return res.status(400).json({
           message: err
         });
       });
   },
 
-  getSelfUser: function (req, res) {
+  getSelfUser: (req, res) => {
     User.findOne({ id: req.decoded.uid })
-      .then(function (result) {
+      .then((result) => {
         /*delete result.last_login_attempt;
         delete result.login_attempts;*/
         return res.status(200).json(result);
       })
-      .catch(function (err) {
+      .catch((err) => {
         return res.status(400).json({
           message: err
         });
       });
   },
 
-  listUsers: function (req, res) {
+  listUsers: (req, res) => {
     User.findAll()
-      .then(function (result) {
+      .then((result) => {
         return res.status(200).json(result);
       })
-      .catch(function (err) {
+      .catch((err) => {
         return res.status(400).json({
           message: err
         });
