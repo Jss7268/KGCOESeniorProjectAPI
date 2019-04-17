@@ -4,96 +4,96 @@ var DeviceExperiment = require('./../models/device_experiment');
 var Verifier = require('../validators/verifier');
 
 module.exports = {
-  createDeviceExperiment: function(req, res) {
+  createDeviceExperiment: (req, res) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
       .then(() => {
         return DeviceExperiment.create(req.body)
       })
-      .then(function(result) {
+      .then((result) => {
         return res.status(201).json({
           message: 'success! created new device experiment',
           experiment_id: result.experiment_id,
           device_id: result.device_id
         });
       })
-      .catch(function(err) {
+      .catch((err) => {
         return res.status(err.status || 400).json({
           message: err.message || err
         });
       });
   },
 
-  deleteDeviceExperiment: function(req, res) {
+  deleteDeviceExperiment: (req, res) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
       .then(() => {
         return DeviceExperiment.delete({ experiment_id: req.params.experiment_id,
         device_id: req.params.device_id })
       })
-      .then(function(result) {
+      .then((result) => {
         return res.status(200).json({
           message: 'deleted device experiment with experiment id: ' + result.experiment_id + 
           ' and device id: ' + result.device_id
         });
       })
-      .catch(function(err) {
+      .catch((err) => {
         return res.status(err.status || 400).json({
           message: err.message || err
         });
       });
   },
 
-  getOneDeviceExperiment: function(req, res) {
+  getOneDeviceExperiment: (req, res) => {
     DeviceExperiment.findOne({
         device_id: req.params.device_id,
         experiment_id: req.params.experiment_id
     })
-      .then(function(result) {
+      .then((result) => {
         return res.status(200).json(result);
       })
-      .catch(function(err) {
+      .catch((err) => {
         return res.status(400).json({
           message: err
         });
       });
   },
 
-  getOneDeviceExperiment: function(req, res) {
+  getOneDeviceExperiment: (req, res) => {
     DeviceExperiment.findOne({
         device_id: req.params.device_id,
         experiment_id: req.params.experiment_id
     })
-      .then(function(result) {
+      .then((result) => {
         return res.status(200).json(result);
       })
-      .catch(function(err) {
+      .catch((err) => {
         return res.status(400).json({
           message: err
         });
       });
   },
 
-  listExperimentsByDevice: function(req, res) {
+  listExperimentsByDevice: (req, res) => {
     DeviceExperiment.findAllByDevice({
         device_id: req.params.device_id
     })
-      .then(function(result) {
+      .then((result) => {
         return res.status(200).json(result);
       })
-      .catch(function(err) {
+      .catch((err) => {
         return res.status(400).json({
           message: err
         });
       });
   },
 
-  listDevicesByExperiment: function(req, res) {
+  listDevicesByExperiment: (req, res) => {
     DeviceExperiment.findAllByExperiment({
         experiment_id: req.params.experiment_id
     })
-      .then(function(result) {
+      .then((result) => {
         return res.status(200).json(result);
       })
-      .catch(function(err) {
+      .catch((err) => {
         return res.status(400).json({
           message: err
         });
@@ -101,12 +101,12 @@ module.exports = {
   },
 
 
-  listDevicesExperiments: function(req, res) {
+  listDevicesExperiments: (req, res) => {
     DeviceExperiment.findAll()
-      .then(function(result) {
+      .then((result) => {
         return res.status(200).json(result);
       })
-      .catch(function(err) {
+      .catch((err) => {
         return res.status(400).json({
           message: err
         });

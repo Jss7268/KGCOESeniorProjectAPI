@@ -15,7 +15,7 @@ router.use('/v1', require('./v1/output_types.routes'));
 router.use('/v1', require('./v1/devices_experiments.routes'));
 
 // API Error routes
-router.use(function(req, res) {
+router.use((req, res) => {
   return res.status(404).json({
     message : "Not found."
     });
