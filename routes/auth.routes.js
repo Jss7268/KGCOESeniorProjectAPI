@@ -37,8 +37,16 @@ router.post('/auth/authenticate', (req, res) => {
 
 // Any route past this point requires a valid auth token
 router.use((req, res, next) => {
-  var token = (req.body.token || req.query.token || req.headers['authorization'])
+  try{
+    var token = (req.body.token || req.query.token || req.headers['authorization'])
     .replace('Bearer ', '');
+  } catch {
+    return res.status(401).json({
+      message: 'failed authentication'
+    })
+  }
+  // var token = (req.body.token || req.query.token || req.headers['authorization'])
+  //   .replace('Bearer ', '');
   if (token) {
     jwt.verify(token, config.SECRET, (err, decoded) => {
       if (err) {
