@@ -10,16 +10,26 @@ async function createTables() {
 	} catch (err) {
 		console.log(err);
 	}
+	
+	try {
+		await db.query(`CREATE TABLE IF NOT EXISTS user_access 
+			(access_level smallint PRIMARY KEY,
+			name varchar(255) NOT NULL,
+			description text)`);
+	} catch (err) {
+		console.log(err);
+	}
 	try {
 		await db.query(`CREATE TABLE IF NOT EXISTS users 
 			(id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (), 
 			name VARCHAR (100) NOT NULL, 
 			email VARCHAR (255), 
 			hashed_password VARCHAR (255) NOT NULL, 
-			access smallint NOT NULL DEFAULT 0, 
+			access_level smallint NOT NULL DEFAULT 0, 
 			created_at bigint NOT NULL, 
 			updated_at bigint, 
-			deleted_at bigint NOT NULL DEFAULT 0)`);
+			deleted_at bigint NOT NULL DEFAULT 0,
+			FOREIGN KEY (access_level) REFERENCES user_access (access_level))`);
 	} catch (err) {
 		console.log(err);
 	}
@@ -95,6 +105,15 @@ async function createTables() {
 	} catch (err) {
 		console.log(err);
 	}
+	try {
+		var accessLevels = [['default', 'Default'], ['authorized_device', 'Authorized Device'], ['elevated_user', 'Elevated User'], ['admin_user', 'Admin User']]
+		for (i = 0; i < accessLevels.length; i ++) {
+			await db.query(`INSERT INTO user_access (access_level, name, description) VALUES ($1, $2, $3) ON CONFLICT (access_level) DO NOTHING`, [i, accessLevels[i][0], accessLevels[i][1]]);
+		}
+	} catch (err) {
+		console.log(err);
+	}
+	
 	console.log("Table creation finished properly");
 	process.exit();
 }
