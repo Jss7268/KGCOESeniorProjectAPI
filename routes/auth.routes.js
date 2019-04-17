@@ -45,8 +45,6 @@ router.use((req, res, next) => {
       message: 'failed authentication'
     })
   }
-  // var token = (req.body.token || req.query.token || req.headers['authorization'])
-  //   .replace('Bearer ', '');
   if (token) {
     jwt.verify(token, config.SECRET, (err, decoded) => {
       if (err) {
