@@ -22,6 +22,10 @@ app.use(bodyParser.json())
 
 routes(app);
 
+app.get('/', function (req, res){
+  return res.status(200).send({'message': 'YES you got this!!'});
+});
+
 app.listen(8000);
 
 if (process.env.USE_HTTPS) {
