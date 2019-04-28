@@ -6,9 +6,21 @@ var Validator = require('../validators/validator');
 var UserAccess = require('./user_access');
 
 module.exports = {
-  findAll: function () {
+  findAll: () => {
     return new Promise((resolve, reject) => {
       db.query('SELECT id, name, email, access_level FROM users where deleted_at = 0', [])
+        .then((results) => {
+          resolve(results.rows);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+  },
+
+  findByAccessLevel: (accessLevel) => {
+    return new Promise((resolve, reject) => {
+      db.query('SELECT id, name, email, access_level FROM users where access_level = $1 and deleted_at = 0', [accessLevel])
         .then((results) => {
           resolve(results.rows);
         })
