@@ -17,7 +17,8 @@ router.post('/auth/authenticate', (req, res) => {
         jwt.sign({ uid: result.id, accessLevel: result.accessLevel }, config.SECRET, { expiresIn: config.JWT_EXPIRATION, issuer: 'edcs' }, (err, token) => {
           return res.status(200).json({
             message: 'authenticated, token attached',
-            token: token
+            token: token,
+            accessLevel: result.accessLevel
           });
         });
       }
