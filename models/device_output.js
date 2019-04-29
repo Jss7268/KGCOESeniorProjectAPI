@@ -192,6 +192,9 @@ function validateDeviceOutputData(data) {
                     return new Promise((resolve, reject) => {
                         DeviceExperiment.findOneByDevice({ device_id: data.device_id })
                             .then((result) => {
+                                if (result == null) {
+                                    reject('Device not linked to any experiment');
+                                }
                                 resolve(result);
                             })
                             .catch((err) => {

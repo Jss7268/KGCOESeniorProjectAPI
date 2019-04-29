@@ -135,7 +135,7 @@ function findAllByDevice(data) {
         Validator.validateColumns(data, ['device_id'])
             .then(function () {
                 return db.query(`SELECT * FROM experiments 
-                LEFT OUTER JOIN devices_experiments on 
+                INNER JOIN devices_experiments on 
                 (experiments.id = devices_experiments.experiment_id and 
                 devices_experiments.device_id = $1 and
                 devices_experiments.deleted_at = 0)

@@ -54,7 +54,7 @@ module.exports = {
     },
     validateOutputTypeName(name) {
         return new Promise((resolve, reject) => {
-            Generic.findOneByColumn('output_types', name, 'name')
+            Generic.findOneByColumn('output_types', name, 'output_type_name')
                 .then((result) => {
                     resolve(result);
                 })
