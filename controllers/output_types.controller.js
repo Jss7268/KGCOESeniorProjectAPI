@@ -1,10 +1,9 @@
 var Promise = require('promise');
 var config = require('./../config/config');
-var OutputType = require('./../models/output_type');
 var Verifier = require('../validators/verifier');
 
 module.exports = {
-  createOutputType: (req, res) => {
+  createOutputType: (OutputType) => (req, res) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
       .then(() => {
         return OutputType.create(req.body)
@@ -22,7 +21,7 @@ module.exports = {
       });
   },
 
-  changeUnits: (req, res) => {
+  changeUnits: (OutputType) => (req, res) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
       .then(() => {
         return OutputType.updateUnits({ id: req.params.id, units: req.body.units })
@@ -37,7 +36,7 @@ module.exports = {
       });
   },
 
-  changeUnitsName: (req, res) => {
+  changeUnitsName: (OutputType) => (req, res) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
       .then(() => {
         return OutputType.updateUnits({ output_type_name: req.params.output_type_name, units: req.body.units })
@@ -52,7 +51,7 @@ module.exports = {
       });
   },
 
-  deleteOutputType: (req, res) => {
+  deleteOutputType: (OutputType) => (req, res) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
       .then(() => {
         return OutputType.delete({ id: req.params.id })
@@ -69,7 +68,7 @@ module.exports = {
       });
   },
 
-  deleteOutputTypeName: (req, res) => {
+  deleteOutputTypeName: (OutputType) => (req, res) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
       .then(() => {
         return OutputType.delete({ output_type_name: req.params.output_type_name })
@@ -86,7 +85,7 @@ module.exports = {
       });
   },
 
-  getOneOutputType: (req, res) => {
+  getOneOutputType: (OutputType) => (req, res) => {
     OutputType.findOne({ id: req.params.id })
       .then((result) => {
         return res.status(200).json(result);
@@ -98,7 +97,7 @@ module.exports = {
       });
   },
 
-  getOneOutputTypeName: (req, res) => {
+  getOneOutputTypeName: (OutputType) => (req, res) => {
     OutputType.findOne({ output_type_name: req.params.output_type_name })
       .then((result) => {
         return res.status(200).json(result);
@@ -110,7 +109,7 @@ module.exports = {
       });
   },
 
-  listOutputTypes: (req, res) => {
+  listOutputTypes: (OutputType) => (req, res) => {
     OutputType.findAll()
       .then((result) => {
         return res.status(200).json(result);

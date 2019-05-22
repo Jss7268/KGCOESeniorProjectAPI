@@ -1,10 +1,9 @@
 var Promise = require('promise');
 var config = require('./../config/config');
-var DeviceExperiment = require('./../models/device_experiment');
 var Verifier = require('../validators/verifier');
 
 module.exports = {
-  createDeviceExperiment: (req, res) => {
+  createDeviceExperiment: (DeviceExperiment) => (req, res) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
       .then(() => {
         return DeviceExperiment.create(req.body)
@@ -23,7 +22,7 @@ module.exports = {
       });
   },
 
-  deleteDeviceExperiment: (req, res) => {
+  deleteDeviceExperiment: (DeviceExperiment) => (req, res) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
       .then(() => {
         return DeviceExperiment.delete({ experiment_id: req.params.experiment_id,
@@ -42,7 +41,7 @@ module.exports = {
       });
   },
 
-  getOneDeviceExperiment: (req, res) => {
+  getOneDeviceExperiment: (DeviceExperiment) => (req, res) => {
     DeviceExperiment.findOne({
         device_id: req.params.device_id,
         experiment_id: req.params.experiment_id
@@ -57,7 +56,7 @@ module.exports = {
       });
   },
 
-  getOneDeviceExperiment: (req, res) => {
+  getOneDeviceExperiment: (DeviceExperiment) => (req, res) => {
     DeviceExperiment.findOne({
         device_id: req.params.device_id,
         experiment_id: req.params.experiment_id
@@ -72,7 +71,7 @@ module.exports = {
       });
   },
 
-  listExperimentsByDevice: (req, res) => {
+  listExperimentsByDevice: (DeviceExperiment) => (req, res) => {
     DeviceExperiment.findAllByDevice({
         device_id: req.params.device_id
     })
@@ -86,7 +85,7 @@ module.exports = {
       });
   },
 
-  listDevicesByExperiment: (req, res) => {
+  listDevicesByExperiment: (DeviceExperiment) => (req, res) => {
     DeviceExperiment.findAllByExperiment({
         experiment_id: req.params.experiment_id
     })
@@ -101,7 +100,7 @@ module.exports = {
   },
 
 
-  listDevicesExperiments: (req, res) => {
+  listDevicesExperiments: (DeviceExperiment) => (req, res) => {
     DeviceExperiment.findAll()
       .then((result) => {
         return res.status(200).json(result);

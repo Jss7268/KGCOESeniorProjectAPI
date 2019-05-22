@@ -1,10 +1,9 @@
 var Promise = require('promise');
 var config = require('./../config/config');
-var User = require('./../models/user');
 var Verifier = require('./../validators/verifier');
 
 module.exports = {
-  createUser: (req, res) => {
+  createUser: (User) => (req, res) => {
     User.create(req.body)
       .then((result) => {
         return res.status(200).json({
@@ -19,7 +18,7 @@ module.exports = {
       });
   },
 
-  changeName: (req, res) => {
+  changeName: (User) => (req, res) => {
     hydrateReq(req)
       .then(() => {
         return User.updateName({ id: req.params.id, name: req.body.name })
@@ -34,7 +33,7 @@ module.exports = {
       });
   },
 
-  changeEmail: (req, res) => {
+  changeEmail: (User) => (req, res) => {
     hydrateReq(req)
       .then(() => {
         return User.updateEmail({ id: req.params.id, email: req.body.email })
@@ -49,7 +48,7 @@ module.exports = {
       });
   },
 
-  changePassword: (req, res) => {
+  changePassword: (User) => (req, res) => {
     hydrateReq(req)
       .then(() => {
         return User.updatePassword({ id: req.params.id, password: req.body.password })
@@ -64,7 +63,7 @@ module.exports = {
       });
   },
 
-  changeAccess: (req, res) => {
+  changeAccess: (User) => (req, res) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'admin_user')
       .then(() => {
         return User.updateAccess({id: req.params.id, access_level: req.body.access_level})
@@ -79,7 +78,7 @@ module.exports = {
       });
   },
 
-  deleteUser: (req, res) => {
+  deleteUser: (User) => (req, res) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'admin_user')
       .then(() => {
         return User.delete({ id: req.params.id })
@@ -96,7 +95,7 @@ module.exports = {
       });
   },
 
-  getOneUser: (req, res) => {
+  getOneUser: (User) => (req, res) => {
     User.findOne({ id: req.params.id })
       .then((result) => {
         /*delete result.last_login_attempt;
@@ -110,7 +109,7 @@ module.exports = {
       });
   },
 
-  getSelfUser: (req, res) => {
+  getSelfUser: (User) => (req, res) => {
     User.findOne({ id: req.decoded.uid })
       .then((result) => {
         /*delete result.last_login_attempt;
@@ -124,7 +123,7 @@ module.exports = {
       });
   },
 
-  listUsers: (req, res) => {
+  listUsers: (User) => (req, res) => {
     User.findAll()
       .then((result) => {
         return res.status(200).json(result);
@@ -136,7 +135,7 @@ module.exports = {
       });
   },
 
-  listUsersByAccess: (req, res) => {
+  listUsersByAccess: (User) => (req, res) => {
     User.findByAccessLevel(req.params.access)
       .then((result) => {
         return res.status(200).json(result);

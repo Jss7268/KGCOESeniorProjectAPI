@@ -1,10 +1,9 @@
 var Promise = require('promise');
 var config = require('./../config/config');
-var Experiment = require('./../models/experiment');
 var Verifier = require('../validators/verifier');
 
 module.exports = {
-  createExperiment: (req, res) => {
+  createExperiment: (Experiment) => (req, res) => {
     hydrateReq(req)
       .then(() => {
         return Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
@@ -25,7 +24,7 @@ module.exports = {
       });
   },
 
-  changeStartTime: (req, res) => {
+  changeStartTime: (Experiment) => (req, res) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
       .then(() => {
         return Experiment.updateStartTime({ id: req.params.id, start_time: req.body.start_time })
@@ -40,7 +39,7 @@ module.exports = {
       });
   },
 
-  deleteExperiment: (req, res) => {
+  deleteExperiment: (Experiment) => (req, res) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
       .then(() => {
         return Experiment.delete({ id: req.params.id })
@@ -57,7 +56,7 @@ module.exports = {
       });
   },
 
-  getOneExperiment: (req, res) => {
+  getOneExperiment: (Experiment) => (req, res) => {
     Experiment.findOne({ id: req.params.id })
       .then((result) => {
         /*delete result.last_login_attempt;
@@ -71,7 +70,7 @@ module.exports = {
       });
   },
 
-  listExperiments: (req, res) => {
+  listExperiments: (Experiment) => (req, res) => {
     Experiment.findAll()
       .then((result) => {
         return res.status(200).json(result);
