@@ -1,9 +1,5 @@
-var Promise = require('promise');
-var config = require('./../config/config');
-var Verifier = require('../validators/verifier');
-
 module.exports = {
-  createDeviceOutput: (DeviceOutput) => (req, res) => {
+  createDeviceOutput: (DeviceOutput, Verifier) => (req, res) => {
     hydrateReq(req);
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
       .then(() => {
@@ -22,7 +18,7 @@ module.exports = {
       });
   },
 
-  changeOutputValue: (DeviceOutput) => (req, res) => {
+  changeOutputValue: (DeviceOutput, Verifier) => (req, res) => {
     hydrateReq(req);
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
       .then(() => {
@@ -38,7 +34,7 @@ module.exports = {
       });
   },
 
-  deleteDeviceOutput: (DeviceOutput) => (req, res) => {
+  deleteDeviceOutput: (DeviceOutput, Verifier) => (req, res) => {
     hydrateReq(req);
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
       .then(() => {
@@ -56,7 +52,7 @@ module.exports = {
       });
   },
 
-  getOneDeviceOutput: (DeviceOutput) => (req, res) => {
+  getOneDeviceOutput: (DeviceOutput, Verifier) => (req, res) => {
     DeviceOutput.findOne({ id: req.params.id })
       .then((result) => {
         return res.status(200).json(result);
@@ -68,7 +64,7 @@ module.exports = {
       });
   },
 
-  listDeviceOutputsByDeviceExperiment: (DeviceOutput) => (req, res) => {
+  listDeviceOutputsByDeviceExperiment: (DeviceOutput, Verifier) => (req, res) => {
     DeviceOutput.findAllByDeviceExperiment(req.params)
       .then((result) => {
         return res.status(200).json(result);
@@ -80,7 +76,7 @@ module.exports = {
       });
   },
 
-  listDeviceOutputsByExperiment: (DeviceOutput) => (req, res) => {
+  listDeviceOutputsByExperiment: (DeviceOutput, Verifier) => (req, res) => {
     DeviceOutput.findAllByExperiment(req.params)
       .then((result) => {
         return res.status(200).json(result);
@@ -92,7 +88,7 @@ module.exports = {
       });
   },
 
-  listDeviceOutputsByDevice: (DeviceOutput) => (req, res) => {
+  listDeviceOutputsByDevice: (DeviceOutput, Verifier) => (req, res) => {
     DeviceOutput.findAllByDevice(req.params)
       .then((result) => {
         return res.status(200).json(result);
@@ -104,7 +100,7 @@ module.exports = {
       });
   },
 
-  listDeviceOutputs: (DeviceOutput) => (req, res) => {
+  listDeviceOutputs: (DeviceOutput, Verifier) => (req, res) => {
     DeviceOutput.findAll()
       .then((result) => {
         return res.status(200).json(result);

@@ -1,9 +1,5 @@
-var Promise = require('promise');
-var config = require('./../config/config');
-var Verifier = require('../validators/verifier');
-
 module.exports = {
-  createDeviceExperiment: (DeviceExperiment) => (req, res) => {
+  createDeviceExperiment: (DeviceExperiment, Verifier) => (req, res) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
       .then(() => {
         return DeviceExperiment.create(req.body)
@@ -22,7 +18,7 @@ module.exports = {
       });
   },
 
-  deleteDeviceExperiment: (DeviceExperiment) => (req, res) => {
+  deleteDeviceExperiment: (DeviceExperiment, Verifier) => (req, res) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
       .then(() => {
         return DeviceExperiment.delete({ experiment_id: req.params.experiment_id,
@@ -41,7 +37,7 @@ module.exports = {
       });
   },
 
-  getOneDeviceExperiment: (DeviceExperiment) => (req, res) => {
+  getOneDeviceExperiment: (DeviceExperiment, Verifier) => (req, res) => {
     DeviceExperiment.findOne({
         device_id: req.params.device_id,
         experiment_id: req.params.experiment_id
@@ -56,7 +52,7 @@ module.exports = {
       });
   },
 
-  getOneDeviceExperiment: (DeviceExperiment) => (req, res) => {
+  getOneDeviceExperiment: (DeviceExperiment, Verifier) => (req, res) => {
     DeviceExperiment.findOne({
         device_id: req.params.device_id,
         experiment_id: req.params.experiment_id
@@ -71,7 +67,7 @@ module.exports = {
       });
   },
 
-  listExperimentsByDevice: (DeviceExperiment) => (req, res) => {
+  listExperimentsByDevice: (DeviceExperiment, Verifier) => (req, res) => {
     DeviceExperiment.findAllByDevice({
         device_id: req.params.device_id
     })
@@ -85,7 +81,7 @@ module.exports = {
       });
   },
 
-  listDevicesByExperiment: (DeviceExperiment) => (req, res) => {
+  listDevicesByExperiment: (DeviceExperiment, Verifier) => (req, res) => {
     DeviceExperiment.findAllByExperiment({
         experiment_id: req.params.experiment_id
     })
@@ -100,7 +96,7 @@ module.exports = {
   },
 
 
-  listDevicesExperiments: (DeviceExperiment) => (req, res) => {
+  listDevicesExperiments: (DeviceExperiment, Verifier) => (req, res) => {
     DeviceExperiment.findAll()
       .then((result) => {
         return res.status(200).json(result);
