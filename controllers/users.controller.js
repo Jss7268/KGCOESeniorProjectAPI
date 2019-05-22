@@ -135,6 +135,18 @@ module.exports = {
         });
       });
   },
+
+  listUsersByAccess: (req, res) => {
+    User.findByAccessLevel(req.params.access)
+      .then((result) => {
+        return res.status(200).json(result);
+      })
+      .catch((err) => {
+        return res.status(400).json({
+          message: err
+        });
+      });
+  },
 };
 
 function hydrateReq(req) {
