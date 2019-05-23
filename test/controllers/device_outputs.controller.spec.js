@@ -4,31 +4,41 @@ const sinon = require('sinon');
 chai.use(require('sinon-chai'));
 const expect = chai.expect;
 DeviceOutputsController = require('../../controllers/device_outputs.controller')
+
 describe('createDeviceOutput', () => {
-  it('should complete this test', async (done) => {
-    const resolvingPromise = new Promise( (resolve) => {
-      resolve('promise resolved');
-    });
-    const result = await resolvingPromise;
-    expect(result).to.equal('promise resolved'); 
-
-  });
+  const req = Mocks.mockRequest({ decoded:{accessLevel: 2}, body: {} });
+  const DeviceOutput = {
+    create: (_) => { return { id: 1 }}
+  }
+  const Verifier = {
+    verifyMinAccessName: (a, b) => new Promise((_, reject) => reject({}))
+  };
+  
   it('returns 400 status on error', (done) => {
-    const req = Mocks.mockRequest({ decoded:{accessLevel: 2}, body: {} });
     const res = Mocks.mockResponse();
-
-    const DeviceOutput = {
-      create: (_) => { id: 1 }
-    }
-    const Verifier = {
-      verifyMinAccessName: (a, b) => new Promise((_, reject) => reject({}))
-    };
     DeviceOutputsController.createDeviceOutput(DeviceOutput, Verifier)(req, res)
     .then(() => {
-      console.log(res)
       expect(res.status).to.have.been.calledWith(400);
       done();
     })
+    .catch((err)=>done(err));
+  });
+
+  it('returns 200 status on error', (done) => {
+    const res = Mocks.mockResponse();
+    const DeviceOutput = {
+      create: (_) => { return { id: 1 }}
+    }
+    const Verifier = {
+      verifyMinAccessName: (a, b) => new Promise((resolve) => resolve({}))
+    };
+    DeviceOutputsController.createDeviceOutput(DeviceOutput, Verifier)(req, res)
+    .then(() => {
+      expect(res.status).to.have.been.calledWith(200);
+      expect(res.json).to.have.been.calledWith({message: 'success! created new device_output', id: 1});
+      done();
+    })
+    .catch((err)=>done(err));
   });
 });
 describe('changeOutputValue', () => {

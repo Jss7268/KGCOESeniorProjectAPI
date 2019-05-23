@@ -7,17 +7,18 @@ module.exports = {
           return DeviceOutput.create(req.body)
         })
         .then((result) => {
-          res.status(200).json({
+          return res.status(200).json({
             message: 'success! created new device_output',
             id: result.id
           });
         })
         .catch((err) => {
-          res.status(err.status || 400).json({
+          return res.status(err.status || 400).json({
             message: err.message || err
           });
         })
         .finally(() => {
+
           resolve();
         });
     });
@@ -46,81 +47,111 @@ module.exports = {
   },
 
   deleteDeviceOutput: (DeviceOutput, Verifier) => (req, res) => {
-    hydrateReq(req);
-    Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
-      .then(() => {
-        return DeviceOutput.delete({ id: req.params.id })
-      })
-      .then((result) => {
-        return res.status(200).json({
-          message: 'deleted device_output with id: ' + result.id
+    return new Promise((resolve) => {
+      hydrateReq(req);
+      Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
+        .then(() => {
+          return DeviceOutput.delete({ id: req.params.id })
+        })
+        .then((result) => {
+          return res.status(200).json({
+            message: 'deleted device_output with id: ' + result.id
+          });
+        })
+        .catch((err) => {
+          return res.status(err.status || 400).json({
+            message: err.message || err
+          });
+        })
+        .finally(() => {
+          resolve();
         });
-      })
-      .catch((err) => {
-        return res.status(err.status || 400).json({
-          message: err.message || err
-        });
-      });
+    });
   },
 
   getOneDeviceOutput: (DeviceOutput, Verifier) => (req, res) => {
-    DeviceOutput.findOne({ id: req.params.id })
-      .then((result) => {
-        return res.status(200).json(result);
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          message: err
+    return new Promise((resolve) => {
+      DeviceOutput.findOne({ id: req.params.id })
+        .then((result) => {
+          return res.status(200).json(result);
+        })
+        .catch((err) => {
+          return res.status(400).json({
+            message: err
+          });
+        })
+        .finally(() => {
+          resolve();
         });
-      });
+    });
   },
 
   listDeviceOutputsByDeviceExperiment: (DeviceOutput, Verifier) => (req, res) => {
-    DeviceOutput.findAllByDeviceExperiment(req.params)
-      .then((result) => {
-        return res.status(200).json(result);
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          message: err
+    return new Promise((resolve) => {
+      DeviceOutput.findAllByDeviceExperiment(req.params)
+        .then((result) => {
+          return res.status(200).json(result);
+        })
+        .catch((err) => {
+          return res.status(400).json({
+            message: err
+          });
+        })
+        .finally(() => {
+          resolve();
         });
-      });
+    });
   },
 
   listDeviceOutputsByExperiment: (DeviceOutput, Verifier) => (req, res) => {
-    DeviceOutput.findAllByExperiment(req.params)
-      .then((result) => {
-        return res.status(200).json(result);
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          message: err
+    return new Promise((resolve) => {
+      DeviceOutput.findAllByExperiment(req.params)
+        .then((result) => {
+          return res.status(200).json(result);
+        })
+        .catch((err) => {
+          return res.status(400).json({
+            message: err
+          });
+        })
+        .finally(() => {
+          resolve();
         });
-      });
+    });
   },
 
   listDeviceOutputsByDevice: (DeviceOutput, Verifier) => (req, res) => {
-    DeviceOutput.findAllByDevice(req.params)
-      .then((result) => {
-        return res.status(200).json(result);
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          message: err
+    return new Promise((resolve) => {
+      DeviceOutput.findAllByDevice(req.params)
+        .then((result) => {
+          return res.status(200).json(result);
+        })
+        .catch((err) => {
+          return res.status(400).json({
+            message: err
+          });
+        })
+        .finally(() => {
+          resolve();
         });
-      });
+    });
   },
 
   listDeviceOutputs: (DeviceOutput, Verifier) => (req, res) => {
-    DeviceOutput.findAll()
-      .then((result) => {
-        return res.status(200).json(result);
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          message: err
+    return new Promise((resolve) => {
+      DeviceOutput.findAll()
+        .then((result) => {
+          return res.status(200).json(result);
+        })
+        .catch((err) => {
+          return res.status(400).json({
+            message: err
+          });
+        })
+        .finally(() => {
+          resolve();
         });
-      });
+    });
   },
 };
 
