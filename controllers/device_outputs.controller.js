@@ -1,37 +1,48 @@
 module.exports = {
   createDeviceOutput: (DeviceOutput, Verifier) => (req, res) => {
-    hydrateReq(req);
-    Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
-      .then(() => {
-        return DeviceOutput.create(req.body)
-      })
-      .then((result) => {
-        return res.status(200).json({
-          message: 'success! created new device_output',
-          id: result.id
+    return new Promise((resolve) => {
+      hydrateReq(req);
+      Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
+        .then(() => {
+          return DeviceOutput.create(req.body)
+        })
+        .then((result) => {
+          res.status(200).json({
+            message: 'success! created new device_output',
+            id: result.id
+          });
+        })
+        .catch((err) => {
+          res.status(err.status || 400).json({
+            message: err.message || err
+          });
+        })
+        .finally(() => {
+          resolve();
         });
-      })
-      .catch((err) => {
-        return res.status(err.status || 400).json({
-          message: err.message || err
-        });
-      });
+    });
+
   },
 
   changeOutputValue: (DeviceOutput, Verifier) => (req, res) => {
-    hydrateReq(req);
-    Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
-      .then(() => {
-        return DeviceOutput.updateOutputValue({ id: req.params.id, output_value: req.body.output_value })
-      })
-      .then((result) => {
-        return res.status(200).json(result);
-      })
-      .catch((err) => {
-        return res.status(err.status || 400).json({
-          message: err.message || err
+    return new Promise((resolve) => {
+      hydrateReq(req);
+      Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
+        .then(() => {
+          return DeviceOutput.updateOutputValue({ id: req.params.id, output_value: req.body.output_value })
+        })
+        .then((result) => {
+          return res.status(200).json(result);
+        })
+        .catch((err) => {
+          return res.status(err.status || 400).json({
+            message: err.message || err
+          });
+        })
+        .finally(() => {
+          resolve();
         });
-      });
+    });
   },
 
   deleteDeviceOutput: (DeviceOutput, Verifier) => (req, res) => {
