@@ -1,44 +1,69 @@
-const Mocks = require('../mocks');
+const mocks = require('../mocks');
 const chai = require('chai');
 const sinon = require('sinon');
 chai.use(require('sinon-chai'));
 const expect = chai.expect;
-DeviceOutputsController = require('../../controllers/device_outputs.controller')
+const errorMessage = 'error';
+deviceOutputsController = require('../../controllers/device_outputs.controller')
 
-describe('createDeviceOutput', () => {
-  const req = Mocks.mockRequest({ decoded:{accessLevel: 2}, body: {} });
-  const DeviceOutput = {
-    create: (_) => { return { id: 1 }}
+var req;
+var res;
+var deviceOutput;
+var badDeviceOutput;
+var berifier;
+var badVerifier;
+
+// use function instead of lambda
+// https://mochajs.org/#arrow-functions
+before(function() {
+  deviceOutput = {
+    create: (_) => { return { id: 1 } }
   }
-  const Verifier = {
-    verifyMinAccessName: (a, b) => new Promise((_, reject) => reject({}))
+  badDeviceOutput = {
+    create: (_) => { throw {message: errorMessage} }
+  }
+  req = mocks.mockRequest({ decoded: { accessLevel: null }, body: {} });
+  berifier = {
+    verifyMinAccessName: (a, b) => new Promise((resolve) => resolve({}))
   };
-  
-  it('returns 400 status on error', (done) => {
-    const res = Mocks.mockResponse();
-    DeviceOutputsController.createDeviceOutput(DeviceOutput, Verifier)(req, res)
-    .then(() => {
-      expect(res.status).to.have.been.calledWith(400);
-      done();
-    })
-    .catch((err)=>done(err));
+  badVerifier = {
+    verifyMinAccessName: (a, b) => new Promise((_, reject) => reject({ message: errorMessage }))
+  };
+});
+
+beforeEach(function() {
+  res = mocks.mockResponse();
+});
+
+describe('createDeviceOutput', function() {
+  it('returns 400 status on bad verifier', function(done) {
+    deviceOutputsController.createDeviceOutput(deviceOutput, badVerifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(400);
+        expect(res.json).to.have.been.calledWith({ message: errorMessage });
+        done();
+      })
+      .catch((err) => done(err));
   });
 
-  it('returns 200 status on error', (done) => {
-    const res = Mocks.mockResponse();
-    const DeviceOutput = {
-      create: (_) => { return { id: 1 }}
-    }
-    const Verifier = {
-      verifyMinAccessName: (a, b) => new Promise((resolve) => resolve({}))
-    };
-    DeviceOutputsController.createDeviceOutput(DeviceOutput, Verifier)(req, res)
-    .then(() => {
-      expect(res.status).to.have.been.calledWith(200);
-      expect(res.json).to.have.been.calledWith({message: 'success! created new device_output', id: 1});
-      done();
-    })
-    .catch((err)=>done(err));
+  it('returns 400 status on bad create', function(done) {
+    deviceOutputsController.createDeviceOutput(deviceOutput, badVerifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(400);
+        expect(res.json).to.have.been.calledWith({ message: errorMessage });
+        done();
+      })
+      .catch((err) => done(err));
+  });
+
+  it('returns 200 status on error', function(done) {
+    deviceOutputsController.createDeviceOutput(deviceOutput, berifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(200);
+        expect(res.json).to.have.been.calledWith({ message: 'success! created new device_output', id: 1 });
+        done();
+      })
+      .catch((err) => done(err));
   });
 });
 describe('changeOutputValue', () => {
