@@ -3,57 +3,52 @@ const chai = require('chai');
 const sinon = require('sinon');
 chai.use(require('sinon-chai'));
 const expect = chai.expect;
+const TestGeneric = require('../test_generic');
 DeviceOutputsController = require('../../controllers/device_outputs.controller')
 
-const RESULT = { result: 'result' };
+const deviceOutput = {
+  create: (ignore) => { return { id: Mocks.ID } },
+  updateOutputValue: ({ id, output_value }) => { return { id: id, output_value: output_value } },
+  delete: ({ id }) => { return { id: id } },
+  findOne: ({ id }) => new Promise((resolve) => resolve({ id: id })),
+  findAllByDeviceExperiment: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
+  findAllByExperiment: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
+  findAllByDevice: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
+  findAll: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
+
+}
+const badDeviceOutput = {
+  create: (ignore) => { throw Mocks.ERROR },
+  updateOutputValue: (ignore) => { throw Mocks.ERROR },
+  delete: (ignore) => { throw Mocks.ERROR },
+  findOne: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+  findAllByDeviceExperiment: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+  findAllByExperiment: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+  findAllByDevice: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+  findAll: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+
+}
+const verifier = {
+  verifyMinAccessName: (ignore1, ignore2) => new Promise((resolve) => resolve({}))
+};
+const badVerifier = {
+  verifyMinAccessName: (ignore1, ignore2) => new Promise((ignore, reject) => reject(Mocks.ERROR))
+};
 
 var req;
 var res;
-var deviceOutput;
-var badDeviceOutput;
-var verifier;
-var badVerifier;
 
 // use function instead of lambda
 // https://mochajs.org/#arrow-functions
-before(function () {
-  deviceOutput = {
-    create: (ignore) => { return { id: Mocks.ID } },
-    updateOutputValue: ({ id, output_value }) => { return { id: id, output_value: output_value } },
-    delete: ({ id }) => { return { id: id } },
-    findOne: ({ id }) => new Promise((resolve) => resolve({ id: id })),
-    findAllByDeviceExperiment: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
-    findAllByExperiment: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
-    findAllByDevice: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
-    findAll: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
-
-  }
-  badDeviceOutput = {
-    create: (ignore) => { throw Mocks.ERROR },
-    updateOutputValue: (ignore) => { throw Mocks.ERROR },
-    delete: (ignore) => { throw Mocks.ERROR },
-    findOne: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
-    findAllByDeviceExperiment: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
-    findAllByExperiment: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
-    findAllByDevice: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
-    findAll: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
-
-  }
-  verifier = {
-    verifyMinAccessName: (ignore1, ignore2) => new Promise((resolve) => resolve({}))
-  };
-  badVerifier = {
-    verifyMinAccessName: (ignore1, ignore2) => new Promise((ignore, reject) => reject(Mocks.ERROR))
-  };
-});
-
 beforeEach(function () {
   req = Mocks.mockRequest();
   res = Mocks.mockResponse();
 });
 
 describe('createDeviceOutput', function () {
-  testForWrite(DeviceOutputsController.createDeviceOutput);
+  TestGeneric.testHydrateReq(DeviceOutputsController.createDeviceOutput, deviceOutput, verifier);
+  TestGeneric.testBadVerifier(DeviceOutputsController.createDeviceOutput, deviceOutput, badVerifier);
+  TestGeneric.testBadModel(DeviceOutputsController.createDeviceOutput, badDeviceOutput, verifier);
 
   it('returns 200 status on success', function (done) {
     DeviceOutputsController.createDeviceOutput(deviceOutput, verifier)(req, res)
@@ -67,7 +62,9 @@ describe('createDeviceOutput', function () {
 });
 
 describe('changeOutputValue', () => {
-  testForWrite(DeviceOutputsController.changeOutputValue);
+  TestGeneric.testHydrateReq(DeviceOutputsController.changeOutputValue, deviceOutput, verifier);
+  TestGeneric.testBadVerifier(DeviceOutputsController.changeOutputValue, deviceOutput, badVerifier);
+  TestGeneric.testBadModel(DeviceOutputsController.changeOutputValue, badDeviceOutput, verifier);
 
   it('returns 200 status on success', function (done) {
     DeviceOutputsController.changeOutputValue(deviceOutput, verifier)(req, res)
@@ -81,7 +78,9 @@ describe('changeOutputValue', () => {
 });
 
 describe('deleteDeviceOutput', () => {
-  testForWrite(DeviceOutputsController.deleteDeviceOutput);
+  TestGeneric.testHydrateReq(DeviceOutputsController.deleteDeviceOutput, deviceOutput, verifier);
+  TestGeneric.testBadVerifier(DeviceOutputsController.deleteDeviceOutput, deviceOutput, badVerifier);
+  TestGeneric.testBadModel(DeviceOutputsController.deleteDeviceOutput, badDeviceOutput, verifier);
 
   it('returns 200 status on success', function (done) {
     DeviceOutputsController.deleteDeviceOutput(deviceOutput, verifier)(req, res)
@@ -95,7 +94,8 @@ describe('deleteDeviceOutput', () => {
 });
 
 describe('getOneDeviceOutput', () => {
-  testBadModel(DeviceOutputsController.getOneDeviceOutput);
+  TestGeneric.testBadModel(DeviceOutputsController.getOneDeviceOutput, badDeviceOutput, verifier);
+
   it('returns 200 status on success', function (done) {
     DeviceOutputsController.getOneDeviceOutput(deviceOutput, verifier)(req, res)
       .then(() => {
@@ -108,7 +108,8 @@ describe('getOneDeviceOutput', () => {
 });
 
 describe('listDeviceOutputsByDeviceExperiment', () => {
-  testBadModel(DeviceOutputsController.listDeviceOutputsByDeviceExperiment);
+  TestGeneric.testBadModel(DeviceOutputsController.listDeviceOutputsByDeviceExperiment, badDeviceOutput, verifier);
+
   it('returns 200 status on success', function (done) {
     DeviceOutputsController.listDeviceOutputsByDeviceExperiment(deviceOutput, verifier)(req, res)
       .then(() => {
@@ -121,7 +122,8 @@ describe('listDeviceOutputsByDeviceExperiment', () => {
 });
 
 describe('listDeviceOutputsByExperiment', () => {
-  testBadModel(DeviceOutputsController.listDeviceOutputsByExperiment);
+  TestGeneric.testBadModel(DeviceOutputsController.listDeviceOutputsByExperiment, badDeviceOutput, verifier);
+
   it('returns 200 status on success', function (done) {
     DeviceOutputsController.listDeviceOutputsByExperiment(deviceOutput, verifier)(req, res)
       .then(() => {
@@ -134,7 +136,8 @@ describe('listDeviceOutputsByExperiment', () => {
 });
 
 describe('listDeviceOutputsByDevice', () => {
-  testBadModel(DeviceOutputsController.listDeviceOutputsByDevice);
+  TestGeneric.testBadModel(DeviceOutputsController.listDeviceOutputsByDevice, badDeviceOutput, verifier);
+
   it('returns 200 status on success', function (done) {
     DeviceOutputsController.listDeviceOutputsByDevice(deviceOutput, verifier)(req, res)
       .then(() => {
@@ -147,7 +150,8 @@ describe('listDeviceOutputsByDevice', () => {
 });
 
 describe('listDeviceOutputs', () => {
-  testBadModel(DeviceOutputsController.listDeviceOutputs);
+  TestGeneric.testBadModel(DeviceOutputsController.listDeviceOutputs, badDeviceOutput, verifier);
+
   it('returns 200 status on success', function (done) {
     DeviceOutputsController.listDeviceOutputs(deviceOutput, verifier)(req, res)
       .then(() => {
@@ -159,53 +163,3 @@ describe('listDeviceOutputs', () => {
   });
 });
 
-function testForWrite(fn) {
-  testHydrateReq(fn);
-  testBadVerifier(fn);
-  testBadModel(fn);
-}
-
-function testHydrateReq(fn) {
-  it('doesn\'t allow devices to set device_id', function (done) {
-    req.decoded.accessLevel = 1; // authorized_device access level
-    fn(deviceOutput, verifier)(req, res)
-      .then(() => {
-        expect(req.body.device_id).to.equal(Mocks.USER_ID);
-        done();
-      })
-      .catch((err) => done(err));
-  });
-
-  it('doesn\'t allow devices to set device_id', function (done) {
-    fn(deviceOutput, verifier)(req, res)
-      .then(() => {
-        expect(req.body.device_id).to.equal(Mocks.DEVICE_ID);
-        done();
-      })
-      .catch((err) => done(err));
-  });
-}
-
-function testBadVerifier(fn) {
-  it('returns 400 status on bad verifier', function (done) {
-    fn(deviceOutput, badVerifier)(req, res)
-      .then(() => {
-        expect(res.status).to.have.been.calledWith(Mocks.ERROR_STATUS);
-        expect(res.json).to.have.been.calledWith({ message: Mocks.ERROR_MESSAGE });
-        done();
-      })
-      .catch((err) => done(err));
-  });
-}
-
-function testBadModel(fn) {
-  it('returns 400 status on bad model', function (done) {
-    fn(badDeviceOutput, verifier)(req, res)
-      .then(() => {
-        expect(res.status).to.have.been.calledWith(Mocks.ERROR_STATUS);
-        expect(res.json).to.have.been.calledWith({ message: Mocks.ERROR_MESSAGE });
-        done();
-      })
-      .catch((err) => done(err));
-  });
-}
