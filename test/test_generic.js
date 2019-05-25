@@ -56,11 +56,33 @@ function testHydrateReqCreatorId(fn, model, verifier) {
     });
 }
 
+function testHydrateReqUserId(fn, model, verifier) {
+    it('doesn\'t allow non-admins to set creator_id', function (done) {
+        req.decoded.accessLevel = Mocks.ACCESS_LEVELS.elevated_user;
+        fn(model, verifier)(req, res)
+            .then(() => {
+                expect(req.params.id).to.equal(req.decoded.uid);
+                done();
+            })
+            .catch((err) => done(err));
+    });
+
+    it('allows admins to set creator_id', function (done) {
+        req.decoded.accessLevel = Mocks.ACCESS_LEVELS.admin_user;
+        fn(model, verifier)(req, res)
+            .then(() => {
+                expect(req.params.id).to.equal(Mocks.ID);
+                done();
+            })
+            .catch((err) => done(err));
+    });
+}
+
 function testBadVerifier(fn, model, badVerifier) {
     it('returns 400 status on bad verifier', function (done) {
         fn(model, badVerifier)(req, res)
             .then(() => {
-                expect(res.status).to.have.been.calledWith(Mocks.ERROR_STATUS);
+                expect(res.status).to.have.been.calledWith(Mocks.FORBIDDEN);
                 expect(res.json).to.have.been.calledWith({ message: Mocks.ERROR_MESSAGE });
                 done();
             })
@@ -83,6 +105,7 @@ function testBadModel(fn, badModel, verifier) {
 module.exports = {
     testHydrateReqDeviceId: testHydrateReqDeviceId,
     testHydrateReqCreatorId: testHydrateReqCreatorId,
+    testHydrateReqUserId: testHydrateReqUserId,
     testBadVerifier: testBadVerifier,
     testBadModel: testBadModel,
 }

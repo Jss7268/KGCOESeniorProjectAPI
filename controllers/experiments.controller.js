@@ -5,7 +5,6 @@ module.exports = {
     return new Promise((resolve) => {
       hydrateReq(req, Verifier)
         .then(() => {
-          console.log('x')
           return Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
         })
         .then(() => {

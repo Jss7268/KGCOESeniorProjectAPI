@@ -7,21 +7,30 @@ const ID = 'id';
 const USER_ID = 'user';
 const ERROR_MESSAGE = 'error';
 const ERROR_STATUS = 418;
+const FORBIDDEN = 403;
 const ERROR = {
     message: ERROR_MESSAGE,
     status: ERROR_STATUS
 };
+const AUTH_ERROR = {
+    message: ERROR_MESSAGE,
+    status: FORBIDDEN
+}
 const OUTPUT_TYPE_NAME = 'output_type_name';
 const UNITS = 'units';
 const START_TIME = 12345;
 const CREATOR_ID = 'creator';
+const ACCESS_LEVEL = 'access_level';
+const EMAIL = 'email';
+const PASSWORD = 'password';
+const NAME = 'name';
+
 const ACCESS_LEVELS = {
     default: 0,
     authorized_device: 1,
     elevated_user: 2,
     admin_user: 3
 }
-
 module.exports = {
     mockResponse: () => {
         const res = {};
@@ -37,6 +46,10 @@ module.exports = {
                 creator_id: CREATOR_ID,
                 units: UNITS,
                 start_time: START_TIME,
+                email: EMAIL,
+                password: PASSWORD,
+                access_level: ACCESS_LEVEL,
+                name: NAME,
 
             },
             decoded: {
@@ -53,17 +66,20 @@ module.exports = {
         };
     },
 
+    mockVerifier: {
+        verifyMinAccessName: (accessLevel, requiredName) => new Promise((resolve) => resolve())
+    },
+    badVerifier: {
+        verifyMinAccessName: (ignore1, ignore2) => new Promise((ignore, reject) => reject(AUTH_ERROR))
+    },
     verifier: {
-        verifyMinAccessName: (accessLevel, requiredName) => new Promise((resolve) => {
+        verifyMinAccessName: (accessLevel, requiredName) => new Promise((resolve, reject) => {
             if (accessLevel >= ACCESS_LEVELS[requiredName]) {
                 resolve();
             } else {
-                reject();
+                reject(AUTH_ERROR);
             }
         })
-    },
-    badVerifier: {
-        verifyMinAccessName: (ignore1, ignore2) => new Promise((ignore, reject) => reject(ERROR))
     },
     ERROR,
     ERROR_MESSAGE,
@@ -78,5 +94,11 @@ module.exports = {
     START_TIME,
     CREATOR_ID,
     ACCESS_LEVELS,
+    ACCESS_LEVEL,
+    EMAIL,
+    PASSWORD,
+    NAME,
+    AUTH_ERROR,
+    FORBIDDEN
 
 }

@@ -1,165 +1,199 @@
-var Promise = require('promise');
+const Mocks = require('../mocks');
+const chai = require('chai');
+const sinon = require('sinon');
+chai.use(require('sinon-chai'));
+const expect = chai.expect;
+const TestGeneric = require('../test_generic');
+const UsersController = require('../../controllers/users.controller')
 
-module.exports = {
-  createUser: (User, Verifier) => (req, res) => {
-    User.create(req.body)
-      .then((result) => {
-        return res.status(200).json({
-          message: 'success! created account for new user',
-          id: result.id
-        });
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          message: err
-        });
-      });
-  },
+const user = {
+  create: (ignore) => new Promise((resolve) => resolve({ id: Mocks.ID })),
+  updateName: ({ id, name }) => new Promise((resolve) => resolve({ id: id, name: name })),
+  updateEmail: ({ id, email }) => new Promise((resolve) => resolve({ id: id, email: email })),
+  updatePassword: ({ id, password }) => new Promise((resolve) => resolve({ id: id, password: password })),
+  updateAccess: ({ id, access_level }) => new Promise((resolve) => resolve({ id: id, access_level: access_level })),
 
-  changeName: (User, Verifier) => (req, res) => {
-    hydrateReq(req)
-      .then(() => {
-        return User.updateName({ id: req.params.id, name: req.body.name })
-      })
-      .then((result) => {
-        return res.status(200).json(result);
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          message: err
-        });
-      });
-  },
-
-  changeEmail: (User, Verifier) => (req, res) => {
-    hydrateReq(req)
-      .then(() => {
-        return User.updateEmail({ id: req.params.id, email: req.body.email })
-      })
-      .then((result) => {
-        return res.status(200).json(result);
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          message: err
-        });
-      });
-  },
-
-  changePassword: (User, Verifier) => (req, res) => {
-    hydrateReq(req)
-      .then(() => {
-        return User.updatePassword({ id: req.params.id, password: req.body.password })
-      })
-      .then((result) => {
-        return res.status(200).json(result);
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          message: err
-        });
-      });
-  },
-
-  changeAccess: (User, Verifier) => (req, res) => {
-    Verifier.verifyMinAccessName(req.decoded.accessLevel, 'admin_user')
-      .then(() => {
-        return User.updateAccess({id: req.params.id, access_level: req.body.access_level})
-      })
-      .then((result) => {
-        return res.status(200).json(result);
-      })
-      .catch((err) => {
-        return res.status(err.status || 400).json({
-          message: err.message || err
-        });
-      });
-  },
-
-  deleteUser: (User, Verifier) => (req, res) => {
-    Verifier.verifyMinAccessName(req.decoded.accessLevel, 'admin_user')
-      .then(() => {
-        return User.delete({ id: req.params.id })
-      })
-      .then((result) => {
-        return res.status(200).json({
-          message: 'deleted user with id: ' + result.id
-        });
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          message: err
-        });
-      });
-  },
-
-  getOneUser: (User, Verifier) => (req, res) => {
-    User.findOne({ id: req.params.id })
-      .then((result) => {
-        /*delete result.last_login_attempt;
-        delete result.login_attempts;*/
-        return res.status(200).json(result);
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          message: err
-        });
-      });
-  },
-
-  getSelfUser: (User, Verifier) => (req, res) => {
-    User.findOne({ id: req.decoded.uid })
-      .then((result) => {
-        /*delete result.last_login_attempt;
-        delete result.login_attempts;*/
-        return res.status(200).json(result);
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          message: err
-        });
-      });
-  },
-
-  listUsers: (User, Verifier) => (req, res) => {
-    User.findAll()
-      .then((result) => {
-        return res.status(200).json(result);
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          message: err
-        });
-      });
-  },
-
-  listUsersByAccess: (User, Verifier) => (req, res) => {
-    User.findByAccessLevel(req.params.access)
-      .then((result) => {
-        return res.status(200).json(result);
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          message: err
-        });
-      });
-  },
-};
-
-function hydrateReq(req) {
-  return new Promise((resolve, reject) => {
-    Verifier.verifyMinAccessName(req.decoded.accessLevel, 'admin_user')
-      .then(() => {
-        if (!('id' in req.params)) {
-          req.params.id = req.decoded.uid;
-        }
-        resolve();
-      })
-      .catch(() => {
-        // only an admin can change update different users
-        req.params.id = req.decoded.uid;
-        resolve();
-      })
-  });
+  delete: ({ id }) => new Promise((resolve) => resolve({ id: id })),
+  findOne: ({ id }) => new Promise((resolve) => resolve({ id: id })),
+  findByAccessLevel: (ignore) => new Promise((resolve) => resolve([Mocks.RESULT])),
+  findAll: (ignore) => new Promise((resolve) => resolve([Mocks.RESULT])),
 
 }
+const badUser = {
+  create: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+  updateName: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+  updateEmail: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+  updatePassword: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+  updateAccess: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+
+  delete: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+  findOne: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+  findByAccessLevel: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+  findAll: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+
+}
+const verifier = Mocks.verifier;
+const badVerifier = Mocks.badVerifier;
+const mockVerifier = Mocks.mockVerifier; // always resolve;
+
+var req;
+var res;
+
+// use function instead of lambda
+// https://mochajs.org/#arrow-functions
+beforeEach(function () {
+  req = Mocks.mockRequest();
+  res = Mocks.mockResponse();
+});
+
+describe('createUser', function () {
+  TestGeneric.testBadModel(UsersController.createUser, badUser, verifier);
+
+  it('returns 201 status on success', function (done) {
+    UsersController.createUser(user, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(201);
+        expect(res.json).to.have.been.calledWith({ message: 'success! created account for new user', id: Mocks.ID });
+        done();
+      })
+      .catch((err) => done(err));
+  });
+});
+
+describe('changeName', () => {
+  TestGeneric.testHydrateReqUserId(UsersController.changeName, user, verifier);
+  TestGeneric.testBadModel(UsersController.changeName, badUser, verifier);
+
+  it('returns 200 status on success', function (done) {
+    UsersController.changeName(user, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(200);
+        // user id because its changing current user
+        expect(res.json).to.have.been.calledWith({ id: Mocks.USER_ID, name: Mocks.NAME });
+        done();
+      })
+      .catch((err) => done(err));
+  });
+});
+
+describe('changeEmail', () => {
+  TestGeneric.testHydrateReqUserId(UsersController.changeEmail, user, verifier);
+  TestGeneric.testBadModel(UsersController.changeEmail, badUser, verifier);
+
+  it('returns 200 status on success', function (done) {
+    UsersController.changeEmail(user, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(200);
+        // user id because its changing current user
+        expect(res.json).to.have.been.calledWith({ id: Mocks.USER_ID, email: Mocks.EMAIL });
+        done();
+      })
+      .catch((err) => done(err));
+  });
+});
+
+describe('changePassword', () => {
+  TestGeneric.testHydrateReqUserId(UsersController.changePassword, user, verifier);
+  TestGeneric.testBadModel(UsersController.changePassword, badUser, verifier);
+
+  it('returns 200 status on success', function (done) {
+    UsersController.changePassword(user, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(200);
+        // user id because its changing current user
+        expect(res.json).to.have.been.calledWith({ id: Mocks.USER_ID, password: Mocks.PASSWORD });
+        done();
+      })
+      .catch((err) => done(err));
+  });
+});
+
+describe('changeAccess', () => {
+  TestGeneric.testBadVerifier(UsersController.changeAccess, user, badVerifier);
+  TestGeneric.testBadModel(UsersController.changeAccess, badUser, mockVerifier);
+
+  it('returns 200 status on success', function (done) {
+    // changing access requires admin access level;
+    req.decoded.accessLevel = Mocks.ACCESS_LEVELS.admin_user;
+    UsersController.changeAccess(user, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(200);
+        expect(res.json).to.have.been.calledWith({ id: Mocks.ID, access_level: Mocks.ACCESS_LEVEL });
+        done();
+      })
+      .catch((err) => done(err));
+  });
+});
+
+describe('deleteUser', () => {
+  TestGeneric.testBadVerifier(UsersController.deleteUser, user, badVerifier);
+  TestGeneric.testBadModel(UsersController.deleteUser, badUser, mockVerifier);
+
+  it('returns 200 status on success', function (done) {
+    // deleting user requires admin access level;
+    req.decoded.accessLevel = Mocks.ACCESS_LEVELS.admin_user;
+    UsersController.deleteUser(user, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(200);
+        expect(res.json).to.have.been.calledWith({ message: 'deleted user with id: ' + Mocks.ID });
+        done();
+      })
+      .catch((err) => done(err));
+  });
+});
+
+describe('getOneUser', () => {
+  TestGeneric.testBadModel(UsersController.getOneUser, badUser, verifier);
+
+  it('returns 200 status on success', function (done) {
+    UsersController.getOneUser(user, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(200);
+        expect(res.json).to.have.been.calledWith({ id: Mocks.ID });
+        done();
+      })
+      .catch((err) => done(err));
+  });
+});
+
+describe('getSelfUser', () => {
+  TestGeneric.testBadModel(UsersController.getSelfUser, badUser, verifier);
+
+  it('returns 200 status on success', function (done) {
+    UsersController.getSelfUser(user, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(200);
+        expect(res.json).to.have.been.calledWith({ id: Mocks.USER_ID });
+        done();
+      })
+      .catch((err) => done(err));
+  });
+});
+
+describe('listUsersByAccess', () => {
+  TestGeneric.testBadModel(UsersController.listUsersByAccess, badUser, verifier);
+
+  it('returns 200 status on success', function (done) {
+    UsersController.listUsersByAccess(user, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(200);
+        expect(res.json).to.have.been.calledWith([Mocks.RESULT]);
+        done();
+      })
+      .catch((err) => done(err));
+  });
+});
+
+describe('listUsers', () => {
+  TestGeneric.testBadModel(UsersController.listUsers, badUser, verifier);
+
+  it('returns 200 status on success', function (done) {
+    UsersController.listUsers(user, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(200);
+        expect(res.json).to.have.been.calledWith([Mocks.RESULT]);
+        done();
+      })
+      .catch((err) => done(err));
+  });
+});

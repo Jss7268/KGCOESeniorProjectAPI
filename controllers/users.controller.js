@@ -5,14 +5,14 @@ module.exports = {
     return new Promise((resolve) => {
       User.create(req.body)
         .then((result) => {
-          return res.status(200).json({
+          return res.status(201).json({
             message: 'success! created account for new user',
             id: result.id
           });
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
@@ -23,7 +23,7 @@ module.exports = {
 
   changeName: (User, Verifier) => (req, res) => {
     return new Promise((resolve) => {
-      hydrateReq(req)
+      hydrateReq(req, Verifier)
         .then(() => {
           return User.updateName({ id: req.params.id, name: req.body.name })
         })
@@ -31,8 +31,8 @@ module.exports = {
           return res.status(200).json(result);
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
@@ -43,7 +43,7 @@ module.exports = {
 
   changeEmail: (User, Verifier) => (req, res) => {
     return new Promise((resolve) => {
-      hydrateReq(req)
+      hydrateReq(req, Verifier)
         .then(() => {
           return User.updateEmail({ id: req.params.id, email: req.body.email })
         })
@@ -51,8 +51,8 @@ module.exports = {
           return res.status(200).json(result);
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
@@ -63,7 +63,7 @@ module.exports = {
 
   changePassword: (User, Verifier) => (req, res) => {
     return new Promise((resolve) => {
-      hydrateReq(req)
+      hydrateReq(req, Verifier)
         .then(() => {
           return User.updatePassword({ id: req.params.id, password: req.body.password })
         })
@@ -71,8 +71,8 @@ module.exports = {
           return res.status(200).json(result);
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
@@ -113,8 +113,8 @@ module.exports = {
           });
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
@@ -132,8 +132,8 @@ module.exports = {
           return res.status(200).json(result);
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
@@ -151,8 +151,8 @@ module.exports = {
           return res.status(200).json(result);
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
@@ -168,8 +168,8 @@ module.exports = {
           return res.status(200).json(result);
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
@@ -185,8 +185,8 @@ module.exports = {
           return res.status(200).json(result);
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
@@ -196,7 +196,7 @@ module.exports = {
   },
 };
 
-function hydrateReq(req) {
+function hydrateReq(req, Verifier) {
   return new Promise((resolve) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'admin_user')
       .then(() => {
@@ -207,6 +207,7 @@ function hydrateReq(req) {
       .catch(() => {
         // only an admin can change update different users
         req.params.id = req.decoded.uid;
+
       })
       .finally(() => {
         resolve();
