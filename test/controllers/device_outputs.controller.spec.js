@@ -11,15 +11,15 @@ const deviceOutput = {
   updateOutputValue: ({ id, output_value }) => new Promise((resolve) => resolve({ id: id, output_value: output_value })),
   delete: ({ id }) => new Promise((resolve) => resolve({ id: id })),
   findOne: ({ id }) => new Promise((resolve) => resolve({ id: id })),
-  findAllByDeviceExperiment: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
-  findAllByExperiment: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
-  findAllByDevice: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
-  findAll: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
+  findAllByDeviceExperiment: (ignore) => new Promise((resolve) => resolve([Mocks.RESULT])),
+  findAllByExperiment: (ignore) => new Promise((resolve) => resolve([Mocks.RESULT])),
+  findAllByDevice: (ignore) => new Promise((resolve) => resolve([Mocks.RESULT])),
+  findAll: (ignore) => new Promise((resolve) => resolve([Mocks.RESULT])),
 
 }
 const badDeviceOutput = {
   create: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
-  updateOutputValue: new Promise((ignore, reject) => reject(Mocks.ERROR)),
+  updateOutputValue: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
   delete: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
   findOne: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
   findAllByDeviceExperiment: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
@@ -42,7 +42,7 @@ beforeEach(function () {
 });
 
 describe('createDeviceOutput', function () {
-  TestGeneric.testHydrateReq(DeviceOutputsController.createDeviceOutput, deviceOutput, verifier);
+  TestGeneric.testHydrateReqDeviceId(DeviceOutputsController.createDeviceOutput, deviceOutput, verifier);
   TestGeneric.testBadVerifier(DeviceOutputsController.createDeviceOutput, deviceOutput, badVerifier);
   TestGeneric.testBadModel(DeviceOutputsController.createDeviceOutput, badDeviceOutput, verifier);
 
@@ -58,7 +58,7 @@ describe('createDeviceOutput', function () {
 });
 
 describe('changeOutputValue', () => {
-  TestGeneric.testHydrateReq(DeviceOutputsController.changeOutputValue, deviceOutput, verifier);
+  TestGeneric.testHydrateReqDeviceId(DeviceOutputsController.changeOutputValue, deviceOutput, verifier);
   TestGeneric.testBadVerifier(DeviceOutputsController.changeOutputValue, deviceOutput, badVerifier);
   TestGeneric.testBadModel(DeviceOutputsController.changeOutputValue, badDeviceOutput, verifier);
 
@@ -74,7 +74,7 @@ describe('changeOutputValue', () => {
 });
 
 describe('deleteDeviceOutput', () => {
-  TestGeneric.testHydrateReq(DeviceOutputsController.deleteDeviceOutput, deviceOutput, verifier);
+  TestGeneric.testHydrateReqDeviceId(DeviceOutputsController.deleteDeviceOutput, deviceOutput, verifier);
   TestGeneric.testBadVerifier(DeviceOutputsController.deleteDeviceOutput, deviceOutput, badVerifier);
   TestGeneric.testBadModel(DeviceOutputsController.deleteDeviceOutput, badDeviceOutput, verifier);
 

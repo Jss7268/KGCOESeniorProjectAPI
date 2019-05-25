@@ -8,10 +8,10 @@ const ExperimentsController = require('../../controllers/experiments.controller'
 
 const experiment = {
   create: (ignore) => { return { id: Mocks.ID } },
-  updateStartTime: ({ id, output_value }) => { return { id: id, output_value: output_value } },
+  updateStartTime: ({ id, start_time }) => { return { id: id, start_time: start_time } },
   delete: ({ id }) => { return { id: id } },
   findOne: ({ id }) => new Promise((resolve) => resolve({ id: id })),
-  findAll: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
+  findAll: (ignore) => new Promise((resolve) => resolve([Mocks.RESULT])),
 
 }
 const badExperiment = {
@@ -35,59 +35,57 @@ beforeEach(function () {
   res = Mocks.mockResponse();
 });
 
-describe('createDeviceOutput', function () {
-  TestGeneric.testHydrateReq(ExperimentsController.createDeviceOutput, experiment, verifier);
-  TestGeneric.testBadVerifier(ExperimentsController.createDeviceOutput, experiment, badVerifier);
-  TestGeneric.testBadModel(ExperimentsController.createDeviceOutput, badExperiment, verifier);
+describe('createExperiment', function () {
+  TestGeneric.testHydrateReqCreatorId(ExperimentsController.createExperiment, experiment, verifier);
+  TestGeneric.testBadVerifier(ExperimentsController.createExperiment, experiment, badVerifier);
+  TestGeneric.testBadModel(ExperimentsController.createExperiment, badExperiment, verifier);
 
   it('returns 201 status on success', function (done) {
-    ExperimentsController.createDeviceOutput(experiment, verifier)(req, res)
+    ExperimentsController.createExperiment(experiment, verifier)(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(201);
-        expect(res.json).to.have.been.calledWith({ message: 'success! created new device_output', id: Mocks.ID });
+        expect(res.json).to.have.been.calledWith({ message: 'success! created new experiment', id: Mocks.ID });
         done();
       })
       .catch((err) => done(err));
   });
 });
 
-describe('changeOutputValue', () => {
-  TestGeneric.testHydrateReq(ExperimentsController.changeOutputValue, experiment, verifier);
-  TestGeneric.testBadVerifier(ExperimentsController.changeOutputValue, experiment, badVerifier);
-  TestGeneric.testBadModel(ExperimentsController.changeOutputValue, badExperiment, verifier);
+describe('changeStartTime', () => {
+  TestGeneric.testBadVerifier(ExperimentsController.changeStartTime, experiment, badVerifier);
+  TestGeneric.testBadModel(ExperimentsController.changeStartTime, badExperiment, verifier);
 
   it('returns 200 status on success', function (done) {
-    ExperimentsController.changeOutputValue(experiment, verifier)(req, res)
+    ExperimentsController.changeStartTime(experiment, verifier)(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
-        expect(res.json).to.have.been.calledWith({ id: Mocks.ID, output_value: Mocks.OUTPUT_VALUE });
+        expect(res.json).to.have.been.calledWith({ id: Mocks.ID, start_time: Mocks.START_TIME });
         done();
       })
       .catch((err) => done(err));
   });
 });
 
-describe('deleteDeviceOutput', () => {
-  TestGeneric.testHydrateReq(ExperimentsController.deleteDeviceOutput, experiment, verifier);
-  TestGeneric.testBadVerifier(ExperimentsController.deleteDeviceOutput, experiment, badVerifier);
-  TestGeneric.testBadModel(ExperimentsController.deleteDeviceOutput, badExperiment, verifier);
+describe('deleteExperiment', () => {
+  TestGeneric.testBadVerifier(ExperimentsController.deleteExperiment, experiment, badVerifier);
+  TestGeneric.testBadModel(ExperimentsController.deleteExperiment, badExperiment, verifier);
 
   it('returns 200 status on success', function (done) {
-    ExperimentsController.deleteDeviceOutput(experiment, verifier)(req, res)
+    ExperimentsController.deleteExperiment(experiment, verifier)(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
-        expect(res.json).to.have.been.calledWith({ message: 'deleted device_output with id: ' + Mocks.ID });
+        expect(res.json).to.have.been.calledWith({ message: 'deleted experiment with id: ' + Mocks.ID });
         done();
       })
       .catch((err) => done(err));
   });
 });
 
-describe('getOneDeviceOutput', () => {
-  TestGeneric.testBadModel(ExperimentsController.getOneDeviceOutput, badExperiment, verifier);
+describe('getOneExperiment', () => {
+  TestGeneric.testBadModel(ExperimentsController.getOneExperiment, badExperiment, verifier);
 
   it('returns 200 status on success', function (done) {
-    ExperimentsController.getOneDeviceOutput(experiment, verifier)(req, res)
+    ExperimentsController.getOneExperiment(experiment, verifier)(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith({ id: Mocks.ID });
@@ -97,53 +95,11 @@ describe('getOneDeviceOutput', () => {
   });
 });
 
-describe('listDeviceOutputsByDeviceExperiment', () => {
-  TestGeneric.testBadModel(ExperimentsController.listDeviceOutputsByDeviceExperiment, badExperiment, verifier);
+describe('listExperiments', () => {
+  TestGeneric.testBadModel(ExperimentsController.listExperiments, badExperiment, verifier);
 
   it('returns 200 status on success', function (done) {
-    ExperimentsController.listDeviceOutputsByDeviceExperiment(experiment, verifier)(req, res)
-      .then(() => {
-        expect(res.status).to.have.been.calledWith(200);
-        expect(res.json).to.have.been.calledWith([Mocks.RESULT]);
-        done();
-      })
-      .catch((err) => done(err));
-  });
-});
-
-describe('listDeviceOutputsByExperiment', () => {
-  TestGeneric.testBadModel(ExperimentsController.listDeviceOutputsByExperiment, badExperiment, verifier);
-
-  it('returns 200 status on success', function (done) {
-    ExperimentsController.listDeviceOutputsByExperiment(experiment, verifier)(req, res)
-      .then(() => {
-        expect(res.status).to.have.been.calledWith(200);
-        expect(res.json).to.have.been.calledWith([Mocks.RESULT]);
-        done();
-      })
-      .catch((err) => done(err));
-  });
-});
-
-describe('listDeviceOutputsByDevice', () => {
-  TestGeneric.testBadModel(ExperimentsController.listDeviceOutputsByDevice, badExperiment, verifier);
-
-  it('returns 200 status on success', function (done) {
-    ExperimentsController.listDeviceOutputsByDevice(experiment, verifier)(req, res)
-      .then(() => {
-        expect(res.status).to.have.been.calledWith(200);
-        expect(res.json).to.have.been.calledWith([Mocks.RESULT]);
-        done();
-      })
-      .catch((err) => done(err));
-  });
-});
-
-describe('listDeviceOutputs', () => {
-  TestGeneric.testBadModel(ExperimentsController.listDeviceOutputs, badExperiment, verifier);
-
-  it('returns 200 status on success', function (done) {
-    ExperimentsController.listDeviceOutputs(experiment, verifier)(req, res)
+    ExperimentsController.listExperiments(experiment, verifier)(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith([Mocks.RESULT]);

@@ -3,8 +3,9 @@ var Promise = require('promise');
 module.exports = {
   createExperiment: (Experiment, Verifier) => (req, res) => {
     return new Promise((resolve) => {
-      hydrateReq(req)
+      hydrateReq(req, Verifier)
         .then(() => {
+          console.log('x')
           return Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
         })
         .then(() => {
@@ -78,8 +79,8 @@ module.exports = {
           return res.status(200).json(result);
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
@@ -95,8 +96,8 @@ module.exports = {
           return res.status(200).json(result);
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
@@ -106,7 +107,7 @@ module.exports = {
   },
 };
 
-function hydrateReq(req) {
+function hydrateReq(req, Verifier) {
   return new Promise((resolve, reject) => {
     Verifier.verifyMinAccessName(req.decoded.accessLevel, 'admin_user')
       .then(() => {

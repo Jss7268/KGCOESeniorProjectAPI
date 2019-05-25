@@ -7,6 +7,20 @@ const ID = 'id';
 const USER_ID = 'user';
 const ERROR_MESSAGE = 'error';
 const ERROR_STATUS = 418;
+const ERROR = {
+    message: ERROR_MESSAGE,
+    status: ERROR_STATUS
+};
+const OUTPUT_TYPE_NAME = 'output_type_name';
+const UNITS = 'units';
+const START_TIME = 12345;
+const CREATOR_ID = 'creator';
+const ACCESS_LEVELS = {
+    default: 0,
+    authorized_device: 1,
+    elevated_user: 2,
+    admin_user: 3
+}
 
 module.exports = {
     mockResponse: () => {
@@ -20,36 +34,49 @@ module.exports = {
             body: {
                 output_value: OUTPUT_VALUE,
                 device_id: DEVICE_ID,
+                creator_id: CREATOR_ID,
+                units: UNITS,
+                start_time: START_TIME,
 
             },
             decoded: {
-                accessLevel: 2,
+                accessLevel: ACCESS_LEVELS.elevated_user,
                 uid: USER_ID,
             },
             params: {
                 id: ID,
                 device_id: DEVICE_ID,
                 experiment_id: EXPERIMENT_ID,
+                output_type_name: OUTPUT_TYPE_NAME,
+
             }
         };
     },
 
     verifier: {
-        verifyMinAccessName: (ignore1, ignore2) => new Promise((resolve) => resolve({}))
+        verifyMinAccessName: (accessLevel, requiredName) => new Promise((resolve) => {
+            if (accessLevel >= ACCESS_LEVELS[requiredName]) {
+                resolve();
+            } else {
+                reject();
+            }
+        })
     },
     badVerifier: {
-        verifyMinAccessName: (ignore1, ignore2) => new Promise((ignore, reject) => reject(Mocks.ERROR))
+        verifyMinAccessName: (ignore1, ignore2) => new Promise((ignore, reject) => reject(ERROR))
     },
-    ERROR: {
-        message: ERROR_MESSAGE,
-        status: ERROR_STATUS
-    },
-    ERROR_MESSAGE: ERROR_MESSAGE,
-    ERROR_STATUS: ERROR_STATUS,
-    DEVICE_ID: DEVICE_ID,
-    EXPERIMENT_ID: EXPERIMENT_ID,
-    OUTPUT_VALUE: OUTPUT_VALUE,
-    ID: ID,
-    USER_ID: USER_ID,
+    ERROR,
+    ERROR_MESSAGE,
+    ERROR_STATUS,
+    DEVICE_ID,
+    EXPERIMENT_ID,
+    OUTPUT_VALUE,
+    ID,
+    USER_ID,
+    OUTPUT_TYPE_NAME,
+    UNITS,
+    START_TIME,
+    CREATOR_ID,
+    ACCESS_LEVELS,
 
 }

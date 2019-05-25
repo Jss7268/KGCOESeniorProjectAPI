@@ -10,9 +10,9 @@ const deviceExperiment = {
   create: (ignore) => { return { experiment_id: Mocks.EXPERIMENT_ID, device_id: Mocks.DEVICE_ID } },
   delete: ({ experiment_id, device_id }) => new Promise((resolve) => resolve({ experiment_id: experiment_id, device_id: device_id })),
   findOne: ({ experiment_id, device_id }) => new Promise((resolve) => resolve({ experiment_id: experiment_id, device_id: device_id })),
-  findAllByExperiment: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
-  findAllByDevice: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
-  findAll: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
+  findAllByExperiment: (ignore) => new Promise((resolve) => resolve([Mocks.RESULT])),
+  findAllByDevice: (ignore) => new Promise((resolve) => resolve([Mocks.RESULT])),
+  findAll: (ignore) => new Promise((resolve) => resolve([Mocks.RESULT])),
 
 }
 const badDeviceExperiment = {

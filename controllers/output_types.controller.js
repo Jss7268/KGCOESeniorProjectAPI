@@ -6,7 +6,7 @@ module.exports = {
           return OutputType.create(req.body)
         })
         .then((result) => {
-          return res.status(200).json({
+          return res.status(201).json({
             message: 'success! created new output_type',
             id: result.id
           });
@@ -113,8 +113,8 @@ module.exports = {
           return res.status(200).json(result);
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
@@ -130,8 +130,8 @@ module.exports = {
           return res.status(200).json(result);
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
@@ -147,8 +147,8 @@ module.exports = {
           return res.status(200).json(result);
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
