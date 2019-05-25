@@ -7,7 +7,7 @@ module.exports = {
           return DeviceOutput.create(req.body)
         })
         .then((result) => {
-          return res.status(200).json({
+          return res.status(201).json({
             message: 'success! created new device_output',
             id: result.id
           });

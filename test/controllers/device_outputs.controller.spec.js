@@ -4,7 +4,7 @@ const sinon = require('sinon');
 chai.use(require('sinon-chai'));
 const expect = chai.expect;
 const TestGeneric = require('../test_generic');
-DeviceOutputsController = require('../../controllers/device_outputs.controller')
+const DeviceOutputsController = require('../../controllers/device_outputs.controller')
 
 const deviceOutput = {
   create: (ignore) => { return { id: Mocks.ID } },
@@ -50,10 +50,10 @@ describe('createDeviceOutput', function () {
   TestGeneric.testBadVerifier(DeviceOutputsController.createDeviceOutput, deviceOutput, badVerifier);
   TestGeneric.testBadModel(DeviceOutputsController.createDeviceOutput, badDeviceOutput, verifier);
 
-  it('returns 200 status on success', function (done) {
+  it('returns 201 status on success', function (done) {
     DeviceOutputsController.createDeviceOutput(deviceOutput, verifier)(req, res)
       .then(() => {
-        expect(res.status).to.have.been.calledWith(200);
+        expect(res.status).to.have.been.calledWith(201);
         expect(res.json).to.have.been.calledWith({ message: 'success! created new device_output', id: Mocks.ID });
         done();
       })

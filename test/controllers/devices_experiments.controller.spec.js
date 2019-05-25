@@ -1,110 +1,136 @@
-module.exports = {
-  createDeviceExperiment: (DeviceExperiment, Verifier) => (req, res) => {
-    Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
-      .then(() => {
-        return DeviceExperiment.create(req.body)
-      })
-      .then((result) => {
-        return res.status(201).json({
-          message: 'success! created new device experiment',
-          experiment_id: result.experiment_id,
-          device_id: result.device_id
-        });
-      })
-      .catch((err) => {
-        return res.status(err.status || 400).json({
-          message: err.message || err
-        });
-      });
-  },
+const Mocks = require('../mocks');
+const chai = require('chai');
+const sinon = require('sinon');
+chai.use(require('sinon-chai'));
+const expect = chai.expect;
+const TestGeneric = require('../test_generic');
+const DevicesExperimentsController = require('../../controllers/devices_experiments.controller')
 
-  deleteDeviceExperiment: (DeviceExperiment, Verifier) => (req, res) => {
-    Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
-      .then(() => {
-        return DeviceExperiment.delete({ experiment_id: req.params.experiment_id,
-        device_id: req.params.device_id })
-      })
-      .then((result) => {
-        return res.status(200).json({
-          message: 'deleted device experiment with experiment id: ' + result.experiment_id + 
-          ' and device id: ' + result.device_id
-        });
-      })
-      .catch((err) => {
-        return res.status(err.status || 400).json({
-          message: err.message || err
-        });
-      });
-  },
+const deviceExperiment = {
+  create: (ignore) => { return { experiment_id: Mocks.EXPERIMENT_ID, device_id: Mocks.DEVICE_ID } },
+  delete: ({ experiment_id, device_id }) => { return { experiment_id: experiment_id, device_id: device_id } },
+  findOne: ({ experiment_id, device_id }) => new Promise((resolve) => resolve({ experiment_id: experiment_id, device_id: device_id })),
+  findAllByExperiment: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
+  findAllByDevice: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
+  findAll: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
 
-  getOneDeviceExperiment: (DeviceExperiment, Verifier) => (req, res) => {
-    DeviceExperiment.findOne({
-        device_id: req.params.device_id,
-        experiment_id: req.params.experiment_id
-    })
-      .then((result) => {
-        return res.status(200).json(result);
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          message: err
-        });
-      });
-  },
+}
+const badDeviceExperiment = {
+  create: (ignore) => { throw Mocks.ERROR },
+  delete: (ignore) => { throw Mocks.ERROR },
+  findOne: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+  findAllByExperiment: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+  findAllByDevice: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+  findAll: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
 
-  getOneDeviceExperiment: (DeviceExperiment, Verifier) => (req, res) => {
-    DeviceExperiment.findOne({
-        device_id: req.params.device_id,
-        experiment_id: req.params.experiment_id
-    })
-      .then((result) => {
-        return res.status(200).json(result);
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          message: err
-        });
-      });
-  },
-
-  listExperimentsByDevice: (DeviceExperiment, Verifier) => (req, res) => {
-    DeviceExperiment.findAllByDevice({
-        device_id: req.params.device_id
-    })
-      .then((result) => {
-        return res.status(200).json(result);
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          message: err
-        });
-      });
-  },
-
-  listDevicesByExperiment: (DeviceExperiment, Verifier) => (req, res) => {
-    DeviceExperiment.findAllByExperiment({
-        experiment_id: req.params.experiment_id
-    })
-      .then((result) => {
-        return res.status(200).json(result);
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          message: err
-        });
-      });
-  },
-
-
-  listDevicesExperiments: (DeviceExperiment, Verifier) => (req, res) => {
-    DeviceExperiment.findAll()
-      .then((result) => {
-        return res.status(200).json(result);
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          message: err
-        });
-      });
-  },
+}
+const verifier = {
+  verifyMinAccessName: (ignore1, ignore2) => new Promise((resolve) => resolve({}))
 };
+const badVerifier = {
+  verifyMinAccessName: (ignore1, ignore2) => new Promise((ignore, reject) => reject(Mocks.ERROR))
+};
+
+var req;
+var res;
+
+// use function instead of lambda
+// https://mochajs.org/#arrow-functions
+beforeEach(function () {
+  req = Mocks.mockRequest();
+  res = Mocks.mockResponse();
+});
+
+describe('createDeviceExperiment', function () {
+  TestGeneric.testBadVerifier(DevicesExperimentsController.createDeviceExperiment, deviceExperiment, badVerifier);
+  TestGeneric.testBadModel(DevicesExperimentsController.createDeviceExperiment, badDeviceExperiment, verifier);
+
+  it('returns 201 status on success', function (done) {
+    DevicesExperimentsController.createDeviceExperiment(deviceExperiment, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(201);
+        expect(res.json).to.have.been.calledWith({
+          message: 'success! created new device experiment',
+          experiment_id: Mocks.EXPERIMENT_ID,
+          device_id: Mocks.DEVICE_ID
+        });
+        done();
+      })
+      .catch((err) => done(err));
+  });
+});
+
+describe('deleteDeviceExperiment', () => {
+  TestGeneric.testBadVerifier(DevicesExperimentsController.deleteDeviceExperiment, deviceExperiment, badVerifier);
+  TestGeneric.testBadModel(DevicesExperimentsController.deleteDeviceExperiment, badDeviceExperiment, verifier);
+
+  it('returns 200 status on success', function (done) {
+    DevicesExperimentsController.deleteDeviceExperiment(deviceExperiment, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(200);
+        expect(res.json).to.have.been.calledWith({
+          message: 'deleted device experiment with experiment id: ' +
+            Mocks.EXPERIMENT_ID + ' and device id: ' + Mocks.DEVICE_ID
+        });
+        done();
+      })
+      .catch((err) => done(err));
+  });
+});
+
+describe('getOneDeviceExperiment', () => {
+  TestGeneric.testBadModel(DevicesExperimentsController.getOneDeviceExperiment, badDeviceExperiment, verifier);
+
+  it('returns 200 status on success', function (done) {
+    DevicesExperimentsController.getOneDeviceExperiment(deviceExperiment, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(200);
+        expect(res.json).to.have.been.calledWith({ experiment_id: Mocks.EXPERIMENT_ID, device_id: Mocks.DEVICE_ID });
+        done();
+      })
+      .catch((err) => done(err));
+  });
+});
+
+describe('listDevicesByExperiment', () => {
+  TestGeneric.testBadModel(DevicesExperimentsController.listDevicesByExperiment, badDeviceExperiment, verifier);
+
+  it('returns 200 status on success', function (done) {
+    DevicesExperimentsController.listDevicesByExperiment(deviceExperiment, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(200);
+        expect(res.json).to.have.been.calledWith([Mocks.RESULT]);
+        done();
+      })
+      .catch((err) => done(err));
+  });
+});
+
+describe('listExperimentsByDevice', () => {
+  TestGeneric.testBadModel(DevicesExperimentsController.listExperimentsByDevice, badDeviceExperiment, verifier);
+
+  it('returns 200 status on success', function (done) {
+    DevicesExperimentsController.listExperimentsByDevice(deviceExperiment, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(200);
+        expect(res.json).to.have.been.calledWith([Mocks.RESULT]);
+        done();
+      })
+      .catch((err) => done(err));
+  });
+});
+
+describe('listDevicesExperiments', () => {
+  TestGeneric.testBadModel(DevicesExperimentsController.listDevicesExperiments, badDeviceExperiment, verifier);
+
+  it('returns 200 status on success', function (done) {
+    DevicesExperimentsController.listDevicesExperiments(deviceExperiment, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(200);
+        expect(res.json).to.have.been.calledWith([Mocks.RESULT]);
+        done();
+      })
+      .catch((err) => done(err));
+  });
+});
+

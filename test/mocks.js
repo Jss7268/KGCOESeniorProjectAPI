@@ -1,9 +1,10 @@
 const sinon = require('sinon');
 
 const OUTPUT_VALUE = 100;
-const DEVICE_ID = 20;
-const ID = 1234;
-const USER_ID = 111;
+const DEVICE_ID = 'device';
+const EXPERIMENT_ID = 'experiment'
+const ID = 'id';
+const USER_ID = 'user';
 const ERROR_MESSAGE = 'error';
 const ERROR_STATUS = 418;
 
@@ -25,7 +26,11 @@ module.exports = {
                 accessLevel: 2,
                 uid: USER_ID,
             },
-            params: {id: ID}
+            params: {
+                id: ID,
+                device_id: DEVICE_ID,
+                experiment_id: EXPERIMENT_ID,
+            }
         };
     },
     ERROR: {
@@ -35,6 +40,7 @@ module.exports = {
     ERROR_MESSAGE: ERROR_MESSAGE,
     ERROR_STATUS: ERROR_STATUS,
     DEVICE_ID: DEVICE_ID,
+    EXPERIMENT_ID: EXPERIMENT_ID,
     OUTPUT_VALUE: OUTPUT_VALUE,
     ID: ID,
     USER_ID: USER_ID,

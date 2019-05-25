@@ -59,28 +59,8 @@ module.exports = {
           return res.status(200).json(result);
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
-          });
-        })
-        .finally(() => {
-          resolve();
-        });
-    });
-  },
-
-  getOneDeviceExperiment: (DeviceExperiment, Verifier) => (req, res) => {
-    return new Promise((resolve) => {
-      DeviceExperiment.findOne({
-        device_id: req.params.device_id,
-        experiment_id: req.params.experiment_id
-      })
-        .then((result) => {
-          return res.status(200).json(result);
-        })
-        .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
@@ -98,8 +78,8 @@ module.exports = {
           return res.status(200).json(result);
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
@@ -117,8 +97,8 @@ module.exports = {
           return res.status(200).json(result);
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
@@ -135,8 +115,8 @@ module.exports = {
           return res.status(200).json(result);
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
