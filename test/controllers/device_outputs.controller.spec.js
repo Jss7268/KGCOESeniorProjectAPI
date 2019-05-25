@@ -5,7 +5,6 @@ chai.use(require('sinon-chai'));
 const expect = chai.expect;
 DeviceOutputsController = require('../../controllers/device_outputs.controller')
 
-const ERROR_MESSAGE = 'error';
 const RESULT = { result: 'result' };
 
 var req;
@@ -21,20 +20,30 @@ before(function () {
   deviceOutput = {
     create: (ignore) => { return { id: Mocks.ID } },
     updateOutputValue: ({ id, output_value }) => { return { id: id, output_value: output_value } },
-    delete: (ignore) => { return {id: Mocks.ID } },
+    delete: ({ id }) => { return { id: id } },
+    findOne: ({ id }) => new Promise((resolve) => resolve({ id: id })),
+    findAllByDeviceExperiment: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
+    findAllByExperiment: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
+    findAllByDevice: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
+    findAll: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
+
   }
   badDeviceOutput = {
-    create: (ignore) => { throw { message: ERROR_MESSAGE } },
-    updateOutputValue: (ignore) => { throw { message: ERROR_MESSAGE } },
-    delete: (ignore) => { throw { message: ERROR_MESSAGE } },
-
+    create: (ignore) => { throw Mocks.ERROR },
+    updateOutputValue: (ignore) => { throw Mocks.ERROR },
+    delete: (ignore) => { throw Mocks.ERROR },
+    findOne: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+    findAllByDeviceExperiment: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+    findAllByExperiment: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+    findAllByDevice: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+    findAll: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
 
   }
   verifier = {
     verifyMinAccessName: (ignore1, ignore2) => new Promise((resolve) => resolve({}))
   };
   badVerifier = {
-    verifyMinAccessName: (ignore1, ignore2) => new Promise((ignore, reject) => reject({ message: ERROR_MESSAGE }))
+    verifyMinAccessName: (ignore1, ignore2) => new Promise((ignore, reject) => reject(Mocks.ERROR))
   };
 });
 
@@ -44,45 +53,9 @@ beforeEach(function () {
 });
 
 describe('createDeviceOutput', function () {
-  it('doesn\'t allow devices to set device_id', function(done) {
-    req.decoded.accessLevel = 1; // authorized_device access level
-    DeviceOutputsController.createDeviceOutput(deviceOutput, verifier)(req, res)
-      .then(() => {
-        expect(req.body.device_id).to.equal(Mocks.USER_ID);
-        done();
-      })
-      .catch((err) => done(err));
-  });
+  testForWrite(DeviceOutputsController.createDeviceOutput);
 
-  it('doesn\'t allow devices to set device_id', function(done) {
-    DeviceOutputsController.createDeviceOutput(deviceOutput, verifier)(req, res)
-      .then(() => {
-        expect(req.body.device_id).to.equal(Mocks.DEVICE_ID);
-        done();
-      })
-      .catch((err) => done(err));
-  });
-  it('returns 400 status on bad verifier', function (done) {
-    DeviceOutputsController.createDeviceOutput(deviceOutput, badVerifier)(req, res)
-      .then(() => {
-        expect(res.status).to.have.been.calledWith(400);
-        expect(res.json).to.have.been.calledWith({ message: ERROR_MESSAGE });
-        done();
-      })
-      .catch((err) => done(err));
-  });
-
-  it('returns 400 status on bad create', function (done) {
-    DeviceOutputsController.createDeviceOutput(badDeviceOutput, verifier)(req, res)
-      .then(() => {
-        expect(res.status).to.have.been.calledWith(400);
-        expect(res.json).to.have.been.calledWith({ message: ERROR_MESSAGE });
-        done();
-      })
-      .catch((err) => done(err));
-  });
-
-  it('returns 200 status on error', function (done) {
+  it('returns 200 status on success', function (done) {
     DeviceOutputsController.createDeviceOutput(deviceOutput, verifier)(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
@@ -94,31 +67,13 @@ describe('createDeviceOutput', function () {
 });
 
 describe('changeOutputValue', () => {
-  it('returns 400 status on bad verifier', function (done) {
-    DeviceOutputsController.changeOutputValue(deviceOutput, badVerifier)(req, res)
-      .then(() => {
-        expect(res.status).to.have.been.calledWith(400);
-        expect(res.json).to.have.been.calledWith({ message: ERROR_MESSAGE });
-        done();
-      })
-      .catch((err) => done(err));
-  });
+  testForWrite(DeviceOutputsController.changeOutputValue);
 
-  it('returns 400 status on bad create', function (done) {
-    DeviceOutputsController.changeOutputValue(badDeviceOutput, verifier)(req, res)
-      .then(() => {
-        expect(res.status).to.have.been.calledWith(400);
-        expect(res.json).to.have.been.calledWith({ message: ERROR_MESSAGE });
-        done();
-      })
-      .catch((err) => done(err));
-  });
-
-  it('returns 200 status on error', function (done) {
+  it('returns 200 status on success', function (done) {
     DeviceOutputsController.changeOutputValue(deviceOutput, verifier)(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
-        expect(res.json).to.have.been.calledWith({ id: Mocks.ID, output_value: Mocks.OUTPUT_VALUE});
+        expect(res.json).to.have.been.calledWith({ id: Mocks.ID, output_value: Mocks.OUTPUT_VALUE });
         done();
       })
       .catch((err) => done(err));
@@ -126,31 +81,13 @@ describe('changeOutputValue', () => {
 });
 
 describe('deleteDeviceOutput', () => {
-  it('returns 400 status on bad verifier', function (done) {
-    DeviceOutputsController.deleteDeviceOutput(deviceOutput, badVerifier)(req, res)
-      .then(() => {
-        expect(res.status).to.have.been.calledWith(400);
-        expect(res.json).to.have.been.calledWith({ message: ERROR_MESSAGE });
-        done();
-      })
-      .catch((err) => done(err));
-  });
+  testForWrite(DeviceOutputsController.deleteDeviceOutput);
 
-  it('returns 400 status on bad create', function (done) {
-    DeviceOutputsController.deleteDeviceOutput(badDeviceOutput, verifier)(req, res)
-      .then(() => {
-        expect(res.status).to.have.been.calledWith(400);
-        expect(res.json).to.have.been.calledWith({ message: ERROR_MESSAGE });
-        done();
-      })
-      .catch((err) => done(err));
-  });
-
-  it('returns 200 status on error', function (done) {
+  it('returns 200 status on success', function (done) {
     DeviceOutputsController.deleteDeviceOutput(deviceOutput, verifier)(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
-        expect(res.json).to.have.been.calledWith({ message: 'deleted device_output with id: ' + Mocks.ID});
+        expect(res.json).to.have.been.calledWith({ message: 'deleted device_output with id: ' + Mocks.ID });
         done();
       })
       .catch((err) => done(err));
@@ -158,21 +95,117 @@ describe('deleteDeviceOutput', () => {
 });
 
 describe('getOneDeviceOutput', () => {
-
+  testBadModel(DeviceOutputsController.getOneDeviceOutput);
+  it('returns 200 status on success', function (done) {
+    DeviceOutputsController.getOneDeviceOutput(deviceOutput, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(200);
+        expect(res.json).to.have.been.calledWith({ id: Mocks.ID });
+        done();
+      })
+      .catch((err) => done(err));
+  });
 });
 
 describe('listDeviceOutputsByDeviceExperiment', () => {
-
+  testBadModel(DeviceOutputsController.listDeviceOutputsByDeviceExperiment);
+  it('returns 200 status on success', function (done) {
+    DeviceOutputsController.listDeviceOutputsByDeviceExperiment(deviceOutput, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(200);
+        expect(res.json).to.have.been.calledWith([Mocks.RESULT]);
+        done();
+      })
+      .catch((err) => done(err));
+  });
 });
 
 describe('listDeviceOutputsByExperiment', () => {
-
+  testBadModel(DeviceOutputsController.listDeviceOutputsByExperiment);
+  it('returns 200 status on success', function (done) {
+    DeviceOutputsController.listDeviceOutputsByExperiment(deviceOutput, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(200);
+        expect(res.json).to.have.been.calledWith([Mocks.RESULT]);
+        done();
+      })
+      .catch((err) => done(err));
+  });
 });
 
 describe('listDeviceOutputsByDevice', () => {
-
+  testBadModel(DeviceOutputsController.listDeviceOutputsByDevice);
+  it('returns 200 status on success', function (done) {
+    DeviceOutputsController.listDeviceOutputsByDevice(deviceOutput, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(200);
+        expect(res.json).to.have.been.calledWith([Mocks.RESULT]);
+        done();
+      })
+      .catch((err) => done(err));
+  });
 });
 
 describe('listDeviceOutputs', () => {
-
+  testBadModel(DeviceOutputsController.listDeviceOutputs);
+  it('returns 200 status on success', function (done) {
+    DeviceOutputsController.listDeviceOutputs(deviceOutput, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(200);
+        expect(res.json).to.have.been.calledWith([Mocks.RESULT]);
+        done();
+      })
+      .catch((err) => done(err));
+  });
 });
+
+function testForWrite(fn) {
+  testHydrateReq(fn);
+  testBadVerifier(fn);
+  testBadModel(fn);
+}
+
+function testHydrateReq(fn) {
+  it('doesn\'t allow devices to set device_id', function (done) {
+    req.decoded.accessLevel = 1; // authorized_device access level
+    fn(deviceOutput, verifier)(req, res)
+      .then(() => {
+        expect(req.body.device_id).to.equal(Mocks.USER_ID);
+        done();
+      })
+      .catch((err) => done(err));
+  });
+
+  it('doesn\'t allow devices to set device_id', function (done) {
+    fn(deviceOutput, verifier)(req, res)
+      .then(() => {
+        expect(req.body.device_id).to.equal(Mocks.DEVICE_ID);
+        done();
+      })
+      .catch((err) => done(err));
+  });
+}
+
+function testBadVerifier(fn) {
+  it('returns 400 status on bad verifier', function (done) {
+    fn(deviceOutput, badVerifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(Mocks.ERROR_STATUS);
+        expect(res.json).to.have.been.calledWith({ message: Mocks.ERROR_MESSAGE });
+        done();
+      })
+      .catch((err) => done(err));
+  });
+}
+
+function testBadModel(fn) {
+  it('returns 400 status on bad model', function (done) {
+    fn(badDeviceOutput, verifier)(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(Mocks.ERROR_STATUS);
+        expect(res.json).to.have.been.calledWith({ message: Mocks.ERROR_MESSAGE });
+        done();
+      })
+      .catch((err) => done(err));
+  });
+}

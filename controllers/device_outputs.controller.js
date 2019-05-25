@@ -75,8 +75,8 @@ module.exports = {
           return res.status(200).json(result);
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
@@ -92,8 +92,8 @@ module.exports = {
           return res.status(200).json(result);
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
@@ -109,8 +109,8 @@ module.exports = {
           return res.status(200).json(result);
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
@@ -126,8 +126,8 @@ module.exports = {
           return res.status(200).json(result);
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
@@ -143,8 +143,8 @@ module.exports = {
           return res.status(200).json(result);
         })
         .catch((err) => {
-          return res.status(400).json({
-            message: err
+          return res.status(err.status || 400).json({
+            message: err.message || err
           });
         })
         .finally(() => {
@@ -157,8 +157,6 @@ module.exports = {
 function hydrateReq(req) {
   // TODO don't hardcode 1 for authorized_device
   if (req.decoded.accessLevel == 1) {
-    console.log(req);
-
     // devices can only manipulate data for themselves
     req.body.device_id = req.decoded.uid
   }
