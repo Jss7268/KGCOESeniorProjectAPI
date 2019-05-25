@@ -18,7 +18,6 @@ var badVerifier;
 // use function instead of lambda
 // https://mochajs.org/#arrow-functions
 before(function () {
-  req = Mocks.mockRequest();
   deviceOutput = {
     create: (ignore) => { return { id: Mocks.ID } },
     updateOutputValue: ({ id, output_value }) => { return { id: id, output_value: output_value } },
@@ -40,10 +39,29 @@ before(function () {
 });
 
 beforeEach(function () {
+  req = Mocks.mockRequest();
   res = Mocks.mockResponse();
 });
 
 describe('createDeviceOutput', function () {
+  it('doesn\'t allow devices to set device_id', function(done) {
+    req.decoded.accessLevel = 1; // authorized_device access level
+    DeviceOutputsController.createDeviceOutput(deviceOutput, verifier)(req, res)
+      .then(() => {
+        expect(req.body.device_id).to.equal(Mocks.USER_ID);
+        done();
+      })
+      .catch((err) => done(err));
+  });
+
+  it('doesn\'t allow devices to set device_id', function(done) {
+    DeviceOutputsController.createDeviceOutput(deviceOutput, verifier)(req, res)
+      .then(() => {
+        expect(req.body.device_id).to.equal(Mocks.DEVICE_ID);
+        done();
+      })
+      .catch((err) => done(err));
+  });
   it('returns 400 status on bad verifier', function (done) {
     DeviceOutputsController.createDeviceOutput(deviceOutput, badVerifier)(req, res)
       .then(() => {

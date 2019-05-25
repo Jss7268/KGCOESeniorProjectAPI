@@ -156,7 +156,9 @@ module.exports = {
 
 function hydrateReq(req) {
   // TODO don't hardcode 1 for authorized_device
-  if (req.accessLevel == 1) {
+  if (req.decoded.accessLevel == 1) {
+    console.log(req);
+
     // devices can only manipulate data for themselves
     req.body.device_id = req.decoded.uid
   }
