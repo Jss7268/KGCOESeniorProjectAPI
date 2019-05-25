@@ -54,10 +54,21 @@ function testHydrateReqCreatorId(fn, model, verifier) {
             })
             .catch((err) => done(err));
     });
+
+    it('allows admins to not set creator_id', function (done) {
+        req.decoded.accessLevel = Mocks.ACCESS_LEVELS.admin_user;
+        delete req.body.creator_id;
+        fn(model, verifier)(req, res)
+            .then(() => {
+                expect(req.body.creator_id).to.equal(req.decoded.uid);
+                done();
+            })
+            .catch((err) => done(err));
+    });
 }
 
 function testHydrateReqUserId(fn, model, verifier) {
-    it('doesn\'t allow non-admins to set creator_id', function (done) {
+    it('doesn\'t allow non-admins to set user id', function (done) {
         req.decoded.accessLevel = Mocks.ACCESS_LEVELS.elevated_user;
         fn(model, verifier)(req, res)
             .then(() => {
@@ -67,11 +78,22 @@ function testHydrateReqUserId(fn, model, verifier) {
             .catch((err) => done(err));
     });
 
-    it('allows admins to set creator_id', function (done) {
+    it('allows admins to set user', function (done) {
         req.decoded.accessLevel = Mocks.ACCESS_LEVELS.admin_user;
         fn(model, verifier)(req, res)
             .then(() => {
                 expect(req.params.id).to.equal(Mocks.ID);
+                done();
+            })
+            .catch((err) => done(err));
+    });
+
+    it('allows admins to modify own access', function (done) {
+        req.decoded.accessLevel = Mocks.ACCESS_LEVELS.admin_user;
+        delete req.params.id;
+        fn(model, verifier)(req, res)
+            .then(() => {
+                expect(req.params.id).to.equal(req.decoded.uid);
                 done();
             })
             .catch((err) => done(err));
