@@ -33,6 +33,13 @@ module.exports = {
             }
         };
     },
+
+    verifier: {
+        verifyMinAccessName: (ignore1, ignore2) => new Promise((resolve) => resolve({}))
+    },
+    badVerifier: {
+        verifyMinAccessName: (ignore1, ignore2) => new Promise((ignore, reject) => reject(Mocks.ERROR))
+    },
     ERROR: {
         message: ERROR_MESSAGE,
         status: ERROR_STATUS

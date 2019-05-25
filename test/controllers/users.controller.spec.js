@@ -1,7 +1,7 @@
 var Promise = require('promise');
 
 module.exports = {
-  createUser: (User, Verifer) => (req, res) => {
+  createUser: (User, Verifier) => (req, res) => {
     User.create(req.body)
       .then((result) => {
         return res.status(200).json({

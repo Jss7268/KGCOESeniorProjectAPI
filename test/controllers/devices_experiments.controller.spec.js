@@ -8,7 +8,7 @@ const DevicesExperimentsController = require('../../controllers/devices_experime
 
 const deviceExperiment = {
   create: (ignore) => { return { experiment_id: Mocks.EXPERIMENT_ID, device_id: Mocks.DEVICE_ID } },
-  delete: ({ experiment_id, device_id }) => { return { experiment_id: experiment_id, device_id: device_id } },
+  delete: ({ experiment_id, device_id }) => new Promise((resolve) => resolve({ experiment_id: experiment_id, device_id: device_id })),
   findOne: ({ experiment_id, device_id }) => new Promise((resolve) => resolve({ experiment_id: experiment_id, device_id: device_id })),
   findAllByExperiment: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
   findAllByDevice: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
@@ -24,13 +24,9 @@ const badDeviceExperiment = {
   findAll: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
 
 }
-const verifier = {
-  verifyMinAccessName: (ignore1, ignore2) => new Promise((resolve) => resolve({}))
-};
-const badVerifier = {
-  verifyMinAccessName: (ignore1, ignore2) => new Promise((ignore, reject) => reject(Mocks.ERROR))
-};
 
+const verifier = Mocks.verifier;
+const badVerifier = Mocks.badVerifier;
 var req;
 var res;
 

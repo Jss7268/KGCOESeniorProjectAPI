@@ -7,9 +7,9 @@ const TestGeneric = require('../test_generic');
 const DeviceOutputsController = require('../../controllers/device_outputs.controller')
 
 const deviceOutput = {
-  create: (ignore) => { return { id: Mocks.ID } },
-  updateOutputValue: ({ id, output_value }) => { return { id: id, output_value: output_value } },
-  delete: ({ id }) => { return { id: id } },
+  create: (ignore) => new Promise((resolve) => resolve({ id: Mocks.ID })),
+  updateOutputValue: ({ id, output_value }) => new Promise((resolve) => resolve({ id: id, output_value: output_value })),
+  delete: ({ id }) => new Promise((resolve) => resolve({ id: id })),
   findOne: ({ id }) => new Promise((resolve) => resolve({ id: id })),
   findAllByDeviceExperiment: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
   findAllByExperiment: (params) => new Promise((resolve) => resolve([Mocks.RESULT])),
@@ -18,9 +18,9 @@ const deviceOutput = {
 
 }
 const badDeviceOutput = {
-  create: (ignore) => { throw Mocks.ERROR },
-  updateOutputValue: (ignore) => { throw Mocks.ERROR },
-  delete: (ignore) => { throw Mocks.ERROR },
+  create: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+  updateOutputValue: new Promise((ignore, reject) => reject(Mocks.ERROR)),
+  delete: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
   findOne: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
   findAllByDeviceExperiment: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
   findAllByExperiment: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
@@ -28,12 +28,8 @@ const badDeviceOutput = {
   findAll: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
 
 }
-const verifier = {
-  verifyMinAccessName: (ignore1, ignore2) => new Promise((resolve) => resolve({}))
-};
-const badVerifier = {
-  verifyMinAccessName: (ignore1, ignore2) => new Promise((ignore, reject) => reject(Mocks.ERROR))
-};
+const verifier = Mocks.verifier;
+const badVerifier = Mocks.badVerifier;
 
 var req;
 var res;
