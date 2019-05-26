@@ -1,198 +1,197 @@
-var Promise = require('promise');
-var config = require('./../config/config');
-var db = require('./../config/db');
-var bcrypt = require('bcrypt');
-var Validator = require('../validators/validator');
-var UserAccess = require('./user_access');
+var _db, _UserAccess, _Validator;
+const bcrypt = require('bcrypt');
 
-module.exports = {
-  findAll: () => {
-    return new Promise((resolve, reject) => {
-      db.query('SELECT id, name, email, access_level FROM users where deleted_at = 0', [])
-        .then((results) => {
-          resolve(results.rows);
-        })
-        .catch((err) => {
-          reject(err);
-        });
-    });
-  },
+module.exports = (db, UserAccess, Validator) => {
+  _db = db, _UserAccess = UserAccess, _Validator = Validator;
+  return {
+    findAll: () => {
+      return new Promise((resolve, reject) => {
+        _db.query('SELECT id, name, email, access_level FROM users where deleted_at = 0', [])
+          .then((results) => {
+            resolve(results.rows);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    },
 
-  findByAccessLevel: (accessLevel) => {
-    return new Promise((resolve, reject) => {
-      db.query('SELECT id, name, email, access_level FROM users where access_level = $1 and deleted_at = 0', [accessLevel])
-        .then((results) => {
-          resolve(results.rows);
-        })
-        .catch((err) => {
-          reject(err);
-        });
-    });
-  },
+    findByAccessLevel: (accessLevel) => {
+      return new Promise((resolve, reject) => {
+        _db.query('SELECT id, name, email, access_level FROM users where access_level = $1 and deleted_at = 0', [accessLevel])
+          .then((results) => {
+            resolve(results.rows);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    },
 
-  findOne: (data) => {
-    return new Promise((resolve, reject) => {
-      if (!data.id && !data.email) {
-        reject('error: must provide id or email')
-      }
-      else {
-        if (data.id) {
-          findOneById(data.id)
-            .then((result) => {
-              delete result.hashed_password;
-              resolve(result);
-            })
-            .catch((err) => {
-              reject(err);
-            });
+    findOne: (data) => {
+      return new Promise((resolve, reject) => {
+        if (!data.id && !data.email) {
+          reject('error: must provide id or email')
         }
-        else if (data.email) {
-          findOneByEmail(data.email)
-            .then((result) => {
-              delete result.password;
-              resolve(result);
-            })
-            .catch((err) => {
-              reject(err);
-            });
+        else {
+          if (data.id) {
+            findOneById(data.id)
+              .then((result) => {
+                delete result.hashed_password;
+                resolve(result);
+              })
+              .catch((err) => {
+                reject(err);
+              });
+          }
+          else if (data.email) {
+            findOneByEmail(data.email)
+              .then((result) => {
+                delete result.password;
+                resolve(result);
+              })
+              .catch((err) => {
+                reject(err);
+              });
+          }
         }
-      }
-    });
-  },
+      });
+    },
 
-  create: (data) => {
-    var time = new Date().getTime();
-    return new Promise((resolve, reject) => {
-      validateUserData(data)
-        .then(function () {
-          return hashPassword(data.password);
-        })
-        .then((hash) => {
-          return db.query(
-            'INSERT INTO users (name, email, hashed_password, created_at, updated_at) VALUES ($1, $2, $3, $4, $4) returning id',
-            [data.name, data.email, hash, time]);
-        })
-        .then((result) => {
-          resolve(result.rows[0]);
-        })
-        .catch((err) => {
-          console.log(err);
-          reject(err);
-        });
-    });
-  },
+    create: (data) => {
+      var time = new Date().getTime();
+      return new Promise((resolve, reject) => {
+        validateUserData(data)
+          .then(function () {
+            return hashPassword(data.password);
+          })
+          .then((hash) => {
+            return _db.query(
+              'INSERT INTO users (name, email, hashed_password, created_at, updated_at) VALUES ($1, $2, $3, $4, $4) returning id',
+              [data.name, data.email, hash, time]);
+          })
+          .then((result) => {
+            resolve(result.rows[0]);
+          })
+          .catch((err) => {
+            console.log(err);
+            reject(err);
+          });
+      });
+    },
 
-  delete: (data) => {
-    var time = new Date().getTime();
-    return new Promise((resolve, reject) => {
-      db.query('UPDATE users SET deleted_at = $2 WHERE id = $1 returning id', [data.id, time])
-        .then((result) => {
-          resolve(result.rows[0]);
-        })
-        .catch((err) => {
-          reject(err);
-        });
-    });
-  },
+    delete: (data) => {
+      var time = new Date().getTime();
+      return new Promise((resolve, reject) => {
+        _db.query('UPDATE users SET deleted_at = $2 WHERE id = $1 returning id', [data.id, time])
+          .then((result) => {
+            resolve(result.rows[0]);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    },
 
-  updateName: (data) => {
-    var time = new Date().getTime();
-    return new Promise((resolve, reject) => {
-      Validator.validateColumns(data, ['id', 'name'])
-        .then(function () {
-          return db.query('UPDATE users SET name = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning name', [data.id, data.name, time])
-        })
-        .then((result) => {
-          resolve(result.rows[0]);
-        })
-        .catch((err) => {
-          reject(err);
-        });
-    });
-  },
+    updateName: (data) => {
+      var time = new Date().getTime();
+      return new Promise((resolve, reject) => {
+        _Validator.validateColumns(data, ['id', 'name'])
+          .then(function () {
+            return _db.query('UPDATE users SET name = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning name', [data.id, data.name, time])
+          })
+          .then((result) => {
+            resolve(result.rows[0]);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    },
 
-  updateEmail: (data) => {
-    var time = new Date().getTime();
-    return new Promise((resolve, reject) => {
-      Validator.validateColumns(data, ['id', 'email'])
-        .then(function () {
-          return validateEmail(data.email)
-        })
-        .then(function () {
-          return db.query('UPDATE users SET email = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning email', [data.id, data.email, time]);
-        })
-        .then((result) => {
-          resolve(result.rows[0]);
-        })
-        .catch((err) => {
-          reject(err);
-        });
-    });
-  },
+    updateEmail: (data) => {
+      var time = new Date().getTime();
+      return new Promise((resolve, reject) => {
+        _Validator.validateColumns(data, ['id', 'email'])
+          .then(function () {
+            return validateEmail(data.email)
+          })
+          .then(function () {
+            return _db.query('UPDATE users SET email = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning email', [data.id, data.email, time]);
+          })
+          .then((result) => {
+            resolve(result.rows[0]);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    },
 
-  updatePassword: (data) => {
-    var time = new Date().getTime();
-    return new Promise((resolve, reject) => {
-      Validator.validateColumns(data, ['id', 'password'])
-        .then(function () {
-          return validatePassword(data.password, 6)
-        })
-        .then(function () {
-          return hashPassword(data.password);
-        })
-        .then((hash) => {
-          return db.query('UPDATE users SET hashed_password = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning id', [data.id, hash, time]);
-        })
-        .then((result) => {
-          resolve(result.rows[0]);
-        })
-        .catch((err) => {
-          reject(err);
-        });
-    });
-  },
+    updatePassword: (data) => {
+      var time = new Date().getTime();
+      return new Promise((resolve, reject) => {
+        _Validator.validateColumns(data, ['id', 'password'])
+          .then(function () {
+            return validatePassword(data.password, 6)
+          })
+          .then(function () {
+            return hashPassword(data.password);
+          })
+          .then((hash) => {
+            return _db.query('UPDATE users SET hashed_password = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning id', [data.id, hash, time]);
+          })
+          .then((result) => {
+            resolve(result.rows[0]);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    },
 
-  authenticate: (data) => {
-    return new Promise((resolve, reject) => {
-      Validator.validateColumns(data, ['email', 'password'])
-        .then(function () {
-          return findOneByEmail(data.email)
-        })
-        .then((user) => {
-          return verifyPassword(data.password, user);
-        })
-        .then((result) => {
-          resolve({ isAuthorized: result.isValid, id: result.id, accessLevel: result.accessLevel });
-        })
-        .catch((err) => {
-          reject(err);
-        });
-    });
-  },
+    authenticate: (data) => {
+      return new Promise((resolve, reject) => {
+        _Validator.validateColumns(data, ['email', 'password'])
+          .then(function () {
+            return findOneByEmail(data.email)
+          })
+          .then((user) => {
+            return verifyPassword(data.password, user);
+          })
+          .then((result) => {
+            resolve({ isAuthorized: result.isValid, id: result.id, accessLevel: result.accessLevel });
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    },
 
-  updateAccess: (data) => {
-    var time = new Date().getTime();
-    return new Promise((resolve, reject) => {
-      Validator.validateColumns(data, ['id', 'access_level'])
-        .then(function () {
-          return validateAccessLevel(data)
-        })
-        .then(function () {
-          return db.query('UPDATE users SET access_level = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning access_level', [data.id, data.access_level, time]);
-        })
-        .then((result) => {
-          resolve(result.rows[0]);
-        })
-        .catch((err) => {
-          reject(err);
-        });
-    });
+    updateAccess: (data) => {
+      var time = new Date().getTime();
+      return new Promise((resolve, reject) => {
+        _Validator.validateColumns(data, ['id', 'access_level'])
+          .then(function () {
+            return validateAccessLevel(data)
+          })
+          .then(function () {
+            return _db.query('UPDATE users SET access_level = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning access_level', [data.id, data.access_level, time]);
+          })
+          .then((result) => {
+            resolve(result.rows[0]);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    },
   }
 };
 
 function findOneById(id) {
   return new Promise((resolve, reject) => {
-    db.query('SELECT * FROM users WHERE id = $1 and deleted_at = 0', [id])
+    _db.query('SELECT * FROM users WHERE id = $1 and deleted_at = 0', [id])
       .then((result) => {
         if (result.rows[0]) {
           resolve(result.rows[0]);
@@ -209,7 +208,7 @@ function findOneById(id) {
 
 function findOneByEmail(email) {
   return new Promise((resolve, reject) => {
-    db.query('SELECT * FROM users WHERE email = $1 and deleted_at = 0', [email])
+    _db.query('SELECT * FROM users WHERE email = $1 and deleted_at = 0', [email])
       .then((result) => {
         if (result.rows[0]) {
           resolve(result.rows[0]);
@@ -246,7 +245,7 @@ function hashPassword(password) {
 
 function validateUserData(data) {
   return new Promise((resolve, reject) => {
-    Validator.validateColumns(data, ['email', 'password'])
+    _Validator.validateColumns(data, ['email', 'password'])
       .then(function () {
         return validatePassword(data.password, 6)
       })
@@ -308,12 +307,12 @@ function verifyPassword(password, user) {
 
 function validateAccessLevel(data) {
   return new Promise((resolve, reject) => {
-    UserAccess.findOne(data)
-    .then(() => {
-      resolve();
-    })
-    .catch((err) => {
-      reject(err); // todo better error message
-    })
+    _UserAccess.findOne(data)
+      .then(() => {
+        resolve();
+      })
+      .catch((err) => {
+        reject(err); // todo better error message
+      })
   })
 }

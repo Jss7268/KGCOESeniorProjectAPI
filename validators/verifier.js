@@ -1,6 +1,3 @@
-var router = require('express').Router();
-var UserAccess;
-
 module.exports = function (UserAccess) {
     return {
         verifyMinAccessLevel: (accessLevel, requiredAccessLevel) => {

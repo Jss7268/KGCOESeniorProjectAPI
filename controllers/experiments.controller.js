@@ -1,4 +1,4 @@
-var Promise = require('promise');
+const promise = require('promise');
 
 module.exports = (Experiment, Verifier) => {
   return {
