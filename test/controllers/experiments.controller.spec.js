@@ -36,12 +36,12 @@ beforeEach(function () {
 });
 
 describe('createExperiment', function () {
-  TestGeneric.testHydrateReqCreatorId(ExperimentsController.createExperiment, experiment, verifier);
-  TestGeneric.testBadVerifier(ExperimentsController.createExperiment, experiment, badVerifier);
-  TestGeneric.testBadModel(ExperimentsController.createExperiment, badExperiment, verifier);
+  TestGeneric.testHydrateReqCreatorId(ExperimentsController(experiment, verifier).createExperiment);
+  TestGeneric.testBadVerifier(ExperimentsController(experiment, badVerifier).createExperiment);
+  TestGeneric.testBadModel(ExperimentsController(badExperiment, verifier).createExperiment);
 
   it('returns 201 status on success', function (done) {
-    ExperimentsController.createExperiment(experiment, verifier)(req, res)
+    ExperimentsController(experiment, verifier).createExperiment(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(201);
         expect(res.json).to.have.been.calledWith({ message: 'success! created new experiment', id: Mocks.ID });
@@ -52,11 +52,11 @@ describe('createExperiment', function () {
 });
 
 describe('changeStartTime', () => {
-  TestGeneric.testBadVerifier(ExperimentsController.changeStartTime, experiment, badVerifier);
-  TestGeneric.testBadModel(ExperimentsController.changeStartTime, badExperiment, verifier);
+  TestGeneric.testBadVerifier(ExperimentsController(experiment, badVerifier).changeStartTime);
+  TestGeneric.testBadModel(ExperimentsController(badExperiment, verifier).changeStartTime);
 
   it('returns 200 status on success', function (done) {
-    ExperimentsController.changeStartTime(experiment, verifier)(req, res)
+    ExperimentsController(experiment, verifier).changeStartTime(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith({ id: Mocks.ID, start_time: Mocks.START_TIME });
@@ -67,11 +67,11 @@ describe('changeStartTime', () => {
 });
 
 describe('deleteExperiment', () => {
-  TestGeneric.testBadVerifier(ExperimentsController.deleteExperiment, experiment, badVerifier);
-  TestGeneric.testBadModel(ExperimentsController.deleteExperiment, badExperiment, verifier);
+  TestGeneric.testBadVerifier(ExperimentsController(experiment, badVerifier).deleteExperiment);
+  TestGeneric.testBadModel(ExperimentsController(badExperiment, verifier).deleteExperiment);
 
   it('returns 200 status on success', function (done) {
-    ExperimentsController.deleteExperiment(experiment, verifier)(req, res)
+    ExperimentsController(experiment, verifier).deleteExperiment(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith({ message: 'deleted experiment with id: ' + Mocks.ID });
@@ -82,10 +82,10 @@ describe('deleteExperiment', () => {
 });
 
 describe('getOneExperiment', () => {
-  TestGeneric.testBadModel(ExperimentsController.getOneExperiment, badExperiment, verifier);
+  TestGeneric.testBadModel(ExperimentsController(badExperiment, verifier).getOneExperiment);
 
   it('returns 200 status on success', function (done) {
-    ExperimentsController.getOneExperiment(experiment, verifier)(req, res)
+    ExperimentsController(experiment, verifier).getOneExperiment(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith({ id: Mocks.ID });
@@ -96,10 +96,10 @@ describe('getOneExperiment', () => {
 });
 
 describe('listExperiments', () => {
-  TestGeneric.testBadModel(ExperimentsController.listExperiments, badExperiment, verifier);
+  TestGeneric.testBadModel(ExperimentsController(badExperiment, verifier).listExperiments);
 
   it('returns 200 status on success', function (done) {
-    ExperimentsController.listExperiments(experiment, verifier)(req, res)
+    ExperimentsController(experiment, verifier).listExperiments(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith([Mocks.RESULT]);

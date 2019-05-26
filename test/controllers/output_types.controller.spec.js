@@ -40,11 +40,11 @@ beforeEach(function () {
 });
 
 describe('createOutputType', function () {
-  TestGeneric.testBadVerifier(OutputTypesController.createOutputType, outputType, badVerifier);
-  TestGeneric.testBadModel(OutputTypesController.createOutputType, badOutputType, verifier);
+  TestGeneric.testBadVerifier(OutputTypesController(outputType, badVerifier).createOutputType);
+  TestGeneric.testBadModel(OutputTypesController(badOutputType, verifier).createOutputType);
 
   it('returns 201 status on success', function (done) {
-    OutputTypesController.createOutputType(outputType, verifier)(req, res)
+    OutputTypesController(outputType, verifier).createOutputType(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(201);
         expect(res.json).to.have.been.calledWith({ message: 'success! created new output_type', id: Mocks.ID });
@@ -55,11 +55,11 @@ describe('createOutputType', function () {
 });
 
 describe('changeUnits', () => {
-  TestGeneric.testBadVerifier(OutputTypesController.changeUnits, outputType, badVerifier);
-  TestGeneric.testBadModel(OutputTypesController.changeUnits, badOutputType, verifier);
+  TestGeneric.testBadVerifier(OutputTypesController(outputType, badVerifier).changeUnits);
+  TestGeneric.testBadModel(OutputTypesController(badOutputType, verifier).changeUnits);
 
   it('returns 200 status on success', function (done) {
-    OutputTypesController.changeUnits(outputType, verifier)(req, res)
+    OutputTypesController(outputType, verifier).changeUnits(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith({ id: Mocks.ID, units: Mocks.UNITS });
@@ -70,10 +70,10 @@ describe('changeUnits', () => {
 });
 
 describe('changeUnitsName', () => {
-  TestGeneric.testBadVerifier(OutputTypesController.changeUnitsName, outputType, badVerifier);
-  TestGeneric.testBadModel(OutputTypesController.changeUnitsName, badOutputType, verifier);
+  TestGeneric.testBadVerifier(OutputTypesController(outputType, badVerifier).changeUnitsName);
+  TestGeneric.testBadModel(OutputTypesController(badOutputType, verifier).changeUnitsName);
   it('returns 200 status on success', function (done) {
-    OutputTypesController.changeUnitsName(outputType, verifier)(req, res)
+    OutputTypesController(outputType, verifier).changeUnitsName(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith({ output_type_name: Mocks.OUTPUT_TYPE_NAME, units: Mocks.UNITS });
@@ -84,11 +84,11 @@ describe('changeUnitsName', () => {
 });
 
 describe('deleteOutputType', () => {
-  TestGeneric.testBadVerifier(OutputTypesController.deleteOutputType, outputType, badVerifier);
-  TestGeneric.testBadModel(OutputTypesController.deleteOutputType, badOutputType, verifier);
+  TestGeneric.testBadVerifier(OutputTypesController(outputType, badVerifier).deleteOutputType);
+  TestGeneric.testBadModel(OutputTypesController(badOutputType, verifier).deleteOutputType);
 
   it('returns 200 status on success', function (done) {
-    OutputTypesController.deleteOutputType(outputType, verifier)(req, res)
+    OutputTypesController(outputType, verifier).deleteOutputType(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith({ message: 'deleted output_type with id: ' + Mocks.ID });
@@ -99,11 +99,11 @@ describe('deleteOutputType', () => {
 });
 
 describe('deleteOutputTypeName', () => {
-  TestGeneric.testBadVerifier(OutputTypesController.deleteOutputTypeName, outputType, badVerifier);
-  TestGeneric.testBadModel(OutputTypesController.deleteOutputTypeName, badOutputType, verifier);
+  TestGeneric.testBadVerifier(OutputTypesController(outputType, badVerifier).deleteOutputTypeName);
+  TestGeneric.testBadModel(OutputTypesController(badOutputType, verifier).deleteOutputTypeName);
 
   it('returns 200 status on success', function (done) {
-    OutputTypesController.deleteOutputTypeName(outputType, verifier)(req, res)
+    OutputTypesController(outputType, verifier).deleteOutputTypeName(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith({ message: 'deleted output_type with id: ' + Mocks.ID });
@@ -114,10 +114,10 @@ describe('deleteOutputTypeName', () => {
 });
 
 describe('getOneOutputType', () => {
-  TestGeneric.testBadModel(OutputTypesController.getOneOutputType, badOutputType, verifier);
+  TestGeneric.testBadModel(OutputTypesController(badOutputType, verifier).getOneOutputType);
 
   it('returns 200 status on success', function (done) {
-    OutputTypesController.getOneOutputType(outputType, verifier)(req, res)
+    OutputTypesController(outputType, verifier).getOneOutputType(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith({ id: Mocks.ID });
@@ -128,10 +128,10 @@ describe('getOneOutputType', () => {
 });
 
 describe('getOneOutputTypeName', () => {
-  TestGeneric.testBadModel(OutputTypesController.getOneOutputTypeName, badOutputType, verifier);
+  TestGeneric.testBadModel(OutputTypesController(badOutputType, verifier).getOneOutputTypeName);
 
   it('returns 200 status on success', function (done) {
-    OutputTypesController.getOneOutputTypeName(outputType, verifier)(req, res)
+    OutputTypesController(outputType, verifier).getOneOutputTypeName(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith({ output_type_name: Mocks.OUTPUT_TYPE_NAME });
@@ -142,10 +142,10 @@ describe('getOneOutputTypeName', () => {
 });
 
 describe('listOutputTypes', () => {
-  TestGeneric.testBadModel(OutputTypesController.listOutputTypes, badOutputType, verifier);
+  TestGeneric.testBadModel(OutputTypesController(badOutputType, verifier).listOutputTypes);
 
   it('returns 200 status on success', function (done) {
-    OutputTypesController.listOutputTypes(outputType, verifier)(req, res)
+    OutputTypesController(outputType, verifier).listOutputTypes(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith([Mocks.RESULT]);
