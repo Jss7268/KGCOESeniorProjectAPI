@@ -1,7 +1,8 @@
 var router = require('express').Router();
 var experimentsController = require('./../../controllers/experiments.controller');
 var Experiment = require('./../../models/experiment');
-var Verifier = require('../../validators/verifier');
+var UserAccess = require('./../../models/user_access');
+var Verifier = require('../../validators/verifier')(UserAccess);
 
 router.get('/experiments',  experimentsController.listExperiments(Experiment, Verifier));
 router.post('/experiments', experimentsController.createExperiment(Experiment, Verifier));

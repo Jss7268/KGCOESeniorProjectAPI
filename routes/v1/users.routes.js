@@ -1,7 +1,8 @@
 var router = require('express').Router();
 var usersController = require('./../../controllers/users.controller');
 var User = require('./../../models/user');
-var Verifier = require('./../../validators/verifier');
+var UserAccess = require('./../../models/user_access');
+var Verifier = require('../../validators/verifier')(UserAccess);
 
 router.get('/users',  usersController.listUsers(User, Verifier));
 router.get('/users/access/:access', usersController.listUsersByAccess(User, Verifier));

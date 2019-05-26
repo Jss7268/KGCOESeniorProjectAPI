@@ -1,7 +1,8 @@
 var router = require('express').Router();
 var devicesExperimentsController = require('./../../controllers/devices_experiments.controller');
 var DeviceExperiment = require('./../../models/device_experiment');
-var Verifier = require('../../validators/verifier');
+var UserAccess = require('./../../models/user_access');
+var Verifier = require('../../validators/verifier')(UserAccess);
 
 router.get('/devices_experiments',  devicesExperimentsController.listDevicesExperiments(DeviceExperiment, Verifier));
 router.post('/devices_experiments', devicesExperimentsController.createDeviceExperiment(DeviceExperiment, Verifier));

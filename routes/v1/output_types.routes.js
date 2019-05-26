@@ -1,7 +1,8 @@
 var router = require('express').Router();
 var outputTypesController = require('./../../controllers/output_types.controller');
 var OutputType = require('./../../models/output_type');
-var Verifier = require('../../validators/verifier');
+var UserAccess = require('./../../models/user_access');
+var Verifier = require('../../validators/verifier')(UserAccess);
 
 router.get('/output_types',  outputTypesController.listOutputTypes(OutputType, Verifier));
 router.post('/output_types', outputTypesController.createOutputType(OutputType, Verifier));

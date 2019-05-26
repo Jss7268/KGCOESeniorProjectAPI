@@ -1,7 +1,8 @@
 var router = require('express').Router();
 var deviceOutputsController = require('./../../controllers/device_outputs.controller');
 var DeviceOutput = require('./../../models/device_output');
-var Verifier = require('../../validators/verifier');
+var UserAccess = require('./../../models/user_access');
+var Verifier = require('../../validators/verifier')(UserAccess);
 
 router.get('/device_outputs',  deviceOutputsController.listDeviceOutputs(DeviceOutput, Verifier));
 router.post('/device_outputs', deviceOutputsController.createDeviceOutput(DeviceOutput, Verifier));
