@@ -20,7 +20,8 @@ const OUTPUT_TYPE_NAME = 'output_type_name';
 const UNITS = 'units';
 const START_TIME = 12345;
 const CREATOR_ID = 'creator';
-const ACCESS_LEVEL = 'access_level';
+const ACCESS_LEVEL = 1;
+const ACCESS_NAME = 'access_name';
 const EMAIL = 'email';
 const PASSWORD = 'password';
 const NAME = 'name';
@@ -95,6 +96,7 @@ module.exports = {
     CREATOR_ID,
     ACCESS_LEVELS,
     ACCESS_LEVEL,
+    ACCESS_NAME,
     EMAIL,
     PASSWORD,
     NAME,
