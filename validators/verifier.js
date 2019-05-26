@@ -1,4 +1,4 @@
-module.exports = function (UserAccess) {
+module.exports = (UserAccess) => {
     return {
         verifyMinAccessLevel: (accessLevel, requiredAccessLevel) => {
             return new Promise((resolve, reject) => {

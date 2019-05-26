@@ -40,7 +40,7 @@ describe('verifyMinAccessLevel', function () {
                 done("Did not reject");
             })
             .catch((err) => {
-                expect(err.status).to.be.equal(403)
+                expect(err.status).to.equal(403)
                 done();
             })
             .catch((err) => done(err));
@@ -52,7 +52,7 @@ describe('verifyMinAccessLevel', function () {
                 done("Did not reject");
             })
             .catch((err) => {
-                expect(err.status).to.be.equal(403)
+                expect(err.status).to.equal(403)
                 done();
             })
             .catch((err) => done(err));
@@ -74,7 +74,7 @@ describe('verifyMinAccessName', function () {
                 done("Did not reject");
             })
             .catch((err) => {
-                expect(err.status).to.be.equal(418) // not a forbidden rejection
+                expect(err.status).to.equal(418) // not a forbidden rejection
                 done();
             })
             .catch((err) => done(err));
@@ -86,7 +86,7 @@ describe('verifyMinAccessName', function () {
                 done("Did not reject");
             })
             .catch((err) => {
-                expect(err.status).to.be.equal(403)
+                expect(err.status).to.equal(403)
                 done();
             })
             .catch((err) => done(err));
@@ -98,7 +98,7 @@ describe('verifyMinAccessName', function () {
                 done("Did not reject");
             })
             .catch((err) => {
-                expect(err.status).to.be.equal(403)
+                expect(err.status).to.equal(403)
                 done();
             })
             .catch((err) => done(err));
