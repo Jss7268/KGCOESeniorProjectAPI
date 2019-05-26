@@ -1,15 +1,17 @@
 var router = require('express').Router();
 var usersController = require('./../../controllers/users.controller');
+var User = require('./../../models/user');
+var Verifier = require('./../../validators/verifier');
 
-router.get('/users',  usersController.listUsers);
-router.get('/users/access/:access', usersController.listUsersByAccess);
-router.post('/users', usersController.createUser);
-router.get('/users/me',  usersController.getSelfUser);
-router.get('/users/:id', usersController.getOneUser);
-router.put('/users/:id/name', usersController.changeName);
-router.put('/users/:id/password', usersController.changePassword);
-router.put('/users/:id/email', usersController.changeEmail);
-router.put('/users/:id/access', usersController.changeAccess);
-router.delete('/users/:id', usersController.deleteUser);
+router.get('/users',  usersController.listUsers(User, Verifier));
+router.get('/users/access/:access', usersController.listUsersByAccess(User, Verifier));
+router.post('/users', usersController.createUser(User, Verifier));
+router.get('/users/me',  usersController.getSelfUser(User, Verifier));
+router.get('/users/:id', usersController.getOneUser(User, Verifier));
+router.put('/users/:id/name', usersController.changeName(User, Verifier));
+router.put('/users/:id/password', usersController.changePassword(User, Verifier));
+router.put('/users/:id/email', usersController.changeEmail(User, Verifier));
+router.put('/users/:id/access', usersController.changeAccess(User, Verifier));
+router.delete('/users/:id', usersController.deleteUser(User, Verifier));
 
 module.exports = router;

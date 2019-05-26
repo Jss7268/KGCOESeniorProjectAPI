@@ -1,11 +1,13 @@
 var router = require('express').Router();
 var devicesExperimentsController = require('./../../controllers/devices_experiments.controller');
+var DeviceExperiment = require('./../../models/device_experiment');
+var Verifier = require('../../validators/verifier');
 
-router.get('/devices_experiments',  devicesExperimentsController.listDevicesExperiments);
-router.post('/devices_experiments', devicesExperimentsController.createDeviceExperiment);
-router.get('/devices_experiments/:device_id/experiments', devicesExperimentsController.listExperimentsByDevice);
-router.get('/devices_experiments/:experiment_id/devices', devicesExperimentsController.listDevicesByExperiment);
-router.get('/devices_experiments/:device_id/:experiment_id', devicesExperimentsController.getOneDeviceExperiment);
-router.delete('/devices_experiments/:device_id/:experiment_id', devicesExperimentsController.deleteDeviceExperiment);
+router.get('/devices_experiments',  devicesExperimentsController.listDevicesExperiments(DeviceExperiment, Verifier));
+router.post('/devices_experiments', devicesExperimentsController.createDeviceExperiment(DeviceExperiment, Verifier));
+router.get('/devices_experiments/:device_id/experiments', devicesExperimentsController.listExperimentsByDevice(DeviceExperiment, Verifier));
+router.get('/devices_experiments/:experiment_id/devices', devicesExperimentsController.listDevicesByExperiment(DeviceExperiment, Verifier));
+router.get('/devices_experiments/:device_id/:experiment_id', devicesExperimentsController.getOneDeviceExperiment(DeviceExperiment, Verifier));
+router.delete('/devices_experiments/:device_id/:experiment_id', devicesExperimentsController.deleteDeviceExperiment(DeviceExperiment, Verifier));
 
 module.exports = router;
