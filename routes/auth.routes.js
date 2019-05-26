@@ -1,12 +1,12 @@
-var router = require('express').Router();
-var jwt = require('jsonwebtoken');
-var User = require('./../models/user');
-var config = require('./../config/config');
-var Promise = require('promise');
-var usersController = require('./../controllers/users.controller');
+const router = require('express').Router();
+const jwt = require('jsonwebtoken');
+const config = require('./../config/config');
+const Injector = require('../config/injector');
+const User = Injector.User;
+const UsersController = Injector.UsersController;
 
 // Registration of new users via API
-router.post('/auth/register', usersController.createUser(User));
+router.post('/auth/register', UsersController.createUser);
 
 // Authentication to obtain a token
 router.post('/auth/authenticate', (req, res) => {

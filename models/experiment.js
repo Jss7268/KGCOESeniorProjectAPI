@@ -1,93 +1,92 @@
-var Promise = require('promise');
-var db = require('../config/db');
-var User = require('./user');
-var Validator = require('../validators/validator');
-var DeviceExperiment = require('./device_experiment');
+var _db, _Validator;
 
-module.exports = {
-  findAll: function () {
-    return new Promise((resolve, reject) => {
-      db.query('SELECT * FROM experiments where deleted_at = 0', [])
-        .then((results) => {
-          resolve(results.rows);
-        })
-        .catch((err) => {
-          reject(err);
-        });
-    });
-  },
-
-  findOne: (data) => {
-    return new Promise((resolve, reject) => {
-      if (!data.id) {
-        reject('error: must provide id')
-      } else {
-        findOneById(data.id)
-          .then((result) => {
-            resolve(result);
+module.exports = (db, Validator) => {
+  _db = db, _Validator = Validator;
+  return {
+    findAll: function () {
+      return new Promise((resolve, reject) => {
+        _db.query('SELECT * FROM experiments where deleted_at = 0', [])
+          .then((results) => {
+            resolve(results.rows);
           })
           .catch((err) => {
             reject(err);
           });
-      }
-    });
-  },
+      });
+    },
 
-  create: (data) => {
-    var time = new Date().getTime();
-    return new Promise((resolve, reject) => {
-      validateExperimentData(data)
-        .then(function () {
-          return db.query(
-            'INSERT INTO experiments (creator_id, notes, description, start_time, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $5) returning id',
-            [data.creator_id, data.notes, data.description, data.start_time, time]);
-        })
-        .then((result) => {
-          resolve(result.rows[0]);
-        })
-        .catch((err) => {
-          console.log(err);
-          reject(err);
-        });
-    });
-  },
+    findOne: (data) => {
+      return new Promise((resolve, reject) => {
+        if (!data.id) {
+          reject('error: must provide id')
+        } else {
+          findOneById(data.id)
+            .then((result) => {
+              resolve(result);
+            })
+            .catch((err) => {
+              reject(err);
+            });
+        }
+      });
+    },
 
-  delete: (data) => {
-    var time = new Date().getTime();
-    return new Promise((resolve, reject) => {
-      db.query('UPDATE experiments SET deleted_at = $2 WHERE id = $1 returning id', [data.id, time])
-        .then((result) => {
-          resolve(result.rows[0]);
-        })
-        .catch((err) => {
-          reject(err);
-        });
-    });
-  },
+    create: (data) => {
+      var time = new Date().getTime();
+      return new Promise((resolve, reject) => {
+        validateExperimentData(data)
+          .then(function () {
+            return _db.query(
+              'INSERT INTO experiments (creator_id, notes, description, start_time, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $5) returning id',
+              [data.creator_id, data.notes, data.description, data.start_time, time]);
+          })
+          .then((result) => {
+            resolve(result.rows[0]);
+          })
+          .catch((err) => {
+            console.log(err);
+            reject(err);
+          });
+      });
+    },
 
-  updateStartTime: (data) => {
-    var time = new Date().getTime();
-    return new Promise((resolve, reject) => {
-      if (!data.id || !data.start_time) {
-        reject('error: id and/or start_time missing')
-      }
-      else {
-        db.query('UPDATE experiments SET start_time = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning start_time',
-        [data.id, data.start_time, time])
+    delete: (data) => {
+      var time = new Date().getTime();
+      return new Promise((resolve, reject) => {
+        _db.query('UPDATE experiments SET deleted_at = $2 WHERE id = $1 returning id', [data.id, time])
           .then((result) => {
             resolve(result.rows[0]);
           })
           .catch((err) => {
             reject(err);
           });
-      }
-    });
+      });
+    },
+
+    updateStartTime: (data) => {
+      var time = new Date().getTime();
+      return new Promise((resolve, reject) => {
+        if (!data.id || !data.start_time) {
+          reject('error: id and/or start_time missing')
+        }
+        else {
+          _db.query('UPDATE experiments SET start_time = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning start_time',
+            [data.id, data.start_time, time])
+            .then((result) => {
+              resolve(result.rows[0]);
+            })
+            .catch((err) => {
+              reject(err);
+            });
+        }
+      });
+    },
   }
 };
 
 function findOneById(id) {
   return new Promise((resolve, reject) => {
-    db.query('SELECT * FROM experiments WHERE id = $1 and deleted_at = 0', [id])
+    _db.query('SELECT * FROM experiments WHERE id = $1 and deleted_at = 0', [id])
       .then((result) => {
         if (result.rows[0]) {
           resolve(result.rows[0]);
@@ -110,7 +109,7 @@ function validateExperimentData(data) {
       data.start_time = null;
     }
     else {
-      validateCreatorId(data.creator_id)
+      _Validator.validiateUserId(data.creator_id)
         .then(function () {
           resolve();
         })
@@ -118,17 +117,5 @@ function validateExperimentData(data) {
           reject(err);
         });
     }
-  });
-}
-
-function validateCreatorId(creatorId) {
-  return new Promise((resolve, reject) => {
-    User.findOne({ id: creatorId })
-      .then((result) => {
-        resolve(result);
-      })
-      .catch((err) => {
-        reject(err);
-      });
   });
 }

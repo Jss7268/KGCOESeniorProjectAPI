@@ -9,11 +9,11 @@ beforeEach(function () {
     req = Mocks.mockRequest();
     res = Mocks.mockResponse();
 });
-function testHydrateReqDeviceId(fn, model, verifier) {
+function testHydrateReqDeviceId(fn) {
     it('doesn\'t allow devices to set device_id', function (done) {
         req.decoded.accessLevel = Mocks.ACCESS_LEVELS.authorized_device;
 
-        fn(model, verifier)(req, res)
+        fn(req, res)
             .then(() => {
                 expect(req.body.device_id).to.equal(req.decoded.uid);
                 done();
@@ -24,7 +24,7 @@ function testHydrateReqDeviceId(fn, model, verifier) {
     it('allows elevated users to set device_id', function (done) {
         req.decoded.accessLevel = Mocks.ACCESS_LEVELS.elevated_user;
 
-        fn(model, verifier)(req, res)
+        fn(req, res)
             .then(() => {
                 expect(req.body.device_id).to.equal(Mocks.DEVICE_ID);
                 done();
@@ -33,11 +33,11 @@ function testHydrateReqDeviceId(fn, model, verifier) {
     });
 }
 
-function testHydrateReqCreatorId(fn, model, verifier) {
+function testHydrateReqCreatorId(fn) {
     it('doesn\'t allow non-admins to set creator_id', function (done) {
         req.decoded.accessLevel = Mocks.ACCESS_LEVELS.elevated_user;
 
-        fn(model, verifier)(req, res)
+        fn(req, res)
             .then(() => {
                 expect(req.body.creator_id).to.equal(req.decoded.uid);
                 done();
@@ -47,7 +47,7 @@ function testHydrateReqCreatorId(fn, model, verifier) {
 
     it('allows admins to set creator_id', function (done) {
         req.decoded.accessLevel = Mocks.ACCESS_LEVELS.admin_user;
-        fn(model, verifier)(req, res)
+        fn(req, res)
             .then(() => {
                 expect(req.body.creator_id).to.equal(Mocks.CREATOR_ID);
                 done();
@@ -58,7 +58,7 @@ function testHydrateReqCreatorId(fn, model, verifier) {
     it('allows admins to not set creator_id', function (done) {
         req.decoded.accessLevel = Mocks.ACCESS_LEVELS.admin_user;
         delete req.body.creator_id;
-        fn(model, verifier)(req, res)
+        fn(req, res)
             .then(() => {
                 expect(req.body.creator_id).to.equal(req.decoded.uid);
                 done();
@@ -67,10 +67,10 @@ function testHydrateReqCreatorId(fn, model, verifier) {
     });
 }
 
-function testHydrateReqUserId(fn, model, verifier) {
+function testHydrateReqUserId(fn) {
     it('doesn\'t allow non-admins to set user id', function (done) {
         req.decoded.accessLevel = Mocks.ACCESS_LEVELS.elevated_user;
-        fn(model, verifier)(req, res)
+        fn(req, res)
             .then(() => {
                 expect(req.params.id).to.equal(req.decoded.uid);
                 done();
@@ -80,7 +80,7 @@ function testHydrateReqUserId(fn, model, verifier) {
 
     it('allows admins to set user', function (done) {
         req.decoded.accessLevel = Mocks.ACCESS_LEVELS.admin_user;
-        fn(model, verifier)(req, res)
+        fn(req, res)
             .then(() => {
                 expect(req.params.id).to.equal(Mocks.ID);
                 done();
@@ -91,7 +91,7 @@ function testHydrateReqUserId(fn, model, verifier) {
     it('allows admins to modify own access', function (done) {
         req.decoded.accessLevel = Mocks.ACCESS_LEVELS.admin_user;
         delete req.params.id;
-        fn(model, verifier)(req, res)
+        fn(req, res)
             .then(() => {
                 expect(req.params.id).to.equal(req.decoded.uid);
                 done();
@@ -100,9 +100,9 @@ function testHydrateReqUserId(fn, model, verifier) {
     });
 }
 
-function testBadVerifier(fn, model, badVerifier) {
+function testBadVerifier(fn) {
     it('returns 400 status on bad verifier', function (done) {
-        fn(model, badVerifier)(req, res)
+        fn(req, res)
             .then(() => {
                 expect(res.status).to.have.been.calledWith(Mocks.FORBIDDEN);
                 expect(res.json).to.have.been.calledWith({ message: Mocks.ERROR_MESSAGE });
@@ -112,9 +112,9 @@ function testBadVerifier(fn, model, badVerifier) {
     });
 }
 
-function testBadModel(fn, badModel, verifier) {
+function testBadModel(fn) {
     it('returns 400 status on bad model', function (done) {
-        fn(badModel, verifier)(req, res)
+        fn(req, res)
             .then(() => {
                 expect(res.status).to.have.been.calledWith(Mocks.ERROR_STATUS);
                 expect(res.json).to.have.been.calledWith({ message: Mocks.ERROR_MESSAGE });

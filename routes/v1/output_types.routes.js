@@ -1,15 +1,14 @@
-var router = require('express').Router();
-var outputTypesController = require('./../../controllers/output_types.controller');
-var OutputType = require('./../../models/output_type');
-var Verifier = require('../../validators/verifier');
+const router = require('express').Router();
+const Injector = require('../../config/injector')
+const OutputTypesController = Injector.OutputTypesController
 
-router.get('/output_types',  outputTypesController.listOutputTypes(OutputType, Verifier));
-router.post('/output_types', outputTypesController.createOutputType(OutputType, Verifier));
-router.get('/output_types/:id', outputTypesController.getOneOutputType(OutputType, Verifier));
-router.get('/output_types/name/:output_type_name', outputTypesController.getOneOutputTypeName(OutputType, Verifier));
-router.put('/output_types/:id/units', outputTypesController.changeUnits(OutputType, Verifier));
-router.put('/output_types/name/:output_type_name/units', outputTypesController.changeUnitsName(OutputType, Verifier));
-router.delete('/output_types/:id', outputTypesController.deleteOutputType(OutputType, Verifier));
-router.delete('/output_types/name/:output_type_name', outputTypesController.deleteOutputTypeName(OutputType, Verifier));
+router.get('/output_types', OutputTypesController.listOutputTypes);
+router.post('/output_types', OutputTypesController.createOutputType);
+router.get('/output_types/:id', OutputTypesController.getOneOutputType);
+router.get('/output_types/name/:output_type_name', OutputTypesController.getOneOutputTypeName);
+router.put('/output_types/:id/units', OutputTypesController.changeUnits);
+router.put('/output_types/name/:output_type_name/units', OutputTypesController.changeUnitsName);
+router.delete('/output_types/:id', OutputTypesController.deleteOutputType);
+router.delete('/output_types/name/:output_type_name', OutputTypesController.deleteOutputTypeName);
 
 module.exports = router;

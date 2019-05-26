@@ -42,12 +42,12 @@ beforeEach(function () {
 });
 
 describe('createDeviceOutput', function () {
-  TestGeneric.testHydrateReqDeviceId(DeviceOutputsController.createDeviceOutput, deviceOutput, verifier);
-  TestGeneric.testBadVerifier(DeviceOutputsController.createDeviceOutput, deviceOutput, badVerifier);
-  TestGeneric.testBadModel(DeviceOutputsController.createDeviceOutput, badDeviceOutput, verifier);
+  TestGeneric.testHydrateReqDeviceId(DeviceOutputsController(deviceOutput, verifier).createDeviceOutput);
+  TestGeneric.testBadVerifier(DeviceOutputsController(deviceOutput, badVerifier).createDeviceOutput);
+  TestGeneric.testBadModel(DeviceOutputsController(badDeviceOutput, verifier).createDeviceOutput);
 
   it('returns 201 status on success', function (done) {
-    DeviceOutputsController.createDeviceOutput(deviceOutput, verifier)(req, res)
+    DeviceOutputsController(deviceOutput, verifier).createDeviceOutput(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(201);
         expect(res.json).to.have.been.calledWith({ message: 'success! created new device_output', id: Mocks.ID });
@@ -58,12 +58,12 @@ describe('createDeviceOutput', function () {
 });
 
 describe('changeOutputValue', () => {
-  TestGeneric.testHydrateReqDeviceId(DeviceOutputsController.changeOutputValue, deviceOutput, verifier);
-  TestGeneric.testBadVerifier(DeviceOutputsController.changeOutputValue, deviceOutput, badVerifier);
-  TestGeneric.testBadModel(DeviceOutputsController.changeOutputValue, badDeviceOutput, verifier);
+  TestGeneric.testHydrateReqDeviceId(DeviceOutputsController(deviceOutput, verifier).changeOutputValue);
+  TestGeneric.testBadVerifier(DeviceOutputsController(deviceOutput, badVerifier).changeOutputValue);
+  TestGeneric.testBadModel(DeviceOutputsController(badDeviceOutput, verifier).changeOutputValue);
 
   it('returns 200 status on success', function (done) {
-    DeviceOutputsController.changeOutputValue(deviceOutput, verifier)(req, res)
+    DeviceOutputsController(deviceOutput, verifier).changeOutputValue(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith({ id: Mocks.ID, output_value: Mocks.OUTPUT_VALUE });
@@ -74,12 +74,12 @@ describe('changeOutputValue', () => {
 });
 
 describe('deleteDeviceOutput', () => {
-  TestGeneric.testHydrateReqDeviceId(DeviceOutputsController.deleteDeviceOutput, deviceOutput, verifier);
-  TestGeneric.testBadVerifier(DeviceOutputsController.deleteDeviceOutput, deviceOutput, badVerifier);
-  TestGeneric.testBadModel(DeviceOutputsController.deleteDeviceOutput, badDeviceOutput, verifier);
+  TestGeneric.testHydrateReqDeviceId(DeviceOutputsController(deviceOutput, verifier).deleteDeviceOutput);
+  TestGeneric.testBadVerifier(DeviceOutputsController(deviceOutput, badVerifier).deleteDeviceOutput);
+  TestGeneric.testBadModel(DeviceOutputsController(badDeviceOutput, verifier).deleteDeviceOutput);
 
   it('returns 200 status on success', function (done) {
-    DeviceOutputsController.deleteDeviceOutput(deviceOutput, verifier)(req, res)
+    DeviceOutputsController(deviceOutput, verifier).deleteDeviceOutput(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith({ message: 'deleted device_output with id: ' + Mocks.ID });
@@ -90,10 +90,10 @@ describe('deleteDeviceOutput', () => {
 });
 
 describe('getOneDeviceOutput', () => {
-  TestGeneric.testBadModel(DeviceOutputsController.getOneDeviceOutput, badDeviceOutput, verifier);
+  TestGeneric.testBadModel(DeviceOutputsController(badDeviceOutput, verifier).getOneDeviceOutput);
 
   it('returns 200 status on success', function (done) {
-    DeviceOutputsController.getOneDeviceOutput(deviceOutput, verifier)(req, res)
+    DeviceOutputsController(deviceOutput, verifier).getOneDeviceOutput(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith({ id: Mocks.ID });
@@ -104,10 +104,10 @@ describe('getOneDeviceOutput', () => {
 });
 
 describe('listDeviceOutputsByDeviceExperiment', () => {
-  TestGeneric.testBadModel(DeviceOutputsController.listDeviceOutputsByDeviceExperiment, badDeviceOutput, verifier);
+  TestGeneric.testBadModel(DeviceOutputsController(badDeviceOutput, verifier).listDeviceOutputsByDeviceExperiment);
 
   it('returns 200 status on success', function (done) {
-    DeviceOutputsController.listDeviceOutputsByDeviceExperiment(deviceOutput, verifier)(req, res)
+    DeviceOutputsController(deviceOutput, verifier).listDeviceOutputsByDeviceExperiment(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith([Mocks.RESULT]);
@@ -118,10 +118,10 @@ describe('listDeviceOutputsByDeviceExperiment', () => {
 });
 
 describe('listDeviceOutputsByExperiment', () => {
-  TestGeneric.testBadModel(DeviceOutputsController.listDeviceOutputsByExperiment, badDeviceOutput, verifier);
+  TestGeneric.testBadModel(DeviceOutputsController(badDeviceOutput, verifier).listDeviceOutputsByExperiment);
 
   it('returns 200 status on success', function (done) {
-    DeviceOutputsController.listDeviceOutputsByExperiment(deviceOutput, verifier)(req, res)
+    DeviceOutputsController(deviceOutput, verifier).listDeviceOutputsByExperiment(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith([Mocks.RESULT]);
@@ -132,10 +132,10 @@ describe('listDeviceOutputsByExperiment', () => {
 });
 
 describe('listDeviceOutputsByDevice', () => {
-  TestGeneric.testBadModel(DeviceOutputsController.listDeviceOutputsByDevice, badDeviceOutput, verifier);
+  TestGeneric.testBadModel(DeviceOutputsController(badDeviceOutput, verifier).listDeviceOutputsByDevice);
 
   it('returns 200 status on success', function (done) {
-    DeviceOutputsController.listDeviceOutputsByDevice(deviceOutput, verifier)(req, res)
+    DeviceOutputsController(deviceOutput, verifier).listDeviceOutputsByDevice(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith([Mocks.RESULT]);
@@ -146,10 +146,10 @@ describe('listDeviceOutputsByDevice', () => {
 });
 
 describe('listDeviceOutputs', () => {
-  TestGeneric.testBadModel(DeviceOutputsController.listDeviceOutputs, badDeviceOutput, verifier);
+  TestGeneric.testBadModel(DeviceOutputsController(badDeviceOutput, verifier).listDeviceOutputs);
 
   it('returns 200 status on success', function (done) {
-    DeviceOutputsController.listDeviceOutputs(deviceOutput, verifier)(req, res)
+    DeviceOutputsController(deviceOutput, verifier).listDeviceOutputs(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith([Mocks.RESULT]);

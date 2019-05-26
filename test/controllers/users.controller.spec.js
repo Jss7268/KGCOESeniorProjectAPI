@@ -47,10 +47,10 @@ beforeEach(function () {
 });
 
 describe('createUser', function () {
-  TestGeneric.testBadModel(UsersController.createUser, badUser, verifier);
+  TestGeneric.testBadModel(UsersController(badUser, verifier).createUser);
 
   it('returns 201 status on success', function (done) {
-    UsersController.createUser(user, verifier)(req, res)
+    UsersController(user, verifier).createUser(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(201);
         expect(res.json).to.have.been.calledWith({ message: 'success! created account for new user', id: Mocks.ID });
@@ -61,11 +61,11 @@ describe('createUser', function () {
 });
 
 describe('changeName', () => {
-  TestGeneric.testHydrateReqUserId(UsersController.changeName, user, verifier);
-  TestGeneric.testBadModel(UsersController.changeName, badUser, verifier);
+  TestGeneric.testHydrateReqUserId(UsersController(user, verifier).changeName);
+  TestGeneric.testBadModel(UsersController(badUser, verifier).changeName);
 
   it('returns 200 status on success', function (done) {
-    UsersController.changeName(user, verifier)(req, res)
+    UsersController(user, verifier).changeName(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         // user id because its changing current user
@@ -77,11 +77,11 @@ describe('changeName', () => {
 });
 
 describe('changeEmail', () => {
-  TestGeneric.testHydrateReqUserId(UsersController.changeEmail, user, verifier);
-  TestGeneric.testBadModel(UsersController.changeEmail, badUser, verifier);
+  TestGeneric.testHydrateReqUserId(UsersController(user, verifier).changeEmail);
+  TestGeneric.testBadModel(UsersController(badUser, verifier).changeEmail);
 
   it('returns 200 status on success', function (done) {
-    UsersController.changeEmail(user, verifier)(req, res)
+    UsersController(user, verifier).changeEmail(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         // user id because its changing current user
@@ -93,11 +93,11 @@ describe('changeEmail', () => {
 });
 
 describe('changePassword', () => {
-  TestGeneric.testHydrateReqUserId(UsersController.changePassword, user, verifier);
-  TestGeneric.testBadModel(UsersController.changePassword, badUser, verifier);
+  TestGeneric.testHydrateReqUserId(UsersController(user, verifier).changePassword);
+  TestGeneric.testBadModel(UsersController(badUser, verifier).changePassword);
 
   it('returns 200 status on success', function (done) {
-    UsersController.changePassword(user, verifier)(req, res)
+    UsersController(user, verifier).changePassword(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         // user id because its changing current user
@@ -109,13 +109,13 @@ describe('changePassword', () => {
 });
 
 describe('changeAccess', () => {
-  TestGeneric.testBadVerifier(UsersController.changeAccess, user, badVerifier);
-  TestGeneric.testBadModel(UsersController.changeAccess, badUser, mockVerifier);
+  TestGeneric.testBadVerifier(UsersController(user, badVerifier).changeAccess);
+  TestGeneric.testBadModel(UsersController(badUser, mockVerifier).changeAccess);
 
   it('returns 200 status on success', function (done) {
     // changing access requires admin access level;
     req.decoded.accessLevel = Mocks.ACCESS_LEVELS.admin_user;
-    UsersController.changeAccess(user, verifier)(req, res)
+    UsersController(user, verifier).changeAccess(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith({ id: Mocks.ID, access_level: Mocks.ACCESS_LEVEL });
@@ -126,13 +126,13 @@ describe('changeAccess', () => {
 });
 
 describe('deleteUser', () => {
-  TestGeneric.testBadVerifier(UsersController.deleteUser, user, badVerifier);
-  TestGeneric.testBadModel(UsersController.deleteUser, badUser, mockVerifier);
+  TestGeneric.testBadVerifier(UsersController(user, badVerifier).deleteUser);
+  TestGeneric.testBadModel(UsersController(badUser, mockVerifier).deleteUser);
 
   it('returns 200 status on success', function (done) {
     // deleting user requires admin access level;
     req.decoded.accessLevel = Mocks.ACCESS_LEVELS.admin_user;
-    UsersController.deleteUser(user, verifier)(req, res)
+    UsersController(user, verifier).deleteUser(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith({ message: 'deleted user with id: ' + Mocks.ID });
@@ -143,10 +143,10 @@ describe('deleteUser', () => {
 });
 
 describe('getOneUser', () => {
-  TestGeneric.testBadModel(UsersController.getOneUser, badUser, verifier);
+  TestGeneric.testBadModel(UsersController(badUser, verifier).getOneUser);
 
   it('returns 200 status on success', function (done) {
-    UsersController.getOneUser(user, verifier)(req, res)
+    UsersController(user, verifier).getOneUser(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith({ id: Mocks.ID });
@@ -157,10 +157,10 @@ describe('getOneUser', () => {
 });
 
 describe('getSelfUser', () => {
-  TestGeneric.testBadModel(UsersController.getSelfUser, badUser, verifier);
+  TestGeneric.testBadModel(UsersController(badUser, verifier).getSelfUser);
 
   it('returns 200 status on success', function (done) {
-    UsersController.getSelfUser(user, verifier)(req, res)
+    UsersController(user, verifier).getSelfUser(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith({ id: Mocks.USER_ID });
@@ -171,10 +171,10 @@ describe('getSelfUser', () => {
 });
 
 describe('listUsersByAccess', () => {
-  TestGeneric.testBadModel(UsersController.listUsersByAccess, badUser, verifier);
+  TestGeneric.testBadModel(UsersController(badUser, verifier).listUsersByAccess);
 
   it('returns 200 status on success', function (done) {
-    UsersController.listUsersByAccess(user, verifier)(req, res)
+    UsersController(user, verifier).listUsersByAccess(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith([Mocks.RESULT]);
@@ -185,10 +185,10 @@ describe('listUsersByAccess', () => {
 });
 
 describe('listUsers', () => {
-  TestGeneric.testBadModel(UsersController.listUsers, badUser, verifier);
+  TestGeneric.testBadModel(UsersController(badUser, verifier).listUsers);
 
   it('returns 200 status on success', function (done) {
-    UsersController.listUsers(user, verifier)(req, res)
+    UsersController(user, verifier).listUsers(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith([Mocks.RESULT]);

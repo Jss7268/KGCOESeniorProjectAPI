@@ -1,4 +1,4 @@
-var subdomain = require('express-subdomain');
+const subdomain = require('express-subdomain');
 
 module.exports = (app) => {
   // api.localhost.com:port/
