@@ -32,9 +32,9 @@ const badUser = {
   findAll: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
 
 }
-const verifier = Mocks.verifier;
-const badVerifier = Mocks.badVerifier;
-const mockVerifier = Mocks.mockVerifier; // always resolve;
+const verifier = Mocks.verifier();
+const badVerifier = Mocks.badVerifier();
+const mockVerifier = Mocks.mockVerifier(); // always resolve;
 
 var req;
 var res;

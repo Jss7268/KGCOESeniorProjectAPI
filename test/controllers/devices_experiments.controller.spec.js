@@ -25,8 +25,8 @@ const badDeviceExperiment = {
 
 }
 
-const verifier = Mocks.verifier;
-const badVerifier = Mocks.badVerifier;
+const verifier = Mocks.verifier();
+const badVerifier = Mocks.badVerifier();
 var req;
 var res;
 
