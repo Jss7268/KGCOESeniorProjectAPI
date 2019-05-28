@@ -51,9 +51,9 @@ module.exports = (Generic) => {
                     });
             });
         },
-        validateOutputTypeName(name) {
+        validateOutputTypeName(outputTypeName) {
             return new Promise((resolve, reject) => {
-                Generic.findOneByColumn('output_types', name, 'output_type_name')
+                Generic.findOneByColumn('output_types', outputTypeName, 'output_type_name')
                     .then((result) => {
                         resolve(result);
                     })
@@ -62,7 +62,7 @@ module.exports = (Generic) => {
                     });
             });
         },
-        validateDeviceOuputId(id) {
+        validateDeviceOutputId(id) {
             return new Promise((resolve, reject) => {
                 Generic.findOne('device_outputs', { id: id })
                     .then((result) => {

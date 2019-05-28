@@ -25,6 +25,12 @@ const ACCESS_NAME = 'access_name';
 const EMAIL = 'email';
 const PASSWORD = 'password';
 const NAME = 'name';
+const RESULT = {
+    result: 'result'
+};
+const TABLE = 'table';
+const COLUMN = 'column';
+const VALUE = 'value';
 
 const ACCESS_LEVELS = {
     default: 0,
@@ -101,6 +107,10 @@ module.exports = {
     PASSWORD,
     NAME,
     AUTH_ERROR,
-    FORBIDDEN
+    FORBIDDEN,
+    RESULT,
+    TABLE,
+    COLUMN,
+    VALUE,
 
 }
