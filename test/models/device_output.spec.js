@@ -18,7 +18,6 @@ const badDeviceExperiment = {
     findOneByDevice: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
 }
 
-
 var validator;
 var badValidator;
 
@@ -28,7 +27,6 @@ beforeEach(function () {
     validator = Mocks.validator();
     badValidator = Mocks.badValidator();
 });
-
 
 describe('findAll', function () {
     it('resolves with data', function (done) {
@@ -200,7 +198,6 @@ describe('findOne', function () {
     });
 });
 
-
 describe('create', function () {
     var data;
     beforeEach(function () {
@@ -280,7 +277,8 @@ describe('create', function () {
             .catch((err) => done(err));
     });
 
-    it('rejects on bad device experiment', function (done) {
+    it('rejects on bad unlinked device', function (done) {
+        data.output_type_id = Mocks.OUTPUT_TYPE_ID;
 
         let mockDeviceExperiment = {
             findOneByDevice: () => new Promise((resolve) => resolve(null))
@@ -389,4 +387,3 @@ describe('updateOutputValue', function () {
             .catch((err) => done(err));
     });
 });
-

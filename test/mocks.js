@@ -1,4 +1,5 @@
 const sinon = require('sinon');
+const Validator = require('../validators/validator')(null);
 
 const OUTPUT_VALUE = 100;
 const DEVICE_ID = 'device';
@@ -109,7 +110,7 @@ module.exports = {
     },
     validator: () => {
         return {
-            validateColumns: sinon.stub().callsFake(() => new Promise((resolve) => resolve())),
+            validateColumns: sinon.stub().callsFake((data, columns) => Validator.validateColumns(data, columns)),
             validateUserId: sinon.stub().callsFake((id) => new Promise((resolve) => resolve({ id: id }))),
             validateExperimentId: sinon.stub().callsFake((id) => new Promise((resolve) => resolve({ id: id }))),
             validateOutputTypeId: sinon.stub().callsFake((id) => new Promise((resolve) => resolve({ id: id }))),
