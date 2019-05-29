@@ -34,7 +34,7 @@ const START_TIME = 12345;
 const CREATOR_ID = 'creator';
 const ACCESS_LEVEL = 1;
 const ACCESS_NAME = 'access_name';
-const EMAIL = 'email';
+const EMAIL = 'email@email.com';
 const PASSWORD = 'password';
 const NAME = 'name';
 const RESULT = {
@@ -46,6 +46,7 @@ const VALUE = 'value';
 const TIMESTAMP = 123456;
 const NOTES = 'notes';
 const DESCRIPTION = 'description';
+const HASH = '$2b$10$qnjbXRzGshMUBRxN1ptWPepVG4GwPKvgV3PiBif13uMP89KMJDh3a';
 
 const ACCESS_LEVELS = {
     default: 0,
@@ -179,5 +180,6 @@ module.exports = {
     OUTPUT_TYPE_ID,
     NOTES,
     DESCRIPTION,
+    HASH,
 
 }

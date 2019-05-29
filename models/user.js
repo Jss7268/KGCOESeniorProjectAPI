@@ -1,7 +1,7 @@
 var _db, _UserAccess, _Validator;
 const bcrypt = require('bcrypt');
 
-module.exports = (db, UserAccess, Validator) => {
+module.exports = (db, Validator, UserAccess) => {
   _db = db, _UserAccess = UserAccess, _Validator = Validator;
   return {
     findAll: () => {
@@ -235,6 +235,7 @@ function hashPassword(password) {
             reject(err);
           }
           else {
+            console.log(hash);
             resolve(hash);
           }
         });
@@ -245,7 +246,7 @@ function hashPassword(password) {
 
 function validateUserData(data) {
   return new Promise((resolve, reject) => {
-    _Validator.validateColumns(data, ['email', 'password'])
+    _Validator.validateColumns(data, ['email', 'password', 'name'])
       .then(function () {
         return validatePassword(data.password, 6)
       })
@@ -294,6 +295,8 @@ function validatePassword(password, minCharacters) {
 
 function verifyPassword(password, user) {
   return new Promise((resolve, reject) => {
+    console.log(password)
+    console.log(user.hashed_password)
     bcrypt.compare(password, user.hashed_password, (err, result) => {
       if (err) {
         reject(err);
