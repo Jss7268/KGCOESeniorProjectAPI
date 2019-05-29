@@ -151,5 +151,8 @@ function findOneByName(output_type_name) {
     });
 }
 function validateOutputTypeData(data) {
+    if (!data.units) {
+        data.units = null;
+    }
     return _Validator.validateColumns(data, ['output_type_name']);
 }
