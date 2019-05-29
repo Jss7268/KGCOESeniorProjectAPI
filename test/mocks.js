@@ -44,6 +44,8 @@ const TABLE = 'table';
 const COLUMN = 'column';
 const VALUE = 'value';
 const TIMESTAMP = 123456;
+const NOTES = 'notes';
+const DESCRIPTION = 'description';
 
 const ACCESS_LEVELS = {
     default: 0,
@@ -175,5 +177,7 @@ module.exports = {
     ILLEGAL,
     TIMESTAMP,
     OUTPUT_TYPE_ID,
+    NOTES,
+    DESCRIPTION,
 
 }

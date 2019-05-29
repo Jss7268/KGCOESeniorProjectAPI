@@ -105,17 +105,16 @@ function validateExperimentData(data) {
     if (!data.creator_id || !data.description) {
       reject('creator_id or description missing')
     }
+    console.log(1);
     if (!data.start_time) {
       data.start_time = null;
     }
-    else {
-      _Validator.validiateUserId(data.creator_id)
-        .then(function () {
-          resolve();
-        })
-        .catch((err) => {
-          reject(err);
-        });
-    }
+    _Validator.validateUserId(data.creator_id)
+      .then(function () {
+        resolve();
+      })
+      .catch((err) => {
+        reject(err);
+      });
   });
 }

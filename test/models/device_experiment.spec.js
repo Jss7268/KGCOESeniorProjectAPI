@@ -19,7 +19,7 @@ beforeEach(function () {
     badValidator = Mocks.badValidator();
 });
 
-describe('findAll', function () {
+describe('device_experiment findAll', function () {
     it('resolves with data', function (done) {
         DeviceExperiment(db, validator).findAll()
             .then((result) => {
@@ -43,7 +43,7 @@ describe('findAll', function () {
     });
 });
 
-describe('findAllByDevice', function () {
+describe('device_experiment findAllByDevice', function () {
     it('resolves with data', function (done) {
         DeviceExperiment(db, validator).findAllByDevice({ device_id: Mocks.DEVICE_ID })
             .then((result) => {
@@ -79,7 +79,7 @@ describe('findAllByDevice', function () {
     });
 });
 
-describe('findAllByExperiment', function () {
+describe('device_experiment findAllByExperiment', function () {
     it('resolves with data', function (done) {
         DeviceExperiment(db, validator).findAllByExperiment({ experiment_id: Mocks.EXPERIMENT_ID })
             .then((result) => {
@@ -115,7 +115,7 @@ describe('findAllByExperiment', function () {
     });
 });
 
-describe('findOneByDevice', function () {
+describe('device_experiment findOneByDevice', function () {
     it('resolves with data', function (done) {
         DeviceExperiment(db, validator).findOneByDevice({ device_id: Mocks.DEVICE_ID })
             .then((result) => {
@@ -139,7 +139,7 @@ describe('findOneByDevice', function () {
     });
 });
 
-describe('findOne', function () {
+describe('device_experiment findOne', function () {
     it('resolves with data', function (done) {
         DeviceExperiment(db, validator).findOne({ device_id: Mocks.DEVICE_ID, experiment_id: Mocks.EXPERIMENT_ID })
             .then((result) => {
@@ -201,7 +201,7 @@ describe('findOne', function () {
     });
 });
 
-describe('create', function () {
+describe('device_experiment create', function () {
     var data = {
         device_id: Mocks.DEVICE_ID,
         experiment_id: Mocks.EXPERIMENT_ID,
@@ -246,7 +246,7 @@ describe('create', function () {
     });
 });
 
-describe('delete', function () {
+describe('device_experiment delete', function () {
     it('resolves with data', function (done) {
 
         DeviceExperiment(db, validator).delete({id: Mocks.ID})

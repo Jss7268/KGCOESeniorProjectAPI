@@ -28,7 +28,7 @@ beforeEach(function () {
     badValidator = Mocks.badValidator();
 });
 
-describe('findAll', function () {
+describe('device_output findAll', function () {
     it('resolves with data', function (done) {
         DeviceOutput(db, validator, deviceExperiment).findAll()
             .then((result) => {
@@ -52,7 +52,7 @@ describe('findAll', function () {
     });
 });
 
-describe('findAllByDevice', function () {
+describe('device_output findAllByDevice', function () {
     it('resolves with data', function (done) {
         DeviceOutput(db, validator, deviceExperiment).findAllByDevice({ device_id: Mocks.DEVICE_ID })
             .then((result) => {
@@ -88,7 +88,7 @@ describe('findAllByDevice', function () {
     });
 });
 
-describe('findAllByExperiment', function () {
+describe('device_output findAllByExperiment', function () {
     it('resolves with data', function (done) {
         DeviceOutput(db, validator, deviceExperiment).findAllByExperiment({ experiment_id: Mocks.EXPERIMENT_ID })
             .then((result) => {
@@ -124,7 +124,7 @@ describe('findAllByExperiment', function () {
     });
 });
 
-describe('findAllByDeviceExperiment', function () {
+describe('device_output findAllByDeviceExperiment', function () {
     it('resolves with data', function (done) {
         DeviceOutput(db, validator, deviceExperiment).findAllByDeviceExperiment({ experiment_id: Mocks.EXPERIMENT_ID, device_id: Mocks.DEVICE_ID })
             .then((result) => {
@@ -148,7 +148,7 @@ describe('findAllByDeviceExperiment', function () {
     });
 });
 
-describe('findOne', function () {
+describe('device_output findOne', function () {
     it('resolves with data', function (done) {
         DeviceOutput(db, validator, deviceExperiment).findOne({ id: Mocks.ID })
             .then((result) => {
@@ -198,7 +198,7 @@ describe('findOne', function () {
     });
 });
 
-describe('create', function () {
+describe('device_output create', function () {
     var data;
     beforeEach(function () {
         data = {
@@ -297,7 +297,7 @@ describe('create', function () {
     it('rejects on bad validation', function (done) {
         data.output_type_id = Mocks.OUTPUT_TYPE_ID;
 
-        DeviceOutput(db, badValidator, deviceExperiment).findAllByExperiment(data)
+        DeviceOutput(db, badValidator, deviceExperiment).create(data)
             .then(() => {
                 done("Did not reject");
             })
@@ -309,7 +309,7 @@ describe('create', function () {
     });
 });
 
-describe('delete', function () {
+describe('device_output delete', function () {
     it('resolves with data', function (done) {
 
         DeviceOutput(db, validator, deviceExperiment).delete({id: Mocks.ID})
@@ -336,7 +336,7 @@ describe('delete', function () {
 });
 
 
-describe('updateOutputValue', function () {
+describe('device_output updateOutputValue', function () {
     it('resolves with data', function (done) {
 
         DeviceOutput(db, validator, deviceExperiment).updateOutputValue({id: Mocks.ID, output_value: Mocks.OUTPUT_VALUE})
