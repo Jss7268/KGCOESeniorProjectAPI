@@ -98,7 +98,7 @@ module.exports = (db) => {
     }
 };
 
-function populateTime(data, columns, setCreatedAt) {
+function populateTime(columns, data, setCreatedAt) {
     data.updated_at = new Date().getTime();
     if (columns.indexOf('updated_at') < 0) {
         columns.push('updated_at');
@@ -121,7 +121,7 @@ function getColumnValues(columns, data) {
 
 function getNumberedDollars(columns) {
     var string = '';
-    for (i = 0; i < columns.length; i++) {
+    for (i = 1; i <= columns.length; i++) {
         string += '$' + i + ', ';
     }
     return string.substring(0, string.length - 2); // remove trailing comma

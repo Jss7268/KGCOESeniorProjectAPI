@@ -27,7 +27,7 @@ module.exports = (db, Validator) => {
                             resolve(result.rows[0]);
                         }
                         else {
-                            reject('no device experiment found')
+                            reject('no device_experiment found')
                         }
                     })
                     .catch((err) => {

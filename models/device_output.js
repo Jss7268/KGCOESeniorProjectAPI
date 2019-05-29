@@ -1,9 +1,9 @@
 var _db, _DeviceExperiment, _Validator;
 
-module.exports = (db, DeviceExperiment, Validator) => {
+module.exports = (db, Validator, DeviceExperiment) => {
     _db = db, _DeviceExperiment = DeviceExperiment, _Validator = Validator;
     return {
-        findAll: function () {
+        findAll: () => {
             return new Promise((resolve, reject) => {
                 _db.query(`SELECT * FROM device_outputs
             LEFT JOIN output_types on device_outputs.output_type_id = output_types.id
@@ -63,7 +63,7 @@ module.exports = (db, DeviceExperiment, Validator) => {
             });
         },
 
-        findAllBy_DeviceExperiment: (data) => {
+        findAllByDeviceExperiment: (data) => {
             return new Promise((resolve, reject) => {
                 _DeviceExperiment.findOne(data)
                     .then((result) => {
@@ -172,6 +172,7 @@ function findOneById(id) {
             });
     });
 }
+
 function validateDeviceOutputData(data) {
     return new Promise((resolve, reject) => {
         columns = ['device_id', 'output_value', 'timestamp']

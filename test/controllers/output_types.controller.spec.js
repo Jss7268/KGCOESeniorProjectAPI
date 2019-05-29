@@ -26,8 +26,8 @@ const badOutputType = {
   findAll: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
 
 }
-const verifier = Mocks.verifier;
-const badVerifier = Mocks.badVerifier;
+const verifier = Mocks.verifier();
+const badVerifier = Mocks.badVerifier();
 
 var req;
 var res;

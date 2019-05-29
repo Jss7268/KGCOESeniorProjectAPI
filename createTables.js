@@ -23,7 +23,7 @@ async function createTables() {
 		await db.query(`CREATE TABLE IF NOT EXISTS users 
 			(id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (), 
 			name VARCHAR (100) NOT NULL, 
-			email VARCHAR (255), 
+			email VARCHAR (255) NOT NULL, 
 			hashed_password VARCHAR (255) NOT NULL, 
 			access_level smallint NOT NULL DEFAULT 0, 
 			created_at bigint NOT NULL, 
