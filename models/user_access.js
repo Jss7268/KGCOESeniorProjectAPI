@@ -6,8 +6,8 @@ module.exports = (db, Validator) => {
     findAll: function () {
       return new Promise((resolve, reject) => {
         _db.query('SELECT * from user_access', [])
-          .then((results) => {
-            resolve(results.rows);
+          .then((result) => {
+            resolve(result.rows);
           })
           .catch((err) => {
             reject(err);
@@ -21,8 +21,13 @@ module.exports = (db, Validator) => {
           .then(() => {
             return _db.query('SELECT * from user_access where access_level = $1', [data.access_level])
           })
-          .then((results) => {
-            resolve(results.rows[0]);
+          .then((result) => {
+            if (result.rows[0]) {
+              resolve(result.rows[0]);
+            }
+            else {
+              reject('no user_access found')
+            }
           })
           .catch((err) => {
             reject(err);
@@ -37,8 +42,13 @@ module.exports = (db, Validator) => {
           .then(() => {
             return _db.query('SELECT * from user_access where access_name = $1', [data.access_name])
           })
-          .then((results) => {
-            resolve(results.rows[0]);
+          .then((result) => {
+            if (result.rows[0]) {
+              resolve(result.rows[0]);
+            }
+            else {
+              reject('no user_access found')
+            }
           })
           .catch((err) => {
 
