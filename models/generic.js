@@ -17,6 +17,7 @@ module.exports = (db) => {
 
         findOne: (table, data) => {
             return new Promise((resolve, reject) => {
+                console.log(20);
                 if (!data.id) {
                     reject('error: must provide id')
                 } else {

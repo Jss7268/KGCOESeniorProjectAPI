@@ -3,12 +3,14 @@ const promise = require('promise');
 module.exports = (Experiment, Verifier) => {
   return {
     createExperiment: (req, res) => {
+      console.log(6);
       return new Promise((resolve) => {
         hydrateReq(req, Verifier)
           .then(() => {
             return Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
           })
           .then(() => {
+            console.log(13);
             return Experiment.create(req.body)
           })
           .then((result) => {
@@ -23,6 +25,7 @@ module.exports = (Experiment, Verifier) => {
             });
           })
           .finally(() => {
+            console.log("Resolving");
             resolve();
           });
       });
@@ -121,6 +124,7 @@ function hydrateReq(req, Verifier) {
         req.body.creator_id = req.decoded.uid;
       })
       .finally(() => {
+        console.log(126);
         resolve();
       });
   });

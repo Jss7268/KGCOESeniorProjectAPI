@@ -102,6 +102,7 @@ function findOneById(id) {
 }
 function validateExperimentData(data) {
   return new Promise((resolve, reject) => {
+    console.log(105);
     if (!data.creator_id || !data.description) {
       reject('creator_id or description missing')
     }

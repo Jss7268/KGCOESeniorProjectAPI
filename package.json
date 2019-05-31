@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "nyc mocha \"test/**/*.js\" --reporter spec"
+    "test": "nyc mocha \"test/**/*.js\" --reporter min",
+    "test-integration": "nyc mocha \"integration-test/routes/v1/devices_experiments.routes.spec.js\" --reporter min"
   },
   "repository": {
     "type": "git",
