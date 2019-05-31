@@ -9,8 +9,8 @@ router.get('/user_inputs/device/:device_id', userInputsController.listUserInputs
 
 // router.get('/user_inputs/:device_id/:experiment_id', userInputsController.listUserInputsByDeviceExperiment); //needed?
 
-// router.get('/user_inputs/:experiment_id/:device_id/:output_type_id', userInputsController.getOneUserInput);
+router.get('/user_inputs/:id', userInputsController.getOneUserInput);
 router.delete('/user_inputs/:id', userInputsController.deleteUserInput);
-router.post('/user_inputs/description', userInputsController.updateDescription);
+router.post('/user_inputs/description', userInputsController.changeDecsription);
 
 module.exports = router;

@@ -92,7 +92,8 @@ async function createTables() {
 	}
 	try {
 		await db.query(`CREATE TABLE IF NOT EXISTS user_inputs 
-			(description text NOT NULL, 
+			(id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (), 
+			description text NOT NULL, 
 			timestamp bigint NOT NULL, 
 			experiment_id uuid NOT NULL, 
 			device_id uuid NOT NULL, 

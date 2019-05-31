@@ -1,22 +1,15 @@
-//listuserinputsbyexperimentid
-//findbyuserid
-//find by description
-//updatedescription
-//listuserinputs
-//createuserinput
-
 module.exports = (UserInput, Verifier) => {
     return {
       createUserInput: (req, res) => {
         return new Promise((resolve) => {
           hydrateReq(req);
-          Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
+          Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
             .then(() => {
               return UserInput.create(req.body)
             })
             .then((result) => {
               return res.status(201).json({
-                message: 'success! created new user input',
+                message: `success! created new user input`,
                 id: result.id
               });
             })
@@ -32,37 +25,44 @@ module.exports = (UserInput, Verifier) => {
   
       },
   
-      changeOutputValue: (req, res) => {
+      changeDecsription: (req, res) => {
         return new Promise((resolve) => {
           hydrateReq(req);
-          Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
+          Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
             .then(() => {
-              return UserInput.updateOutputValue({ id: req.params.id, output_value: req.body.output_value })
+              return UserInput.updateDescription(req.body)
             })
             .then((result) => {
-              return res.status(200).json(result);
+              return res.status(200).json(result)({
+                message: `success! the description has been changed`,
+                id: result.id
+              });
             })
             .catch((err) => {
               return res.status(err.status || 400).json({
                 message: err.message || err
               });
             })
+            .catch((err) => {
+              return ;
+            })
             .finally(() => {
               resolve();
             });
         });
+
       },
   
       deleteUserInput: (req, res) => {
         return new Promise((resolve) => {
           hydrateReq(req);
-          Verifier.verifyMinAccessName(req.decoded.accessLevel, 'authorized_device')
+          Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
             .then(() => {
               return UserInput.delete({ id: req.params.id })
             })
             .then((result) => {
               return res.status(200).json({
-                message: 'deleted device_output with id: ' + result.id
+                message: `deleted user input with id: ${result.id}`
               });
             })
             .catch((err) => {

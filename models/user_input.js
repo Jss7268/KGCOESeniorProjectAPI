@@ -6,8 +6,6 @@ module.exports = (db, Validator) => {
         findAll: function () {
             return new Promise((resolve, reject) => {
                 _db.query(`SELECT * FROM user_inputs
-            LEFT JOIN sanitized_users on (user_inputs.user_id = sanitized_users.id)
-            LEFT JOIN experiments on (user_inputs.experiment_id = experiments.id)
             where user_inputs.deleted_at = 0
             ORDER BY user_inputs.timestamp ASC`, [])
                     .then((results) => {
@@ -46,8 +44,6 @@ module.exports = (db, Validator) => {
                     })
                     .then((result) => {
                         return _db.query(`SELECT * FROM user_inputs
-                    LEFT JOIN sanitized_users on (user_inputs.device_id = sanitized_users.id) OR (user_inputs.user_id = sanitized_users.id)
-                    LEFT JOIN experiments on (user_inputs.experiment_id = experiments.id)
                     where user_inputs.experiment_id = $1 and user_inputs.deleted_at = 0
                     ORDER BY user_inputs.timestamp ASC`, [result.id])
                     })
@@ -132,23 +128,39 @@ module.exports = (db, Validator) => {
             });
         },
 
-        //need id column in user_inputs
-        // updateDescription: (data) => {
-        //     var time = new Date().getTime();
-        //     return new Promise((resolve, reject) => { 
-        //         _db.query('UPDATE user_inputs SET description = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning description',
-        //             [data.id, data.description, time])
-        //             .then((result) => {
-        //                 resolve(result.rows[0]);
-        //             })
-        //             .catch((err) => {
-        //                 reject(err);
-        //             });
-            
-        //     });
-        // },
+        updateDescription: (data) => {
+            var time = new Date().getTime();
+            return new Promise((resolve, reject) => { 
+                _db.query('UPDATE user_inputs SET description = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning description',
+                    [data.id, data.description, time])
+                    .then((result) => {
+                        resolve(result.rows[0]);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        reject(err);
+                    });
+            });
+        },
     }
 };
+
+function findOneById(id) {
+    return new Promise((resolve, reject) => {
+      _db.query('SELECT * FROM user_inputs WHERE id = $1 and deleted_at = 0', [id])
+        .then((result) => {
+          if (result.rows[0]) {
+            resolve(result.rows[0]);
+          }
+          else {
+            reject('no user input found')
+          }
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+}
 
 function validateUserInputData(data) {
     return new Promise((resolve, reject) => {
@@ -168,7 +180,7 @@ function validateUserInputData(data) {
                 return _Validator.validateExperimentId(data.experiment_id)
             })
             .then((description) => {
-                data.description = description;
+                description = data.description;
                 resolve();
             })
             .catch((err) => {
