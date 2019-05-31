@@ -57,25 +57,6 @@ module.exports = (db, Validator) => {
             });
         },
 
-        // findAllBy_DeviceExperiment: (data) => {
-        //     return new Promise((resolve, reject) => {
-        //         _DeviceExperiment.findOne(data)
-        //             .then((result) => {
-        //                 return _db.query(`SELECT * FROM user_inputs
-        //             LEFT JOIN sanitized_users on (user_inputs.device_id = sanitized_users.id) OR (user_inputs.user_id = sanitized_users.id)
-        //             LEFT JOIN experiments on (user_inputs.experiment_id = experiments.id)
-        //             where user_inputs.device_id = $1 and user_inputs.experiment_id = $2 and user_inputs.deleted_at = 0
-        //             ORDER BY user_inputs.timestamp ASC`, [result.device_id, result.experiment_id])
-        //             })
-        //             .then((results) => {
-        //                 resolve(results.rows);
-        //             })
-        //             .catch((err) => {
-        //                 reject(err);
-        //             });
-        //     });
-        // },
-
         findOne: (data) => {
             return new Promise((resolve, reject) => {
                 if (!data.id) {
