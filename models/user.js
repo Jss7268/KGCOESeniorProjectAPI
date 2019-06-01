@@ -6,7 +6,7 @@ module.exports = (db, Validator, UserAccess) => {
   return {
     findAll: () => {
       return new Promise((resolve, reject) => {
-        _db.query('SELECT id, name, email, access_level FROM users where deleted_at = 0', [])
+        _db.query('SELECT * FROM sanitized_users where deleted_at = 0', [])
           .then((results) => {
             resolve(results.rows);
           })
@@ -18,7 +18,7 @@ module.exports = (db, Validator, UserAccess) => {
 
     findByAccessLevel: (accessLevel) => {
       return new Promise((resolve, reject) => {
-        _db.query('SELECT id, name, email, access_level FROM users where access_level = $1 and deleted_at = 0', [accessLevel])
+        _db.query('SELECT * FROM sanitized_users where access_level = $1 and deleted_at = 0', [accessLevel])
           .then((results) => {
             resolve(results.rows);
           })
@@ -47,7 +47,7 @@ module.exports = (db, Validator, UserAccess) => {
           else if (data.email) {
             findOneByEmail(data.email)
               .then((result) => {
-                delete result.password;
+                delete result.hashed_password;
                 resolve(result);
               })
               .catch((err) => {
