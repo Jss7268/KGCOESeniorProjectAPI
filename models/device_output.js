@@ -50,7 +50,7 @@ module.exports = (db, Validator, DeviceExperiment) => {
                         return _Validator.validateExperimentId(data.experiment_id)
                     })
                     .then((result) => {
-                        return _db.query(`SELECT *, device_outputs.id FROM device_outputs
+                        return _db.query(`SELECT *, device_outputs.* FROM device_outputs
                             INNER JOIN output_types on (device_outputs.output_type_id = output_types.id)
                             INNER JOIN sanitized_users on (device_outputs.device_id = sanitized_users.id)
                             INNER JOIN experiments on (device_outputs.experiment_id = experiments.id)
