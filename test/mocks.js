@@ -124,6 +124,7 @@ module.exports = {
                 data[columnName] = value;
                 resolve(data);
             })),
+            getWhereAndQueryParamList: sinon.stub().callsFake((data, ignore) => { return { additionalWhere: 'where', queryParamList: Object.values(data == null ? {} : data) } }),
         }
 
     },
@@ -136,6 +137,8 @@ module.exports = {
             validateOutputTypeName: sinon.stub().callsFake(() => new Promise((ignore, reject) => reject(VALIDATION_ERROR))),
             validateDeviceOutputId: sinon.stub().callsFake(() => new Promise((ignore, reject) => reject(VALIDATION_ERROR))),
             validateGeneric: sinon.stub().callsFake(() => new Promise((ignore, reject) => reject(VALIDATION_ERROR))),
+            getWhereAndQueryParamList: sinon.stub().callsFake((data, ignore) => { return { additionalWhere: 'where', queryParamList: [Object.values(data == null ? {} : data)] } }),
+
         }
     },
     db: () => {
