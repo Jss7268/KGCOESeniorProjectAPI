@@ -82,7 +82,7 @@ module.exports = (db, Validator) => {
                             'INSERT INTO user_inputs ' +
                             '(experiment_id, device_id, user_id,' +
                             'description, timestamp, created_at, updated_at) ' +
-                            'VALUES ($1, $2, $3, $4, $5, $6, $6) returning experiment_id, device_id',
+                            'VALUES ($1, $2, $3, $4, $5, $6, $6) returning id',
                             [data.experiment_id, data.device_id, data.user_id,
                             data.description, data.timestamp, time]);
                     })
@@ -161,7 +161,7 @@ function validateUserInputData(data) {
                 return _Validator.validateExperimentId(data.experiment_id)
             })
             .then((description) => {
-                description = data.description;
+                data.description = description;
                 resolve();
             })
             .catch((err) => {

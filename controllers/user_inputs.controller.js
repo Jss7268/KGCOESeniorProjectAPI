@@ -2,7 +2,6 @@ module.exports = (UserInput, Verifier) => {
     return {
       createUserInput: (req, res) => {
         return new Promise((resolve) => {
-          hydrateReq(req);
           Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
             .then(() => {
               return UserInput.create(req.body)
@@ -25,9 +24,8 @@ module.exports = (UserInput, Verifier) => {
   
       },
   
-      changeDecsription: (req, res) => {
+      changeDescription: (req, res) => {
         return new Promise((resolve) => {
-          hydrateReq(req);
           Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
             .then(() => {
               return UserInput.updateDescription(req.body)
@@ -55,7 +53,6 @@ module.exports = (UserInput, Verifier) => {
   
       deleteUserInput: (req, res) => {
         return new Promise((resolve) => {
-          hydrateReq(req);
           Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
             .then(() => {
               return UserInput.delete({ id: req.params.id })
@@ -145,12 +142,4 @@ module.exports = (UserInput, Verifier) => {
       },
     }
   };
-  
-  function hydrateReq(req) {
-    // TODO don't hardcode 1 for authorized_device
-    if (req.decoded.accessLevel == 1) {
-      // devices can only manipulate data for themselves
-      req.body.device_id = req.decoded.uid
-    }
-  }
   
