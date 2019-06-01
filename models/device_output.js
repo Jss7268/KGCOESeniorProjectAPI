@@ -6,11 +6,11 @@ module.exports = (db, Validator, DeviceExperiment) => {
         findAll: () => {
             return new Promise((resolve, reject) => {
                 _db.query(`SELECT *, device_outputs.* FROM device_outputs
-            LEFT JOIN output_types on device_outputs.output_type_id = output_types.id
-            LEFT JOIN sanitized_users on (device_outputs.device_id = sanitized_users.id)
-            LEFT JOIN experiments on (device_outputs.experiment_id = experiments.id)
-            where device_outputs.deleted_at = 0
-            ORDER BY device_outputs.timestamp ASC`, [])
+                    INNER  JOIN output_types on device_outputs.output_type_id = output_types.id
+                    INNER JOIN sanitized_users on (device_outputs.device_id = sanitized_users.id)
+                    INNER JOIN experiments on (device_outputs.experiment_id = experiments.id)
+                    where device_outputs.deleted_at = 0
+                    ORDER BY device_outputs.timestamp ASC`, [])
                     .then((results) => {
                         resolve(results.rows);
                     })
@@ -28,11 +28,11 @@ module.exports = (db, Validator, DeviceExperiment) => {
                     })
                     .then((result) => {
                         return _db.query(`SELECT *, device_outputs.* FROM device_outputs
-                        LEFT JOIN output_types on (device_outputs.output_type_id = output_types.id)
-                        LEFT JOIN sanitized_users on (device_outputs.device_id = sanitized_users.id)
-                        LEFT JOIN experiments on (device_outputs.experiment_id = experiments.id)
-                        where device_outputs.device_id = $1 and device_outputs.deleted_at = 0
-                        ORDER BY device_outputs.timestamp ASC`, [result.id])
+                            INNER JOIN output_types on (device_outputs.output_type_id = output_types.id)
+                            INNER JOIN sanitized_users on (device_outputs.device_id = sanitized_users.id)
+                            INNER JOIN experiments on (device_outputs.experiment_id = experiments.id)
+                            where device_outputs.device_id = $1 and device_outputs.deleted_at = 0
+                            ORDER BY device_outputs.timestamp ASC`, [result.id])
                     })
                     .then((results) => {
                         resolve(results.rows);
@@ -50,12 +50,12 @@ module.exports = (db, Validator, DeviceExperiment) => {
                         return _Validator.validateExperimentId(data.experiment_id)
                     })
                     .then((result) => {
-                        return _db.query(`SELECT *, device_outputs.* FROM device_outputs
-                    LEFT JOIN output_types on (device_outputs.output_type_id = output_types.id)
-                    LEFT JOIN sanitized_users on (device_outputs.device_id = sanitized_users.id)
-                    LEFT JOIN experiments on (device_outputs.experiment_id = experiments.id)
-                    where device_outputs.experiment_id = $1 and device_outputs.deleted_at = 0
-                    ORDER BY device_outputs.timestamp ASC`, [result.id])
+                        return _db.query(`SELECT *, device_outputs.id FROM device_outputs
+                            INNER JOIN output_types on (device_outputs.output_type_id = output_types.id)
+                            INNER JOIN sanitized_users on (device_outputs.device_id = sanitized_users.id)
+                            INNER JOIN experiments on (device_outputs.experiment_id = experiments.id)
+                            where device_outputs.experiment_id = $1 and device_outputs.deleted_at = 0
+                            ORDER BY device_outputs.timestamp ASC`, [result.id])
                     })
                     .then((results) => {
                         resolve(results.rows);
@@ -72,11 +72,11 @@ module.exports = (db, Validator, DeviceExperiment) => {
                 _DeviceExperiment.findOne(data)
                     .then((result) => {
                         return _db.query(`SELECT *, device_outputs.* FROM device_outputs
-                    LEFT JOIN output_types on (device_outputs.output_type_id = output_types.id)
-                    LEFT JOIN sanitized_users on (device_outputs.device_id = sanitized_users.id)
-                    LEFT JOIN experiments on (device_outputs.experiment_id = experiments.id)
-                    where device_outputs.device_id = $1 and device_outputs.experiment_id = $2 and device_outputs.deleted_at = 0
-                    ORDER BY device_outputs.timestamp ASC`, [result.device_id, result.experiment_id])
+                            INNER JOIN output_types on (device_outputs.output_type_id = output_types.id)
+                            INNER JOIN sanitized_users on (device_outputs.device_id = sanitized_users.id)
+                            INNER JOIN experiments on (device_outputs.experiment_id = experiments.id)
+                            where device_outputs.device_id = $1 and device_outputs.experiment_id = $2 and device_outputs.deleted_at = 0
+                            ORDER BY device_outputs.timestamp ASC`, [result.device_id, result.experiment_id])
                     })
                     .then((results) => {
                         resolve(results.rows);
