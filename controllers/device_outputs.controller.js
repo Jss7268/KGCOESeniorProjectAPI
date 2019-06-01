@@ -139,7 +139,7 @@ module.exports = (DeviceOutput, Verifier) => {
 
     listDeviceOutputs: (req, res) => {
       return new Promise((resolve) => {
-        DeviceOutput.findAll()
+        DeviceOutput.findAllByQuery(req.query)
           .then((result) => {
             return res.status(200).json(result);
           })

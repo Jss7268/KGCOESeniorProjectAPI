@@ -85,5 +85,21 @@ module.exports = (Generic) => {
                     });
             });
         },
+        getWhereAndQueryParamList,
+    }
+
+    function getWhereAndQueryParamList(data, possibleQueryParams) {
+        data = Object.keys(data)
+            .filter(k => possibleQueryParams.includes(k))
+            .map(k => Object.assign({}, { [k]: data[k] }))
+            .reduce((res, o) => Object.assign(res, o), {});
+    
+        let additionalWhere = '';
+        let i = 1;
+        Object.keys(data).forEach(column => {
+            additionalWhere += 'AND device_outputs.' + column + ' = $' + i;
+            i++;
+        });
+        return {additionalWhere, queryParamList: Object.values(data)};
     }
 }

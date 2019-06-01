@@ -1,16 +1,23 @@
 var _db, _DeviceExperiment, _Validator;
 
+const POSSIBLE_QUERY_PARAMS = [
+    'device_id', 'experiment_id', 'output_type_id'
+];
+
 module.exports = (db, Validator, DeviceExperiment) => {
     _db = db, _DeviceExperiment = DeviceExperiment, _Validator = Validator;
     return {
-        findAll: () => {
+        findAll: (data) => {
+            let { additionalWhere, queryParamList }
+                = _Validator.getWhereAndQueryParamList(data, POSSIBLE_QUERY_PARAMS);
             return new Promise((resolve, reject) => {
                 _db.query(`SELECT *, device_outputs.* FROM device_outputs
-                    INNER  JOIN output_types on device_outputs.output_type_id = output_types.id
-                    INNER JOIN sanitized_users on (device_outputs.device_id = sanitized_users.id)
-                    INNER JOIN experiments on (device_outputs.experiment_id = experiments.id)
-                    where device_outputs.deleted_at = 0
-                    ORDER BY device_outputs.timestamp ASC`, [])
+                        INNER JOIN output_types on device_outputs.output_type_id = output_types.id
+                        INNER JOIN sanitized_users on (device_outputs.device_id = sanitized_users.id)
+                        INNER JOIN experiments on (device_outputs.experiment_id = experiments.id)
+                        where device_outputs.deleted_at = 0 `
+                    + additionalWhere +
+                    `ORDER BY device_outputs.timestamp ASC`, queryParamList)
                     .then((results) => {
                         resolve(results.rows);
                     })
