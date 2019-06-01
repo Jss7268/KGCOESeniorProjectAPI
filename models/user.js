@@ -2,7 +2,7 @@ var _db, _UserAccess, _Validator;
 const bcrypt = require('bcrypt');
 
 const POSSIBLE_QUERY_PARAMS = [
-  'device_id', 'experiment_id', 'output_type_id'
+  'name', 'email', 'access_level'
 ];
 
 module.exports = (db, Validator, UserAccess) => {

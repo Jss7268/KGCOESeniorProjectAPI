@@ -1,7 +1,7 @@
 var _db, _DeviceExperiment, _Validator;
 
 const POSSIBLE_QUERY_PARAMS = [
-    'device_id', 'experiment_id', 'output_type_id'
+    'device_id', 'experiment_id', 'output_type_id', 'output_value', 'timestamp'
 ];
 
 module.exports = (db, Validator, DeviceExperiment) => {

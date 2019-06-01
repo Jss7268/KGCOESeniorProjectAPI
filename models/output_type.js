@@ -1,7 +1,7 @@
 var _db, _Validator;
 
 const POSSIBLE_QUERY_PARAMS = [
-
+    'output_type_name', 'units'
 ];
 
 module.exports = (db, Validator) => {

@@ -1,7 +1,7 @@
 var _db, _Validator;
 
 const POSSIBLE_QUERY_PARAMS = [
-  'creator_id'
+  'creator_id', 'notes', 'description', 'start_time'
 ];
 
 module.exports = (db, Validator) => {
