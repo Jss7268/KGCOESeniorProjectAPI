@@ -5,9 +5,11 @@ module.exports = (db, Validator) => {
     return {
         findAll: function () {
             return new Promise((resolve, reject) => {
-                _db.query(`SELECT * FROM user_inputs
-            where user_inputs.deleted_at = 0
-            ORDER BY user_inputs.timestamp ASC`, [])
+                _db.query(`SELECT *, user_inputs.* FROM user_inputs
+                INNER JOIN sanitized_users on (user_inputs.device_id = sanitized_users.id OR user_inputs.user_id = sanitized_users.id )
+                INNER JOIN experiments on (user_inputs.experiment_id = experiments.id)
+                where user_inputs.deleted_at = 0 
+                ORDER BY user_inputs.timestamp ASC`, [])
                     .then((results) => {
                         resolve(results.rows);
                     })
@@ -24,8 +26,12 @@ module.exports = (db, Validator) => {
                         return _Validator.validateUserId(data.device_id);
                     })
                     .then((result) => {
-                        return _db.query(`SELECT * FROM user_inputs where device_id = $1 and deleted_at = 0
-                    ORDER BY timestamp ASC`, [result.id])
+                        return _db.query(`SELECT *, user_inputs.* FROM user_inputs
+                        INNER JOIN sanitized_users on (user_inputs.device_id = sanitized_users.id 
+                            OR user_inputs.user_id = sanitized_users.id )
+                        INNER JOIN experiments on (user_inputs.experiment_id = experiments.id) 
+                        where user_inputs.device_id = $1 and user_inputs.deleted_at = 0
+                        ORDER BY user_inputs.timestamp ASC`, [result.id])
                     })
                     .then((results) => {
                         resolve(results.rows);
@@ -43,9 +49,12 @@ module.exports = (db, Validator) => {
                         return _Validator.validateExperimentId(data.experiment_id)
                     })
                     .then((result) => {
-                        return _db.query(`SELECT * FROM user_inputs
-                    where user_inputs.experiment_id = $1 and user_inputs.deleted_at = 0
-                    ORDER BY user_inputs.timestamp ASC`, [result.id])
+                        return _db.query(`SELECT *, user_inputs.* FROM user_inputs
+                        INNER JOIN sanitized_users on (user_inputs.device_id = sanitized_users.id 
+                            OR user_inputs.user_id = sanitized_users.id )
+                        INNER JOIN experiments on (user_inputs.experiment_id = experiments.id)
+                        where user_inputs.experiment_id = $1 and user_inputs.deleted_at = 0
+                        ORDER BY user_inputs.timestamp ASC`, [result.id])
                     })
                     .then((results) => {
                         resolve(results.rows);
@@ -128,7 +137,11 @@ module.exports = (db, Validator) => {
 
 function findOneById(id) {
     return new Promise((resolve, reject) => {
-      _db.query('SELECT * FROM user_inputs WHERE id = $1 and deleted_at = 0', [id])
+      _db.query(`SELECT *, user_inputs.* FROM user_inputs
+      INNER JOIN sanitized_users on (user_inputs.device_id = sanitized_users.id 
+        OR user_inputs.user_id = sanitized_users.id )
+      INNER JOIN experiments on (user_inputs.experiment_id = experiments.id)  
+      WHERE user_inputs.id = $1 and user_inputs.deleted_at = 0`, [id])
         .then((result) => {
           if (result.rows[0]) {
             resolve(result.rows[0]);
@@ -160,8 +173,7 @@ function validateUserInputData(data) {
             .then(function() {
                 return _Validator.validateExperimentId(data.experiment_id)
             })
-            .then((description) => {
-                data.description = description;
+            .then(() => {
                 resolve();
             })
             .catch((err) => {
