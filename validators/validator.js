@@ -89,6 +89,9 @@ module.exports = (Generic) => {
     }
 
     function getWhereAndQueryParamList(data, possibleQueryParams) {
+        if (data == null) {
+            return {additionalWhere: '', queryParamList: []};
+        }
         data = Object.keys(data)
             .filter(k => possibleQueryParams.includes(k))
             .map(k => Object.assign({}, { [k]: data[k] }))

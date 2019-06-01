@@ -1,11 +1,17 @@
 var _db, _Validator;
 
+const POSSIBLE_QUERY_PARAMS = [
+  'device_id', 'experiment_id', 'output_type_id'
+];
+
 module.exports = (db, Validator) => {
   _db = db, _Validator = Validator;
   return {
     findAll: (data) => {
+      let { additionalWhere, queryParamList }
+        = _Validator.getWhereAndQueryParamList(data, POSSIBLE_QUERY_PARAMS);
       return new Promise((resolve, reject) => {
-        _db.query('SELECT * from user_access where deleted_at = 0', [])
+        _db.query('SELECT * from user_access where deleted_at = 0 ' + additionalWhere, queryParamList)
           .then((result) => {
             resolve(result.rows);
           })
