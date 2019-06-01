@@ -235,7 +235,6 @@ function hashPassword(password) {
             reject(err);
           }
           else {
-            console.log(hash);
             resolve(hash);
           }
         });
@@ -295,8 +294,6 @@ function validatePassword(password, minCharacters) {
 
 function verifyPassword(password, user) {
   return new Promise((resolve, reject) => {
-    console.log(password)
-    console.log(user.hashed_password)
     bcrypt.compare(password, user.hashed_password, (err, result) => {
       if (err) {
         reject(err);
