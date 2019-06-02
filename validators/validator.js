@@ -4,10 +4,13 @@ const SUFFIX_TO_OPERATOR = {
     'gte': '>=',
     'eq': '=',
     'neq': '<>',
+    '!eq': '<>',
     'lt': '<',
     'lte': '<=',
     'null': 'IS NULL',
     'nnull': 'IS NOT NULL',
+    '!null': 'IS NOT NULL',
+
 }
 
 module.exports = (Generic) => {
