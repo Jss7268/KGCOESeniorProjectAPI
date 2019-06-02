@@ -1,8 +1,7 @@
-var _db, _UserAccess, _Validator;
-const bcrypt = require('bcrypt');
+var _db, _UserAccess, _Validator, _bcrypt;
 
-module.exports = (db, Validator, UserAccess) => {
-  _db = db, _UserAccess = UserAccess, _Validator = Validator;
+module.exports = (db, Validator, UserAccess, bcrypt) => {
+  _db = db, _UserAccess = UserAccess, _Validator = Validator, _bcrypt = bcrypt;
   return {
     findAll: () => {
       return new Promise((resolve, reject) => {
@@ -43,8 +42,7 @@ module.exports = (db, Validator, UserAccess) => {
               .catch((err) => {
                 reject(err);
               });
-          }
-          else if (data.email) {
+          } else {
             findOneByEmail(data.email)
               .then((result) => {
                 delete result.password;
@@ -241,12 +239,12 @@ function findOneByEmail(email) {
 
 function hashPassword(password) {
   return new Promise((resolve, reject) => {
-    bcrypt.genSalt(10, (err, salt) => {
+    _bcrypt.genSalt(10, (err, salt) => {
       if (err) {
         reject(err);
       }
       else {
-        bcrypt.hash(password, salt, (err, hash) => {
+        _bcrypt.hash(password, salt, (err, hash) => {
           if (err) {
             reject(err);
           }
@@ -327,7 +325,7 @@ function validatePassword(password, minCharacters) {
 
 function verifyPassword(password, user) {
   return new Promise((resolve, reject) => {
-    bcrypt.compare(password, user.hashed_password, (err, result) => {
+    _bcrypt.compare(password, user.hashed_password, (err, result) => {
       if (err) {
         reject(err);
       }
