@@ -11,6 +11,8 @@ router.put('/users/:id/name', UsersController.changeName);
 router.put('/users/:id/password', UsersController.changePassword);
 router.put('/users/:id/email', UsersController.changeEmail);
 router.put('/users/:id/access', UsersController.changeAccess);
+router.post('/users/:id/reject_requested_access', UsersController.rejectRequestedAccess);
+
 router.delete('/users/:id', UsersController.deleteUser);
 
 module.exports = router;

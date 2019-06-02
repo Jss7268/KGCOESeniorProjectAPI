@@ -37,6 +37,16 @@ async function createTables() {
 	} catch (err) {
 		console.log(err);
 	}
+
+	try{
+		await db.query(`ALTER TABLE users
+			ADD COLUMN requested_access_level smallint DEFAULT NULL,
+			ADD COLUMN requested_reason VARCHAR (255) DEFAULT NULL,
+			ADD FOREIGN KEY (requested_access_level) REFERENCES user_access (access_level)`)
+	} catch (err) {
+		console.log(err);
+	}
+
 	try {
 		await db.query(`CREATE TABLE IF NOT EXISTS experiments 
 			(id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (), 
