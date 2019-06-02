@@ -110,7 +110,7 @@ module.exports = (User, Verifier) => {
           })
           .then((result) => {
             return res.status(200).json({
-              message: 'deleted user with id: ' + result.id
+              message: `deleted user with id: ${result.id}`
             });
           })
           .catch((err) => {

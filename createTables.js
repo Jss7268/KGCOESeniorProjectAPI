@@ -127,7 +127,7 @@ async function createTables() {
 	}
 
 	try {
-		await db.query(`UPDATE users SET access_level = (SELECT access_level from user_access where access_name = $1) where email = $2 and deleted_at = 0`, ['admin_user', 'test@admin.com']);
+		await db.query(`UPDATE users SET access_level = (SELECT access_level from user_access WHERE access_name = $1) WHERE email = $2 and deleted_at = 0`, ['admin_user', 'test@admin.com']);
 	} catch (err) {
 		console.log(err);
 	}

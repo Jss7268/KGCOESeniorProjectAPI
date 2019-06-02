@@ -19,7 +19,7 @@ module.exports = (db, Validator) => {
       return new Promise((resolve, reject) => {
         _Validator.validateColumns(data, ['access_level'])
           .then(() => {
-            return _db.query('SELECT * from user_access where access_level = $1 and deleted_at = 0', [data.access_level])
+            return _db.query('SELECT * from user_access WHERE access_level = $1 and deleted_at = 0', [data.access_level]);
           })
           .then((result) => {
             if (result.rows[0]) {
@@ -40,7 +40,7 @@ module.exports = (db, Validator) => {
         _Validator.validateColumns(data, ['access_name'])
 
           .then(() => {
-            return _db.query('SELECT * from user_access where access_name = $1 and deleted_at = 0', [data.access_name])
+            return _db.query('SELECT * from user_access WHERE access_name = $1 and deleted_at = 0', [data.access_name]);
           })
           .then((result) => {
             if (result.rows[0]) {

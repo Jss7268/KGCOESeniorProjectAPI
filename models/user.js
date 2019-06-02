@@ -6,7 +6,7 @@ module.exports = (db, Validator, UserAccess) => {
   return {
     findAll: () => {
       return new Promise((resolve, reject) => {
-        _db.query('SELECT id, name, email, access_level FROM users where deleted_at = 0', [])
+        _db.query('SELECT id, name, email, access_level FROM users WHERE deleted_at = 0', [])
           .then((results) => {
             resolve(results.rows);
           })
@@ -18,7 +18,7 @@ module.exports = (db, Validator, UserAccess) => {
 
     findByAccessLevel: (accessLevel) => {
       return new Promise((resolve, reject) => {
-        _db.query('SELECT id, name, email, access_level FROM users where access_level = $1 and deleted_at = 0', [accessLevel])
+        _db.query('SELECT id, name, email, access_level FROM users WHERE access_level = $1 and deleted_at = 0', [accessLevel])
           .then((results) => {
             resolve(results.rows);
           })
@@ -235,7 +235,6 @@ function hashPassword(password) {
             reject(err);
           }
           else {
-            console.log(hash);
             resolve(hash);
           }
         });
@@ -285,7 +284,7 @@ function validatePassword(password, minCharacters) {
       reject('password must be a string');
     }
     else if (password.length < minCharacters) {
-      reject('password must be at least ' + minCharacters + ' characters long');
+      reject(`password must be at least ${minCharacters} characters long`);
     }
     else {
       resolve();
@@ -295,8 +294,6 @@ function validatePassword(password, minCharacters) {
 
 function verifyPassword(password, user) {
   return new Promise((resolve, reject) => {
-    console.log(password)
-    console.log(user.hashed_password)
     bcrypt.compare(password, user.hashed_password, (err, result) => {
       if (err) {
         reject(err);

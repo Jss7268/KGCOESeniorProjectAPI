@@ -3,7 +3,7 @@ module.exports = (UserAccess) => {
         verifyMinAccessLevel: (accessLevel, requiredAccessLevel) => {
             return new Promise((resolve, reject) => {
                 if (!accessLevel || accessLevel < requiredAccessLevel) {
-                    reject({ status: 403, message: 'failed authorization. Needed access level of: ' + requiredAccessLevel + ' but was ' + accessLevel });
+                    reject({ status: 403, message: `failed authorization. Needed access level of: ${requiredAccessLevel} but was ${accessLevel}` });
                 } else {
                     resolve();
                 }
@@ -14,10 +14,10 @@ module.exports = (UserAccess) => {
                 UserAccess.findOneByName({ access_name: requiredName })
                     .then((result) => {
                         if (!accessLevel || accessLevel < result.access_level) {
-                            var msg = 'failed authorization. Needed access level of: ' + requiredName;
+                            var msg = `failed authorization. Needed access level of: ${requiredName}`;
                             UserAccess.findOne({ access_level: accessLevel })
                                 .then((access) => {
-                                    reject({ status: 403, message: msg + ' but was: ' + access.access_name });
+                                    reject({ status: 403, message: msg + ` but was: ${access.access_name}` });
                                 })
                                 .catch(() => {
                                     reject({ status: 403, message: msg });
