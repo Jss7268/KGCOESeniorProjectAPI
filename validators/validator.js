@@ -6,6 +6,8 @@ const SUFFIX_TO_OPERATOR = {
     'neq': '<>',
     'lt': '<',
     'lte': '<=',
+    'null': 'IS NULL',
+    'nnull': 'IS NOT NULL',
 }
 
 module.exports = (Generic) => {
@@ -110,14 +112,20 @@ module.exports = (Generic) => {
         let additionalWhere = '';
         let i = 1;
 
-        Object.keys(data).forEach(column => {
+        Object.keys(data).forEach(key => {
             let operator = '=',
-                operatorIndex = column.indexOf(OPERATOR_FLAG);
+                operatorIndex = key.indexOf(OPERATOR_FLAG),
+                column = key;
             if (operatorIndex > 0) {
                 operator = SUFFIX_TO_OPERATOR[column.substring(operatorIndex + 2)] || '=';
                 column = column.substring(0, operatorIndex);
             }
-            additionalWhere += ` AND device_outputs.${column} ${operator} $${i}`;
+            if (operator.endsWith('NULL')) {
+                additionalWhere += ` AND ${column} ${operator}`;
+                delete data[key];
+            } else {
+                additionalWhere += ` AND ${column} ${operator} $${i}`;
+            }
             i++;
         });
         return { additionalWhere, queryParamList: Object.values(data) };
