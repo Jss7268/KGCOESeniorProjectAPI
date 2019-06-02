@@ -17,7 +17,7 @@ module.exports = (UserAccess) => {
                             var msg = `failed authorization. Needed access level of: ${requiredName}`;
                             UserAccess.findOne({ access_level: accessLevel })
                                 .then((access) => {
-                                    reject({ status: 403, message: msg + ` but was: ${access.access_name}` });
+                                    reject({ status: 403, message: `${msg} but was: ${access.access_name}` });
                                 })
                                 .catch(() => {
                                     reject({ status: 403, message: msg });

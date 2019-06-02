@@ -7,7 +7,7 @@ module.exports = (Generic) => {
                 columns.forEach(column => {
                     if (!(column in data)) {
                         shouldReject = true;
-                        msg += column + ', ';
+                        msg += `${column}, `;
                     }
                 });
                 if (shouldReject) {

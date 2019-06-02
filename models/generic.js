@@ -130,7 +130,7 @@ function getNumberedDollars(columns) {
 function getColumnNames(columns) {
     var string = '';
     columns.forEach(column => {
-        string += column + ', ';
+        string += `${column}, `;
     });
     return string.substring(0, string.length - 2); // remove trailing comma
 }
