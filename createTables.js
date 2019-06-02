@@ -10,7 +10,27 @@ async function createTables() {
 	} catch (err) {
 		console.log(err);
 	}
-	
+	try {
+		await db.query(`CREATE TABLE IF NOT EXISTS user_access 
+			(access_level smallint PRIMARY KEY,
+			access_name varchar(255) NOT NULL,
+			description text,
+			created_at bigint NOT NULL, 
+			updated_at bigint, 
+			deleted_at bigint NOT NULL DEFAULT 0)`);
+	} catch (err) {
+		console.log(err);
+	}
+
+	try {
+		await db.query(`ALTER TABLE user_access 
+		ADD COLUMN created_at bigint NOT NULL DEFAULT 0, 
+		ADD COLUMN updated_at bigint, 
+		ADD COLUMN deleted_at bigint NOT NULL DEFAULT 0`)
+	} catch (err) {
+		console.log(err);
+	}
+
 	try {
 		await db.query(`CREATE TABLE IF NOT EXISTS user_access 
 			(access_level smallint PRIMARY KEY,
