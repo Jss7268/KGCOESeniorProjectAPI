@@ -55,7 +55,7 @@ module.exports = (DeviceOutput, Verifier) => {
           })
           .then((result) => {
             return res.status(200).json({
-              message: 'deleted device_output with id: ' + result.id
+              message: `deleted device_output with id: ${result.id}`
             });
           })
           .catch((err) => {
