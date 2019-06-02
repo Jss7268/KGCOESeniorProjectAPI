@@ -1,3 +1,4 @@
+const OPERATOR_FLAG = '__';
 const SUFFIX_TO_OPERATOR = {
     'gt': '>',
     'gte': '>=',
@@ -5,7 +6,6 @@ const SUFFIX_TO_OPERATOR = {
     'neq': '<>',
     'lt': '<',
     'lte': '<=',
-    'in': 'in'
 }
 
 module.exports = (Generic) => {
@@ -100,20 +100,26 @@ module.exports = (Generic) => {
 
     function getWhereAndQueryParamList(data, possibleQueryParams) {
         if (data == null) {
-            return {additionalWhere: '', queryParamList: []};
+            return { additionalWhere: '', queryParamList: [] };
         }
         data = Object.keys(data)
-            .filter(k => possibleQueryParams.includes(k))
-            .map(k => Object.assign({}, { [k]: data[k] }))
+            .filter(column => possibleQueryParams.includes(column.substring(0, column.indexOf(OPERATOR_FLAG))))
+            .map(column => Object.assign({}, { [column]: data[column] }))
             .reduce((res, o) => Object.assign(res, o), {});
-    
+
         let additionalWhere = '';
         let i = 1;
-        let operator = '=';
+
         Object.keys(data).forEach(column => {
-            additionalWhere += 'AND device_outputs.' + column + ' ' + operator + ' $' + i;
+            let operator = '=',
+                operatorIndex = column.indexOf(OPERATOR_FLAG);
+            if (operatorIndex > 0) {
+                operator = SUFFIX_TO_OPERATOR[column.substring(operatorIndex + 2)] || '=';
+                column = column.substring(0, operatorIndex);
+            }
+            additionalWhere += ` AND device_outputs.${column} ${operator} $${i}`;
             i++;
         });
-        return {additionalWhere, queryParamList: Object.values(data)};
+        return { additionalWhere, queryParamList: Object.values(data) };
     }
 }
