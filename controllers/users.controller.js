@@ -102,26 +102,6 @@ module.exports = (User, Verifier) => {
       });
     },
 
-    changeAccess: (req, res) => {
-      return new Promise((resolve) => {
-        Verifier.verifyMinAccessName(req.decoded.accessLevel, 'admin_user')
-          .then(() => {
-            return User.updateAccess({ id: req.params.id, access_level: req.body.access_level })
-          })
-          .then((result) => {
-            return res.status(200).json(result);
-          })
-          .catch((err) => {
-            return res.status(err.status || 400).json({
-              message: err.message || err
-            });
-          })
-          .finally(() => {
-            resolve();
-          });
-      });
-    },
-
     rejectRequestedAccess: (req, res) => {
       return new Promise((resolve) => {
         Verifier.verifyMinAccessName(req.decoded.accessLevel, 'admin_user')
