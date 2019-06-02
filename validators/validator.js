@@ -85,5 +85,12 @@ module.exports = (Generic) => {
                     });
             });
         },
+
+        //Todo: validation for description to avoid inserting sql statements etc.
+        // validateDescription(description) {
+        //     return new Promise((resolve, reject) => {
+
+        //     })
+        // }
     }
 }

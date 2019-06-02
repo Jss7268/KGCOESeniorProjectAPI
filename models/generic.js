@@ -5,7 +5,7 @@ module.exports = (db) => {
     return {
         findAll: (table) => {
             return new Promise((resolve, reject) => {
-                _db.query('SELECT * FROM ' + table + 'where deleted_at = 0', [])
+                _db.query(`SELECT * FROM ${table} WHERE deleted_at = 0`, [])
                     .then((results) => {
                         resolve(results.rows);
                     })
@@ -33,13 +33,13 @@ module.exports = (db) => {
 
         findOneByColumn: (table, value, columnName) => {
             return new Promise((resolve, reject) => {
-                _db.query('SELECT * FROM ' + table + ' WHERE ' + columnName + ' = $1 and deleted_at = 0', [value])
+                _db.query(`SELECT * FROM ${table} WHERE ${columnName} = $1 and deleted_at = 0`, [value])
                     .then((result) => {
                         if (result.rows[0]) {
                             resolve(result.rows[0]);
                         }
                         else {
-                            reject('no ' + table + ' found')
+                            reject(`no ${table} found`)
                         }
                     })
                     .catch((err) => {
@@ -53,7 +53,7 @@ module.exports = (db) => {
 
             return new Promise((resolve, reject) => {
                 _db.query(
-                    'INSERT INTO ' + table + '(' + getColumnNames(columns) + ') VALUES (' + getNumberedDollars(columns) + ') returning id',
+                    `INSERT INTO ${table} (${getColumnNames(columns)}) VALUES (${getNumberedDollars(columns)}) returning id`,
                     getColumnValues(columns, data))
                     .then((result) => {
                         resolve(result.rows[0]);
@@ -68,7 +68,7 @@ module.exports = (db) => {
         delete: (table, data) => {
             var time = new Date().getTime();
             return new Promise((resolve, reject) => {
-                _db.query('UPDATE ' + table + ' SET deleted_at = $2 WHERE id = $1 returning id', [data.id, time])
+                _db.query(`UPDATE ${table} SET deleted_at = $2 WHERE id = $1 returning id`, [data.id, time])
                     .then((result) => {
                         resolve(result.rows[0]);
                     })
@@ -82,10 +82,10 @@ module.exports = (db) => {
             var time = new Date().getTime();
             return new Promise((resolve, reject) => {
                 if (!data.id || !data[column]) {
-                    reject('error: id and/or ' + column + ' missing')
+                    reject(`error: id and/or ${column} missing`)
                 }
                 else {
-                    _db.query('UPDATE ' + table + ' SET $2 = $3, updated_at = $4 WHERE id = $1 and deleted_at = 0 returning $2', [data.id, column, data[column], time])
+                    _db.query(`UPDATE ${table} SET $2 = $3, updated_at = $4 WHERE id = $1 and deleted_at = 0 returning $2`, [data.id, column, data[column], time])
                         .then((result) => {
                             resolve(result.rows[0]);
                         })
@@ -122,7 +122,7 @@ function getColumnValues(columns, data) {
 function getNumberedDollars(columns) {
     var string = '';
     for (i = 1; i <= columns.length; i++) {
-        string += '$' + i + ', ';
+        string += `$${i}, `;
     }
     return string.substring(0, string.length - 2); // remove trailing comma
 }
@@ -137,13 +137,13 @@ function getColumnNames(columns) {
 
 function findOneById(table, id) {
     return new Promise((resolve, reject) => {
-        _db.query('SELECT * FROM ' + table + ' WHERE id = $1 and deleted_at = 0', [id])
+        _db.query(`SELECT * FROM ${table} WHERE id = $1 and deleted_at = 0`, [id])
             .then((result) => {
                 if (result.rows[0]) {
                     resolve(result.rows[0]);
                 }
                 else {
-                    reject('no ' + table + ' found')
+                    reject(`no ${table} found`)
                 }
             })
             .catch((err) => {

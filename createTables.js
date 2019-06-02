@@ -15,7 +15,10 @@ async function createTables() {
 		await db.query(`CREATE TABLE IF NOT EXISTS user_access 
 			(access_level smallint PRIMARY KEY,
 			access_name varchar(255) NOT NULL,
-			description text)`);
+			description text,
+			created_at bigint NOT NULL, 
+			updated_at bigint, 
+			deleted_at bigint NOT NULL DEFAULT 0)`);
 	} catch (err) {
 		console.log(err);
 	}
@@ -92,7 +95,8 @@ async function createTables() {
 	}
 	try {
 		await db.query(`CREATE TABLE IF NOT EXISTS user_inputs 
-			(description text NOT NULL, 
+			(id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (), 
+			description text NOT NULL, 
 			timestamp bigint NOT NULL, 
 			experiment_id uuid NOT NULL, 
 			device_id uuid NOT NULL, 
@@ -116,14 +120,15 @@ async function createTables() {
 	try {
 		var accessLevels = [['default', 'Default'], ['authorized_device', 'Authorized Device'], ['elevated_user', 'Elevated User'], ['admin_user', 'Admin User']]
 		for (i = 0; i < accessLevels.length; i ++) {
-			await db.query(`INSERT INTO user_access (access_level, access_name, description) VALUES ($1, $2, $3) ON CONFLICT (access_level) DO NOTHING`, [i, accessLevels[i][0], accessLevels[i][1]]);
+			let time = new Date().getTime();
+			await db.query(`INSERT INTO user_access (access_level, access_name, description, created_at, updated_at) VALUES ($1, $2, $3, $4, $4) ON CONFLICT (access_level) DO NOTHING`, [i, accessLevels[i][0], accessLevels[i][1], time]);
 		}
 	} catch (err) {
 		console.log(err);
 	}
 
 	try {
-		await db.query(`UPDATE users SET access_level = (SELECT access_level from user_access where access_name = $1) where email = $2 and deleted_at = 0`, ['admin_user', 'test@admin.com']);
+		await db.query(`UPDATE users SET access_level = (SELECT access_level from user_access WHERE access_name = $1) WHERE email = $2 and deleted_at = 0`, ['admin_user', 'test@admin.com']);
 	} catch (err) {
 		console.log(err);
 	}
