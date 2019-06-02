@@ -65,9 +65,8 @@ describe('deleteDeviceExperiment', () => {
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith({
-          message: 'deleted device experiment with experiment id: ' +
-            Mocks.EXPERIMENT_ID + ' and device id: ' + Mocks.DEVICE_ID
-        });
+          message: `deleted device experiment with experiment id: ${Mocks.EXPERIMENT_ID} and device id: ${Mocks.DEVICE_ID}`
+       });
         done();
       })
       .catch((err) => done(err));

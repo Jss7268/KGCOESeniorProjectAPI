@@ -71,7 +71,7 @@ module.exports = (OutputType, Verifier) => {
           })
           .then((result) => {
             return res.status(200).json({
-              message: 'deleted output_type with id: ' + result.id
+              message: `deleted output_type with id: ${result.id}`
             });
           })
           .catch((err) => {
@@ -93,7 +93,7 @@ module.exports = (OutputType, Verifier) => {
           })
           .then((result) => {
             return res.status(200).json({
-              message: 'deleted output_type with id: ' + result.id
+              message: `deleted output_type with id: ${result.id}`
             });
           })
           .catch((err) => {

@@ -135,7 +135,7 @@ describe('deleteUser', () => {
     UsersController(user, verifier).deleteUser(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
-        expect(res.json).to.have.been.calledWith({ message: 'deleted user with id: ' + Mocks.ID });
+        expect(res.json).to.have.been.calledWith({ message: `deleted user with id: ${Mocks.ID}` });
         done();
       })
       .catch((err) => done(err));

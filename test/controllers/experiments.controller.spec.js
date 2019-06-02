@@ -74,7 +74,7 @@ describe('deleteExperiment', () => {
     ExperimentsController(experiment, verifier).deleteExperiment(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
-        expect(res.json).to.have.been.calledWith({ message: 'deleted experiment with id: ' + Mocks.ID });
+        expect(res.json).to.have.been.calledWith({ message: `deleted experiment with id: ${Mocks.ID}` });
         done();
       })
       .catch((err) => done(err));

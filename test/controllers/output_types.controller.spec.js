@@ -91,7 +91,7 @@ describe('deleteOutputType', () => {
     OutputTypesController(outputType, verifier).deleteOutputType(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
-        expect(res.json).to.have.been.calledWith({ message: 'deleted output_type with id: ' + Mocks.ID });
+        expect(res.json).to.have.been.calledWith({ message: `deleted output_type with id: ${Mocks.ID}` });
         done();
       })
       .catch((err) => done(err));
@@ -106,7 +106,7 @@ describe('deleteOutputTypeName', () => {
     OutputTypesController(outputType, verifier).deleteOutputTypeName(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
-        expect(res.json).to.have.been.calledWith({ message: 'deleted output_type with id: ' + Mocks.ID });
+        expect(res.json).to.have.been.calledWith({ message: `deleted output_type with id: ${Mocks.ID}` });
         done();
       })
       .catch((err) => done(err));

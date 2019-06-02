@@ -82,7 +82,7 @@ describe('deleteDeviceOutput', () => {
     DeviceOutputsController(deviceOutput, verifier).deleteDeviceOutput(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
-        expect(res.json).to.have.been.calledWith({ message: 'deleted device_output with id: ' + Mocks.ID });
+        expect(res.json).to.have.been.calledWith({ message: `deleted device_output with id: ${Mocks.ID}` });
         done();
       })
       .catch((err) => done(err));

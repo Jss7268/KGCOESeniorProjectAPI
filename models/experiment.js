@@ -5,7 +5,7 @@ module.exports = (db, Validator) => {
   return {
     findAll: function () {
       return new Promise((resolve, reject) => {
-        _db.query('SELECT * FROM experiments where deleted_at = 0', [])
+        _db.query('SELECT * FROM experiments WHERE deleted_at = 0', [])
           .then((results) => {
             resolve(results.rows);
           })

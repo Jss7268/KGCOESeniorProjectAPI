@@ -20,7 +20,7 @@ describe('generic findAll', function () {
     it('resolves with data', function (done) {
         Generic(db).findAll(Mocks.TABLE)
             .then((result) => {
-                expect(db.query).to.be.calledWith('SELECT * FROM ' + Mocks.TABLE + 'where deleted_at = 0', [])
+                expect(db.query).to.be.calledWith(`SELECT * FROM ${Mocks.TABLE} WHERE deleted_at = 0`, [])
                 expect(result).to.be.an('array');
                 expect(result[0].paramList).to.deep.equal([]);
                 done();
@@ -45,7 +45,7 @@ describe('generic findOne', function () {
     it('resolves with data', function (done) {
         Generic(db).findOne(Mocks.TABLE, { id: Mocks.ID })
             .then((result) => {
-                expect(db.query).to.be.calledWith('SELECT * FROM ' + Mocks.TABLE + ' WHERE id = $1 and deleted_at = 0', [Mocks.ID])
+                expect(db.query).to.be.calledWith(`SELECT * FROM ${Mocks.TABLE} WHERE id = $1 and deleted_at = 0`, [Mocks.ID])
                 expect(result.paramList).to.deep.equal([Mocks.ID]);
                 done();
             })
@@ -61,7 +61,7 @@ describe('generic findOne', function () {
                 done("Did not reject");
             })
             .catch((err) => {
-                expect(err).to.equal('no ' + Mocks.TABLE + ' found');
+                expect(err).to.equal(`no ${Mocks.TABLE} found`);
                 done();
             })
             .catch((err) => done(err));
@@ -96,7 +96,7 @@ describe('generic findOneByColumn', function () {
     it('resolves with data', function (done) {
         Generic(db).findOneByColumn(Mocks.TABLE, Mocks.VALUE, Mocks.COLUMN)
             .then((result) => {
-                expect(db.query).to.have.been.deep.calledWith('SELECT * FROM ' + Mocks.TABLE + ' WHERE ' + Mocks.COLUMN + ' = $1 and deleted_at = 0', [Mocks.VALUE])
+                expect(db.query).to.have.been.deep.calledWith(`SELECT * FROM ${Mocks.TABLE} WHERE ${Mocks.COLUMN} = $1 and deleted_at = 0`, [Mocks.VALUE])
                 expect(result.paramList).to.deep.equal([Mocks.VALUE]);
                 done();
             })
@@ -112,7 +112,7 @@ describe('generic findOneByColumn', function () {
                 done("Did not reject");
             })
             .catch((err) => {
-                expect(err).to.equal('no ' + Mocks.TABLE + ' found');
+                expect(err).to.equal(`no ${Mocks.TABLE} found`);
                 done();
             })
             .catch((err) => done(err));
@@ -147,7 +147,7 @@ describe('generic create', function () {
             .then((result) => {
                 var time = result.paramList[result.paramList.length - 1];
                 expect(db.query).to.have.been.deep.calledWith(
-                    'INSERT INTO ' + Mocks.TABLE + '(id, value, updated_at, created_at) VALUES ($1, $2, $3, $4) returning id',
+                    `INSERT INTO ${Mocks.TABLE} (id, value, updated_at, created_at) VALUES ($1, $2, $3, $4) returning id`,
                     [Mocks.ID, Mocks.VALUE, time, time]
                 );
                 expect(result.paramList).to.be.an('array');
@@ -164,7 +164,7 @@ describe('generic create', function () {
             .then((result) => {
                 var time = result.paramList[result.paramList.length - 2];
                 expect(db.query).to.have.been.deep.calledWith(
-                    'INSERT INTO ' + Mocks.TABLE + '(id, value, updated_at, created_at) VALUES ($1, $2, $3, $4) returning id',
+                    `INSERT INTO ${Mocks.TABLE} (id, value, updated_at, created_at) VALUES ($1, $2, $3, $4) returning id`,
                     [Mocks.ID, Mocks.VALUE, time, createdAt]
                 );
                 expect(result.paramList).to.be.an('array');
@@ -179,7 +179,7 @@ describe('generic create', function () {
             .then((result) => {
                 var time = result.paramList[result.paramList.length - 1];
                 expect(db.query).to.have.been.deep.calledWith(
-                    'INSERT INTO ' + Mocks.TABLE + '(id, value, updated_at, created_at) VALUES ($1, $2, $3, $4) returning id',
+                    `INSERT INTO ${Mocks.TABLE} (id, value, updated_at, created_at) VALUES ($1, $2, $3, $4) returning id`,
                     [Mocks.ID, Mocks.VALUE, time, time]
                 );
                 expect(result.paramList).to.be.an('array');
@@ -245,7 +245,7 @@ describe('generic update', function () {
             .then((result) => {
                 let time = result.paramList[3];
                 expect(db.query).to.have.been.deep.calledWith(
-                    'UPDATE ' + Mocks.TABLE + ' SET $2 = $3, updated_at = $4 WHERE id = $1 and deleted_at = 0 returning $2',
+                    `UPDATE ${Mocks.TABLE} SET $2 = $3, updated_at = $4 WHERE id = $1 and deleted_at = 0 returning $2`,
                     [Mocks.ID, Mocks.COLUMN, Mocks.VALUE, time]
                 );
                 expect(result.paramList).to.be.an('array');
@@ -275,7 +275,7 @@ describe('generic update', function () {
                 done("Did not reject");
             })
             .catch((err) => {
-                expect(err).to.equal('error: id and/or ' + Mocks.COLUMN + ' missing');
+                expect(err).to.equal(`error: id and/or ${Mocks.COLUMN} missing`);
                 done();
             })
             .catch((err) => done(err));
@@ -288,7 +288,7 @@ describe('generic update', function () {
                 done("Did not reject");
             })
             .catch((err) => {
-                expect(err).to.equal('error: id and/or ' + Mocks.COLUMN + ' missing');
+                expect(err).to.equal(`error: id and/or ${Mocks.COLUMN} missing`);
                 done();
             })
             .catch((err) => done(err));
