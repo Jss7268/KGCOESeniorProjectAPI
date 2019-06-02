@@ -35,8 +35,7 @@ module.exports = (DeviceExperiment, Verifier) => {
           })
           .then((result) => {
             return res.status(200).json({
-              message: 'deleted device experiment with experiment id: ' + result.experiment_id +
-                ' and device id: ' + result.device_id
+              message: `deleted device experiment with experiment id: ${result.experiment_id} and device id: ${result.device_id}`
             });
           })
           .catch((err) => {

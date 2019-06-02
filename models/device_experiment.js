@@ -10,7 +10,7 @@ module.exports = (db, Validator) => {
             let { additionalWhere, queryParamList }
                 = _Validator.getWhereAndQueryParamList(data, POSSIBLE_QUERY_PARAMS);
             return new Promise((resolve, reject) => {
-                _db.query('SELECT * FROM devices_experiments where deleted_at = 0 ' +
+                _db.query('SELECT * FROM devices_experiments WHERE deleted_at = 0 ' +
                     additionalWhere, queryParamList)
                     .then((results) => {
                         resolve(results.rows);
