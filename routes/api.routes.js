@@ -10,6 +10,7 @@ router.use('/v1', require('./v1/experiments.routes'));
 router.use('/v1', require('./v1/device_outputs.routes'));
 router.use('/v1', require('./v1/output_types.routes'));
 router.use('/v1', require('./v1/devices_experiments.routes'));
+router.use('/v1', require('./v1/user_inputs.routes'));
 
 // API Error routes
 router.use((req, res) => {
