@@ -1,3 +1,13 @@
+const SUFFIX_TO_OPERATOR = {
+    'gt': '>',
+    'gte': '>=',
+    'eq': '=',
+    'neq': '<>',
+    'lt': '<',
+    'lte': '<=',
+    'in': 'in'
+}
+
 module.exports = (Generic) => {
     return {
         validateColumns(data, columns) {
@@ -99,8 +109,9 @@ module.exports = (Generic) => {
     
         let additionalWhere = '';
         let i = 1;
+        let operator = '=';
         Object.keys(data).forEach(column => {
-            additionalWhere += 'AND device_outputs.' + column + ' = $' + i;
+            additionalWhere += 'AND device_outputs.' + column + ' ' + operator + ' $' + i;
             i++;
         });
         return {additionalWhere, queryParamList: Object.values(data)};

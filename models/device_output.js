@@ -15,9 +15,9 @@ module.exports = (db, Validator, DeviceExperiment) => {
                         INNER JOIN output_types on device_outputs.output_type_id = output_types.id
                         INNER JOIN sanitized_users on (device_outputs.device_id = sanitized_users.id)
                         INNER JOIN experiments on (device_outputs.experiment_id = experiments.id)
-                        WHERE device_outputs.deleted_at = 0 `
-                        + additionalWhere +
-                        `ORDER BY device_outputs.timestamp ASC`, queryParamList)
+                        WHERE device_outputs.deleted_at = 0
+                        ${additionalWhere}
+                        ORDER BY device_outputs.timestamp ASC`, queryParamList)
                     .then((results) => {
                         resolve(results.rows);
                     })
