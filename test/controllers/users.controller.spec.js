@@ -12,7 +12,7 @@ const user = {
   updateEmail: ({ id, email }) => new Promise((resolve) => resolve({ id: id, email: email })),
   updatePassword: ({ id, password }) => new Promise((resolve) => resolve({ id: id, password: password })),
   updateAccess: ({ id, access_level }) => new Promise((resolve) => resolve({ id: id, access_level: access_level })),
-  rejectRequestedAccess: ({ id }) => new Promise((resolve) => resolve({ id: id })),
+  rejectRequestedAccessLevel: ({ id }) => new Promise((resolve) => resolve({ id: id })),
   delete: ({ id }) => new Promise((resolve) => resolve({ id: id })),
   findOne: ({ id }) => new Promise((resolve) => resolve({ id: id })),
   findByAccessLevel: (ignore) => new Promise((resolve) => resolve([Mocks.RESULT])),
@@ -25,7 +25,7 @@ const badUser = {
   updateEmail: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
   updatePassword: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
   updateAccess: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
-  rejectRequestedAccess: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
+  rejectRequestedAccessLevel: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
   delete: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
   findOne: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
   findByAccessLevel: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
@@ -125,14 +125,14 @@ describe('changeAccess', () => {
   });
 });
 
-describe('rejectRequestedAccess', () => {
-  TestGeneric.testBadVerifier(UsersController(user, badVerifier).rejectRequestedAccess);
-  TestGeneric.testBadModel(UsersController(badUser, mockVerifier).rejectRequestedAccess);
+describe('rejectRequestedAccessLevel', () => {
+  TestGeneric.testBadVerifier(UsersController(user, badVerifier).rejectRequestedAccessLevel);
+  TestGeneric.testBadModel(UsersController(badUser, mockVerifier).rejectRequestedAccessLevel);
 
   it('returns 200 status on success', function (done) {
     // changing access requires admin access level;
     req.decoded.accessLevel = Mocks.ACCESS_LEVELS.admin_user;
-    UsersController(user, verifier).rejectRequestedAccess(req, res)
+    UsersController(user, verifier).rejectRequestedAccessLevel(req, res)
       .then(() => {
         expect(res.status).to.have.been.calledWith(200);
         expect(res.json).to.have.been.calledWith({ id: Mocks.ID });
