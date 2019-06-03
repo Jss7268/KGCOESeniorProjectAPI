@@ -71,7 +71,7 @@ module.exports = (db, Validator, UserAccess, bcrypt) => {
           })
           .then((hash) => {
             return _db.query(
-              'INSERT INTO users (name, email, hashed_password, requested_access_level, requested_reason, created_at, updated_at) VALUES ($1, $2, $3, $4, $4) returning id',
+              'INSERT INTO users (name, email, hashed_password, requested_access_level, requested_reason, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $6) returning id',
               [data.name, data.email, hash, data.requested_access_level, data.requested_reason, time]);
           })
           .then((result) => {
