@@ -115,7 +115,10 @@ module.exports = (Generic) => {
             return { additionalWhere: '', queryParamList: [] };
         }
         data = Object.keys(data)
-            .filter(column => possibleQueryParams.includes(column.substring(0, column.indexOf(OPERATOR_FLAG))))
+            .filter(column => {
+                let operatorIndex = column.indexOf(OPERATOR_FLAG);
+                return possibleQueryParams.includes(column.substring(0, operatorIndex < 0 ? column.length : operatorIndex));
+            })
             .map(column => Object.assign({}, { [column]: data[column] }))
             .reduce((res, o) => Object.assign(res, o), {});
 
@@ -135,9 +138,11 @@ module.exports = (Generic) => {
                 delete data[key];
             } else {
                 additionalWhere += ` AND ${column} ${operator} $${i}`;
+                i++;
             }
-            i++;
         });
+        console.log(additionalWhere);
+        console.log(data);
         return { additionalWhere, queryParamList: Object.values(data) };
     }
 }
