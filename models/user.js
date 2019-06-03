@@ -11,7 +11,7 @@ module.exports = (db, Validator, UserAccess, bcrypt) => {
       let { additionalWhere, queryParamList }
         = _Validator.getWhereAndQueryParamList(data, POSSIBLE_QUERY_PARAMS);
       return new Promise((resolve, reject) => {
-        _db.query(`SELECT id, name, email, access_level FROM users WHERE deleted_at = 0 ${additionalWhere}`, queryParamList)
+        _db.query(`SELECT * FROM sanitized_users WHERE deleted_at = 0 ${additionalWhere}`, queryParamList)
           .then((results) => {
             resolve(results.rows);
           })
@@ -23,7 +23,7 @@ module.exports = (db, Validator, UserAccess, bcrypt) => {
 
     findByAccessLevel: (accessLevel) => {
       return new Promise((resolve, reject) => {
-        _db.query('SELECT id, name, email, access_level FROM users WHERE access_level = $1 and deleted_at = 0', [accessLevel])
+        _db.query('SELECT * FROM sanitized_users WHERE access_level = $1 and deleted_at = 0', [accessLevel])
           .then((results) => {
             resolve(results.rows);
           })
@@ -51,7 +51,7 @@ module.exports = (db, Validator, UserAccess, bcrypt) => {
           } else {
             findOneByEmail(data.email)
               .then((result) => {
-                delete result.password;
+                delete result.hashed_password;
                 resolve(result);
               })
               .catch((err) => {
