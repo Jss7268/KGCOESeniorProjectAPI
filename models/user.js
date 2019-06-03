@@ -1,11 +1,17 @@
 var _db, _UserAccess, _Validator, _bcrypt;
+const POSSIBLE_QUERY_PARAMS = [
+  'name', 'email', 'access_level'
+];
 
 module.exports = (db, Validator, UserAccess, bcrypt) => {
   _db = db, _UserAccess = UserAccess, _Validator = Validator, _bcrypt = bcrypt;
+
   return {
-    findAll: () => {
+    findAll: (data) => {
+      let { additionalWhere, queryParamList }
+        = _Validator.getWhereAndQueryParamList(data, POSSIBLE_QUERY_PARAMS);
       return new Promise((resolve, reject) => {
-        _db.query('SELECT id, name, email, access_level FROM users WHERE deleted_at = 0', [])
+        _db.query(`SELECT id, name, email, access_level FROM users WHERE deleted_at = 0 ${additionalWhere}`, queryParamList)
           .then((results) => {
             resolve(results.rows);
           })
