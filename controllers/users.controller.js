@@ -102,11 +102,11 @@ module.exports = (User, Verifier) => {
       });
     },
 
-    rejectRequestedAccess: (req, res) => {
+    rejectRequestedAccessLevel: (req, res) => {
       return new Promise((resolve) => {
         Verifier.verifyMinAccessName(req.decoded.accessLevel, 'admin_user')
           .then(() => {
-            return User.rejectRequestedAccess({ id: req.params.id })
+            return User.rejectRequestedAccessLevel({ id: req.params.id })
           })
           .then((result) => {
             return res.status(200).json(result);

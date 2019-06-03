@@ -141,8 +141,6 @@ module.exports = (Generic) => {
                 i++;
             }
         });
-        console.log(additionalWhere);
-        console.log(data);
         return { additionalWhere, queryParamList: Object.values(data) };
     }
 }
