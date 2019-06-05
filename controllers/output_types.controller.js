@@ -143,7 +143,7 @@ module.exports = (OutputType, Verifier) => {
 
     listOutputTypes: (req, res) => {
       return new Promise((resolve) => {
-        OutputType.findAll()
+        OutputType.findAll(req.query)
           .then((result) => {
             return res.status(200).json(result);
           })

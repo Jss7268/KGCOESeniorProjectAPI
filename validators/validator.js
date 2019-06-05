@@ -1,3 +1,18 @@
+const OPERATOR_FLAG = '__';
+const SUFFIX_TO_OPERATOR = {
+    'gt': '>',
+    'gte': '>=',
+    'eq': '=',
+    'neq': '<>',
+    '!eq': '<>',
+    'lt': '<',
+    'lte': '<=',
+    'null': 'IS NULL',
+    'nnull': 'IS NOT NULL',
+    '!null': 'IS NOT NULL',
+
+}
+
 module.exports = (Generic) => {
     return {
         validateColumns(data, columns) {
@@ -85,6 +100,41 @@ module.exports = (Generic) => {
                     });
             });
         },
+        getWhereAndQueryParamList,
+    }
+
+    function getWhereAndQueryParamList(data, possibleQueryParams) {
+        if (data == null) {
+            return { additionalWhere: '', queryParamList: [] };
+        }
+        data = Object.keys(data)
+            .filter(column => {
+                let operatorIndex = column.indexOf(OPERATOR_FLAG);
+                return possibleQueryParams.includes(column.substring(0, operatorIndex < 0 ? column.length : operatorIndex));
+            })
+            .map(column => Object.assign({}, { [column]: data[column] }))
+            .reduce((res, o) => Object.assign(res, o), {});
+
+        let additionalWhere = '';
+        let i = 1;
+
+        Object.keys(data).forEach(key => {
+            let operator = '=',
+                operatorIndex = key.indexOf(OPERATOR_FLAG),
+                column = key;
+            if (operatorIndex > 0) {
+                operator = SUFFIX_TO_OPERATOR[column.substring(operatorIndex + 2)] || '=';
+                column = column.substring(0, operatorIndex);
+            }
+            if (operator.endsWith('NULL')) {
+                additionalWhere += ` AND ${column} ${operator}`;
+                delete data[key];
+            } else {
+                additionalWhere += ` AND ${column} ${operator} $${i}`;
+                i++;
+            }
+        });
+        return { additionalWhere, queryParamList: Object.values(data) };
 
         //Todo: validation for description to avoid inserting sql statements etc.
         // validateDescription(description) {

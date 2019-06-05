@@ -184,7 +184,7 @@ module.exports = (User, Verifier) => {
 
     listUsers: (req, res) => {
       return new Promise((resolve) => {
-        User.findAll()
+        User.findAll(req.query)
           .then((result) => {
             return res.status(200).json(result);
           })

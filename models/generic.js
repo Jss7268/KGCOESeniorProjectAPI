@@ -95,6 +95,9 @@ module.exports = (db) => {
                 }
             });
         },
+        getColumnValues,
+        getColumnNames,
+        getNumberedDollars,
     }
 };
 

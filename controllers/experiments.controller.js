@@ -91,7 +91,7 @@ module.exports = (Experiment, Verifier) => {
 
     listExperiments: (req, res) => {
       return new Promise((resolve) => {
-        Experiment.findAll()
+        Experiment.findAll(req.query)
           .then((result) => {
             return res.status(200).json(result);
           })

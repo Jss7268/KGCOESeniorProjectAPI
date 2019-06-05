@@ -110,7 +110,7 @@ module.exports = (DeviceExperiment, Verifier) => {
 
     listDevicesExperiments: (req, res) => {
       return new Promise((resolve) => {
-        DeviceExperiment.findAll()
+        DeviceExperiment.findAll(req.query)
           .then((result) => {
             return res.status(200).json(result);
           })
