@@ -1,7 +1,7 @@
 var _db, _UserAccess, _Validator, _bcrypt;
 
 const POSSIBLE_QUERY_PARAMS = [
-  'name', 'email', 'access_level'
+  'name', 'email', 'access_level', 'requested_access_level', 'requested_reason'
 ];
 
 module.exports = (db, Validator, UserAccess, bcrypt) => {
