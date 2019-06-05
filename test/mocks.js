@@ -27,7 +27,11 @@ const DB_ERROR = {
 const VALIDATION_ERROR = {
     message: ERROR_MESSAGE,
     status: ILLEGAL
-}
+};
+const BCRPYT_ERROR = {
+    message: ERROR_MESSAGE,
+    status: 499
+};
 const OUTPUT_TYPE_NAME = 'output_type_name';
 const UNITS = 'units';
 const START_TIME = 12345;
@@ -37,6 +41,7 @@ const ACCESS_NAME = 'access_name';
 const EMAIL = 'email@email.com';
 const PASSWORD = 'password';
 const NAME = 'name';
+const REQUESTED_REASON = 'requested_reason';
 const RESULT = {
     result: 'result'
 };
@@ -47,6 +52,10 @@ const TIMESTAMP = 123456;
 const NOTES = 'notes';
 const DESCRIPTION = 'description';
 const HASH = '$2b$10$qnjbXRzGshMUBRxN1ptWPepVG4GwPKvgV3PiBif13uMP89KMJDh3a';
+let TOO_LONG = '1234567890';
+for (let i = 0; i < 10; i++) {
+    TOO_LONG = TOO_LONG + TOO_LONG;
+}
 
 const ACCESS_LEVELS = {
     default: 0,
@@ -184,5 +193,8 @@ module.exports = {
     NOTES,
     DESCRIPTION,
     HASH,
+    REQUESTED_REASON,
+    TOO_LONG,
+    BCRPYT_ERROR,
 
 }

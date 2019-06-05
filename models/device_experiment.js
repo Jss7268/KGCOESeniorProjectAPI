@@ -60,11 +60,11 @@ module.exports = (db, Validator) => {
                 _Validator.validateColumns(data, ['experiment_id'])
                     .then(function () {
                         // users table has devices in it as devices are a user sub-type
-                        return _db.query(`SELECT users.id, users.name, users.email, users.access_level FROM users 
-                    INNER JOIN devices_experiments on 
-                    (users.id = devices_experiments.device_id and 
-                    devices_experiments.experiment_id = $1 and
-                    devices_experiments.deleted_at = 0)
+                        return _db.query(`SELECT *, devices_experiments.* FROM devices_experiments 
+                    INNER JOIN users on 
+                    (devices_experiments.device_id = users.id) 
+                    WHERE devices_experiments.experiment_id = $1 and
+                    devices_experiments.deleted_at = 0
                     ORDER BY users.updated_at DESC`,
                             [data.experiment_id])
                     })
@@ -137,11 +137,11 @@ function findAllByDevice(data) {
     return new Promise((resolve, reject) => {
         _Validator.validateColumns(data, ['device_id'])
             .then(function () {
-                return _db.query(`SELECT * FROM experiments 
-                INNER JOIN devices_experiments on 
-                (experiments.id = devices_experiments.experiment_id and 
-                devices_experiments.device_id = $1 and
-                devices_experiments.deleted_at = 0)
+                return _db.query(`SELECT *, devices_experiments.* FROM devices_experiments 
+                INNER JOIN experiments on 
+                (devices_experiments.experiment_id = experiments.id) 
+                WHERE devices_experiments.device_id = $1 and
+                devices_experiments.deleted_at = 0
                 ORDER BY experiments.start_time, experiments.updated_at DESC`,
                     [data.device_id])
             })

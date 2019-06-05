@@ -135,5 +135,12 @@ module.exports = (Generic) => {
             }
         });
         return { additionalWhere, queryParamList: Object.values(data) };
+
+        //Todo: validation for description to avoid inserting sql statements etc.
+        // validateDescription(description) {
+        //     return new Promise((resolve, reject) => {
+
+        //     })
+        // }
     }
 }

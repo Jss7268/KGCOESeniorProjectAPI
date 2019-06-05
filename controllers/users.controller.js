@@ -102,6 +102,26 @@ module.exports = (User, Verifier) => {
       });
     },
 
+    rejectRequestedAccessLevel: (req, res) => {
+      return new Promise((resolve) => {
+        Verifier.verifyMinAccessName(req.decoded.accessLevel, 'admin_user')
+          .then(() => {
+            return User.rejectRequestedAccessLevel({ id: req.params.id })
+          })
+          .then((result) => {
+            return res.status(200).json(result);
+          })
+          .catch((err) => {
+            return res.status(err.status || 400).json({
+              message: err.message || err
+            });
+          })
+          .finally(() => {
+            resolve();
+          });
+      });
+    },
+
     deleteUser: (req, res) => {
       return new Promise((resolve) => {
         Verifier.verifyMinAccessName(req.decoded.accessLevel, 'admin_user')
