@@ -122,7 +122,7 @@ async function createTables() {
 	}
 
 	try {
-		await db.query(`CREATE OR REPLACE VIEW sanitized_users AS SELECT id, name, email, access_level, created_at, updated_at, deleted_at from users`)
+		await db.query(`CREATE OR REPLACE VIEW sanitized_users AS SELECT id, name, email, access_level, created_at, updated_at, deleted_at, requested_access_level, requested_reason from users`)
 	} catch (err) {
 		console.log(err);
 	}
