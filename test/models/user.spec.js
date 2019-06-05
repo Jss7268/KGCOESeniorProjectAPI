@@ -3,6 +3,7 @@ const chai = require('chai');
 const sinon = require('sinon');
 chai.use(require('sinon-chai'));
 const expect = chai.expect;
+const bcrypt = require('bcrypt');
 
 const User = require('../../models/user');
 
@@ -28,7 +29,7 @@ beforeEach(function () {
 
 describe('user findAll', function () {
     it('resolves with data', function (done) {
-        User(db, validator, userAccess).findAll()
+        User(db, validator, userAccess, bcrypt).findAll()
             .then((result) => {
                 expect(result).to.be.an('array');
                 expect(result[0].paramList).to.deep.equal([]);
@@ -38,7 +39,7 @@ describe('user findAll', function () {
     });
 
     it('rejects on bad query', function (done) {
-        User(badDb, validator, userAccess).findAll()
+        User(badDb, validator, userAccess, bcrypt).findAll()
             .then(() => {
                 done("Did not reject");
             })
@@ -52,7 +53,7 @@ describe('user findAll', function () {
 
 describe('user findByAccessLevel', function () {
     it('resolves with data', function (done) {
-        User(db, validator, userAccess).findByAccessLevel(Mocks.ACCESS_LEVEL)
+        User(db, validator, userAccess, bcrypt).findByAccessLevel(Mocks.ACCESS_LEVEL)
             .then((result) => {
                 expect(result).to.be.an('array');
                 expect(result[0].paramList).to.deep.equal([Mocks.ACCESS_LEVEL]);
@@ -62,7 +63,7 @@ describe('user findByAccessLevel', function () {
     });
 
     it('rejects on bad query', function (done) {
-        User(badDb, validator, userAccess).findByAccessLevel(Mocks.ACCESS_LEVEL)
+        User(badDb, validator, userAccess, bcrypt).findByAccessLevel(Mocks.ACCESS_LEVEL)
             .then(() => {
                 done("Did not reject");
             })
@@ -76,7 +77,7 @@ describe('user findByAccessLevel', function () {
 
 describe('user findOneId', function () {
     it('resolves with data', function (done) {
-        User(db, validator, userAccess).findOne({ id: Mocks.OUTPUT_TYPE_ID })
+        User(db, validator, userAccess, bcrypt).findOne({ id: Mocks.OUTPUT_TYPE_ID })
             .then((result) => {
                 expect(result.paramList).to.deep.equal([Mocks.OUTPUT_TYPE_ID]);
                 done();
@@ -88,7 +89,7 @@ describe('user findOneId', function () {
         var mockDb = {
             query: (ignore) => new Promise((resolve) => resolve({ rows: [] }))
         }
-        User(mockDb, validator, userAccess).findOne({ id: Mocks.OUTPUT_TYPE_ID })
+        User(mockDb, validator, userAccess, bcrypt).findOne({ id: Mocks.OUTPUT_TYPE_ID })
             .then(() => {
                 done("Did not reject");
             })
@@ -100,7 +101,7 @@ describe('user findOneId', function () {
     });
 
     it('rejects with no id or name', function (done) {
-        User(db, validator, userAccess).findOne({})
+        User(db, validator, userAccess, bcrypt).findOne({})
             .then(() => {
                 done("Did not reject");
             })
@@ -112,7 +113,7 @@ describe('user findOneId', function () {
     });
 
     it('rejects on bad query', function (done) {
-        User(badDb, validator, userAccess).findOne({ id: Mocks.OUTPUT_TYPE_ID })
+        User(badDb, validator, userAccess, bcrypt).findOne({ id: Mocks.OUTPUT_TYPE_ID })
             .then(() => {
                 done("Did not reject");
             })
@@ -126,7 +127,7 @@ describe('user findOneId', function () {
 
 describe('user findOneEmail', function () {
     it('resolves with data', function (done) {
-        User(db, validator, userAccess).findOne({ email: Mocks.EMAIL })
+        User(db, validator, userAccess, bcrypt).findOne({ email: Mocks.EMAIL })
             .then((result) => {
                 expect(result.paramList).to.deep.equal([Mocks.EMAIL]);
                 done();
@@ -138,7 +139,7 @@ describe('user findOneEmail', function () {
         var mockDb = {
             query: (ignore) => new Promise((resolve) => resolve({ rows: [] }))
         }
-        User(mockDb, validator, userAccess).findOne({ email: Mocks.EMAIL })
+        User(mockDb, validator, userAccess, bcrypt).findOne({ email: Mocks.EMAIL })
             .then(() => {
                 done("Did not reject");
             })
@@ -150,7 +151,7 @@ describe('user findOneEmail', function () {
     });
 
     it('rejects on bad query', function (done) {
-        User(badDb, validator, userAccess).findOne({ email: Mocks.EMAIL })
+        User(badDb, validator, userAccess, bcrypt).findOne({ email: Mocks.EMAIL })
             .then(() => {
                 done("Did not reject");
             })
@@ -169,16 +170,56 @@ describe('user create', function () {
         data = {
             name: Mocks.NAME,
             email: Mocks.EMAIL,
-            password: Mocks.PASSWORD
+            password: Mocks.PASSWORD,
+            requested_access_level: Mocks.ACCESS_LEVEL,
+            requested_reason: Mocks.REQUESTED_REASON,
         };
     })
 
     it('resolves with data using all columns', function (done) {
 
-        User(db, validator, userAccess).create(data)
+        User(db, validator, userAccess, bcrypt).create(data)
             .then((result) => {
                 expect(result.paramList).to.be.an('array');
-                expect(result.paramList.length).to.be.equal(4);
+                expect(result.paramList.length).to.be.equal(6);
+                done();
+            })
+            .catch((err) => done(err));
+    });
+
+    it('resolves with missing requested_access_level', function (done) {
+        delete data.requested_access_level;
+        User(db, validator, userAccess, bcrypt).create(data)
+            .then((result) => {
+                expect(result.paramList).to.be.an('array');
+                expect(result.paramList.length).to.be.equal(6);
+                expect(result.paramList[3]).to.be.null
+                done();
+            })
+            .catch((err) => done(err));
+    });
+
+    it('resolves with missing requested_reason', function (done) {
+        delete data.requested_reason;
+        User(db, validator, userAccess, bcrypt).create(data)
+            .then((result) => {
+                expect(result.paramList).to.be.an('array');
+                expect(result.paramList.length).to.be.equal(6);
+                expect(result.paramList[4]).to.be.null
+                done();
+            })
+            .catch((err) => done(err));
+    });
+
+    it('rejects with too long of requested_reason', function (done) {
+        data.requested_reason = Mocks.TOO_LONG;
+
+        User(db, validator, userAccess, bcrypt).create(data)
+            .then(() => {
+                done("Did not reject");
+            })
+            .catch((err) => {
+                expect(err).to.equal('requested reason must be less than 256 characters long');
                 done();
             })
             .catch((err) => done(err));
@@ -187,7 +228,7 @@ describe('user create', function () {
     it('rejects with data missing name', function (done) {
         delete data.name;
 
-        User(db, validator, userAccess).create(data)
+        User(db, validator, userAccess, bcrypt).create(data)
             .then(() => {
                 done("Did not reject");
             })
@@ -201,7 +242,7 @@ describe('user create', function () {
     it('rejects with data missing email', function (done) {
         delete data.email;
 
-        User(db, validator, userAccess).create(data)
+        User(db, validator, userAccess, bcrypt).create(data)
             .then(() => {
                 done("Did not reject");
             })
@@ -212,10 +253,24 @@ describe('user create', function () {
             .catch((err) => done(err));
     });
 
+    it('rejects with too long of email', function (done) {
+        data.email = Mocks.TOO_LONG;
+
+        User(db, validator, userAccess, bcrypt).create(data)
+            .then(() => {
+                done("Did not reject");
+            })
+            .catch((err) => {
+                expect(err).to.equal('email must be less than 256 characters long');
+                done();
+            })
+            .catch((err) => done(err));
+    });
+
     it('rejects with data missing password', function (done) {
         delete data.password;
 
-        User(db, validator, userAccess).create(data)
+        User(db, validator, userAccess, bcrypt).create(data)
             .then(() => {
                 done("Did not reject");
             })
@@ -228,7 +283,7 @@ describe('user create', function () {
 
     it('rejects on bad query', function (done) {
 
-        User(badDb, validator, userAccess).create(data)
+        User(badDb, validator, userAccess, bcrypt).create(data)
             .then(() => {
                 done("Did not reject");
             })
@@ -241,7 +296,7 @@ describe('user create', function () {
 
     it('rejects on bad validation', function (done) {
 
-        User(db, badValidator, userAccess).create(data)
+        User(db, badValidator, userAccess, bcrypt).create(data)
             .then(() => {
                 done("Did not reject");
             })
@@ -251,12 +306,43 @@ describe('user create', function () {
             })
             .catch((err) => done(err));
     });
+
+    it('rejects on bad genSalt', function (done) {
+        let mockBcrypt = {
+            genSalt: (ignore, cb) => {cb(Mocks.BCRPYT_ERROR, null)}
+        }
+        User(db, validator, userAccess, mockBcrypt).create(data)
+            .then(() => {
+                done("Did not reject");
+            })
+            .catch((err) => {
+                expect(err).to.equal(Mocks.BCRPYT_ERROR);
+                done();
+            })
+            .catch((err) => done(err));
+    });
+
+    it('rejects on bad hash', function (done) {
+        let mockBcrypt = {
+            genSalt: bcrypt.genSalt,
+            hash: (password, salt, cb) => {cb(Mocks.BCRPYT_ERROR, null)}
+        }
+        User(db, validator, userAccess, mockBcrypt).create(data)
+            .then(() => {
+                done("Did not reject");
+            })
+            .catch((err) => {
+                expect(err).to.equal(Mocks.BCRPYT_ERROR);
+                done();
+            })
+            .catch((err) => done(err));
+    });
 });
 
 describe('user delete', function () {
     it('resolves with data', function (done) {
 
-        User(db, validator, userAccess).delete({ id: Mocks.USER_ID })
+        User(db, validator, userAccess, bcrypt).delete({ id: Mocks.USER_ID })
             .then((result) => {
                 expect(result.paramList).to.be.an('array');
                 expect(result.paramList.length).to.be.equal(2);
@@ -267,7 +353,7 @@ describe('user delete', function () {
 
     it('rejects on bad query', function (done) {
 
-        User(badDb, validator, userAccess).delete({ id: Mocks.USER_ID })
+        User(badDb, validator, userAccess, bcrypt).delete({ id: Mocks.USER_ID })
             .then(() => {
                 done("Did not reject");
             })
@@ -283,7 +369,7 @@ describe('user delete', function () {
 describe('user updateName', function () {
     it('resolves with data', function (done) {
 
-        User(db, validator, userAccess).updateName({ id: Mocks.USER_ID, name: Mocks.NAME })
+        User(db, validator, userAccess, bcrypt).updateName({ id: Mocks.USER_ID, name: Mocks.NAME })
             .then((result) => {
                 expect(result.paramList).to.be.an('array');
                 expect(result.paramList.length).to.be.equal(3);
@@ -294,7 +380,7 @@ describe('user updateName', function () {
 
     it('rejects on bad query', function (done) {
 
-        User(badDb, validator, userAccess).updateName({ id: Mocks.USER_ID, name: Mocks.NAME })
+        User(badDb, validator, userAccess, bcrypt).updateName({ id: Mocks.USER_ID, name: Mocks.NAME })
             .then(() => {
                 done("Did not reject");
             })
@@ -307,7 +393,7 @@ describe('user updateName', function () {
 
     it('rejects on missing id', function (done) {
 
-        User(badDb, validator, userAccess).updateName({ name: Mocks.NAME })
+        User(badDb, validator, userAccess, bcrypt).updateName({ name: Mocks.NAME })
             .then(() => {
                 done("Did not reject");
             })
@@ -320,7 +406,7 @@ describe('user updateName', function () {
 
     it('rejects on missing name', function (done) {
 
-        User(db, validator, userAccess).updateName({ id: Mocks.USER_ID })
+        User(db, validator, userAccess, bcrypt).updateName({ id: Mocks.USER_ID })
             .then(() => {
                 done("Did not reject");
             })
@@ -335,7 +421,7 @@ describe('user updateName', function () {
 describe('user updateEmail', function () {
     it('resolves with data', function (done) {
 
-        User(db, validator, userAccess).updateEmail({ id: Mocks.USER_ID, email: Mocks.EMAIL })
+        User(db, validator, userAccess, bcrypt).updateEmail({ id: Mocks.USER_ID, email: Mocks.EMAIL })
             .then((result) => {
                 expect(result.paramList).to.be.an('array');
                 expect(result.paramList.length).to.be.equal(3);
@@ -346,7 +432,7 @@ describe('user updateEmail', function () {
 
     it('rejects on bad query', function (done) {
 
-        User(badDb, validator, userAccess).updateEmail({ id: Mocks.USER_ID, email: Mocks.EMAIL })
+        User(badDb, validator, userAccess, bcrypt).updateEmail({ id: Mocks.USER_ID, email: Mocks.EMAIL })
             .then(() => {
                 done("Did not reject");
             })
@@ -359,7 +445,7 @@ describe('user updateEmail', function () {
 
     it('rejects on missing id', function (done) {
 
-        User(db, validator, userAccess).updateEmail({ email: Mocks.EMAIL })
+        User(db, validator, userAccess, bcrypt).updateEmail({ email: Mocks.EMAIL })
             .then(() => {
                 done("Did not reject");
             })
@@ -372,7 +458,7 @@ describe('user updateEmail', function () {
 
     it('rejects on missing email', function (done) {
 
-        User(db, validator, userAccess).updateEmail({ id: Mocks.USER_ID })
+        User(db, validator, userAccess, bcrypt).updateEmail({ id: Mocks.USER_ID })
             .then(() => {
                 done("Did not reject");
             })
@@ -385,7 +471,7 @@ describe('user updateEmail', function () {
 
     it('rejects on incorrect email type', function (done) {
 
-        User(db, validator, userAccess).updateEmail({ id: Mocks.USER_ID, email: 123456 })
+        User(db, validator, userAccess, bcrypt).updateEmail({ id: Mocks.USER_ID, email: 123456 })
             .then(() => {
                 done("Did not reject");
             })
@@ -398,7 +484,7 @@ describe('user updateEmail', function () {
 
     it('rejects on incorrect email type', function (done) {
 
-        User(db, validator, userAccess).updateEmail({ id: Mocks.USER_ID, email: 'bad' })
+        User(db, validator, userAccess, bcrypt).updateEmail({ id: Mocks.USER_ID, email: 'bad' })
             .then(() => {
                 done("Did not reject");
             })
@@ -411,7 +497,7 @@ describe('user updateEmail', function () {
 
     it('rejects on bad validation', function (done) {
 
-        User(db, badValidator, userAccess).updateEmail({ id: Mocks.USER_ID, email: Mocks.EMAIL })
+        User(db, badValidator, userAccess, bcrypt).updateEmail({ id: Mocks.USER_ID, email: Mocks.EMAIL })
             .then(() => {
                 done("Did not reject");
             })
@@ -427,7 +513,7 @@ describe('user updateEmail', function () {
 describe('user updatePassword', function () {
     it('resolves with data', function (done) {
 
-        User(db, validator, userAccess).updatePassword({ id: Mocks.USER_ID, password: Mocks.PASSWORD })
+        User(db, validator, userAccess, bcrypt).updatePassword({ id: Mocks.USER_ID, password: Mocks.PASSWORD })
             .then((result) => {
                 expect(result.paramList).to.be.an('array');
                 expect(result.paramList.length).to.be.equal(3);
@@ -438,7 +524,7 @@ describe('user updatePassword', function () {
 
     it('rejects on bad query', function (done) {
 
-        User(badDb, validator, userAccess).updatePassword({ id: Mocks.USER_ID, password: Mocks.PASSWORD })
+        User(badDb, validator, userAccess, bcrypt).updatePassword({ id: Mocks.USER_ID, password: Mocks.PASSWORD })
             .then(() => {
                 done("Did not reject");
             })
@@ -451,7 +537,7 @@ describe('user updatePassword', function () {
 
     it('rejects on missing id', function (done) {
 
-        User(db, validator, userAccess).updatePassword({ password: Mocks.PASSWORD })
+        User(db, validator, userAccess, bcrypt).updatePassword({ password: Mocks.PASSWORD })
             .then(() => {
                 done("Did not reject");
             })
@@ -464,7 +550,7 @@ describe('user updatePassword', function () {
 
     it('rejects on missing password', function (done) {
 
-        User(db, validator, userAccess).updatePassword({ id: Mocks.USER_ID })
+        User(db, validator, userAccess, bcrypt).updatePassword({ id: Mocks.USER_ID })
             .then(() => {
                 done("Did not reject");
             })
@@ -477,7 +563,7 @@ describe('user updatePassword', function () {
 
     it('rejects on incorrect password type', function (done) {
 
-        User(db, validator, userAccess).updatePassword({ id: Mocks.USER_ID, password: 123456789 })
+        User(db, validator, userAccess, bcrypt).updatePassword({ id: Mocks.USER_ID, password: 123456789 })
             .then(() => {
                 done("Did not reject");
             })
@@ -490,7 +576,7 @@ describe('user updatePassword', function () {
 
     it('rejects on short password', function (done) {
 
-        User(db, validator, userAccess).updatePassword({ id: Mocks.USER_ID, password: 'hi' })
+        User(db, validator, userAccess, bcrypt).updatePassword({ id: Mocks.USER_ID, password: 'hi' })
             .then(() => {
                 done("Did not reject");
             })
@@ -503,7 +589,7 @@ describe('user updatePassword', function () {
 
     it('rejects on bad validation', function (done) {
 
-        User(db, badValidator, userAccess).updatePassword({ id: Mocks.USER_ID, password: Mocks.PASSWORD })
+        User(db, badValidator, userAccess, bcrypt).updatePassword({ id: Mocks.USER_ID, password: Mocks.PASSWORD })
             .then(() => {
                 done("Did not reject");
             })
@@ -518,7 +604,7 @@ describe('user updatePassword', function () {
 describe('user updateAccess', function () {
     it('resolves with data', function (done) {
 
-        User(db, validator, userAccess).updateAccess({ id: Mocks.USER_ID, access_level: Mocks.ACCESS_LEVEL })
+        User(db, validator, userAccess, bcrypt).updateAccess({ id: Mocks.USER_ID, access_level: Mocks.ACCESS_LEVEL })
             .then((result) => {
                 expect(result.paramList).to.be.an('array');
                 expect(result.paramList.length).to.be.equal(3);
@@ -529,7 +615,7 @@ describe('user updateAccess', function () {
 
     it('rejects on bad query', function (done) {
 
-        User(badDb, validator, userAccess).updateAccess({ id: Mocks.USER_ID, access_level: Mocks.ACCESS_LEVEL })
+        User(badDb, validator, userAccess, bcrypt).updateAccess({ id: Mocks.USER_ID, access_level: Mocks.ACCESS_LEVEL })
             .then(() => {
                 done("Did not reject");
             })
@@ -542,7 +628,7 @@ describe('user updateAccess', function () {
 
     it('rejects on missing id', function (done) {
 
-        User(db, validator, userAccess).updateAccess({ access_level: Mocks.ACCESS_LEVEL })
+        User(db, validator, userAccess, bcrypt).updateAccess({ access_level: Mocks.ACCESS_LEVEL })
             .then(() => {
                 done("Did not reject");
             })
@@ -555,7 +641,7 @@ describe('user updateAccess', function () {
 
     it('rejects on missing access_level', function (done) {
 
-        User(db, validator, userAccess).updateAccess({ id: Mocks.USER_ID })
+        User(db, validator, userAccess, bcrypt).updateAccess({ id: Mocks.USER_ID })
             .then(() => {
                 done("Did not reject");
             })
@@ -580,6 +666,46 @@ describe('user updateAccess', function () {
     });
 });
 
+describe('user rejectRequestedAccessLevel', function () {
+    it('resolves with data', function (done) {
+
+        User(db, validator, userAccess, bcrypt).rejectRequestedAccessLevel({ id: Mocks.USER_ID })
+            .then((result) => {
+                expect(result.paramList).to.be.an('array');
+                expect(result.paramList.length).to.be.equal(2);
+                done();
+            })
+            .catch((err) => done(err));
+    });
+
+    it('rejects on bad query', function (done) {
+
+        User(badDb, validator, userAccess, bcrypt).rejectRequestedAccessLevel({ id: Mocks.USER_ID })
+            .then(() => {
+                done("Did not reject");
+            })
+            .catch((err) => {
+                expect(err).to.equal(Mocks.DB_ERROR);
+                done();
+            })
+            .catch((err) => done(err));
+    });
+
+    it('rejects on missing id', function (done) {
+
+        User(db, validator, userAccess, bcrypt).rejectRequestedAccessLevel({ })
+            .then(() => {
+                done("Did not reject");
+            })
+            .catch((err) => {
+                expect(err).to.equal('missing: id');
+                done();
+            })
+            .catch((err) => done(err));
+    });
+
+});
+
 describe('user authenticate', function () {
     let mockDb = {
         query: () => new Promise((resolve) => resolve(
@@ -588,7 +714,7 @@ describe('user authenticate', function () {
     }
     it('resolves with data', function (done) {
 
-        User(mockDb, validator, userAccess).authenticate({ email: Mocks.EMAIL, password: Mocks.PASSWORD })
+        User(mockDb, validator, userAccess, bcrypt).authenticate({ email: Mocks.EMAIL, password: Mocks.PASSWORD })
             .then((result) => {
                 expect(result).to.be.an('object');
                 expect(result.isAuthorized).to.be.true;
@@ -601,7 +727,7 @@ describe('user authenticate', function () {
 
     it('rejects on bad query', function (done) {
 
-        User(badDb, validator, userAccess).authenticate({ email: Mocks.EMAIL, password: Mocks.PASSWORD })
+        User(badDb, validator, userAccess, bcrypt).authenticate({ email: Mocks.EMAIL, password: Mocks.PASSWORD })
             .then(() => {
                 done("Did not reject");
             })
@@ -614,7 +740,7 @@ describe('user authenticate', function () {
 
     it('rejects on missing email', function (done) {
 
-        User(db, validator, userAccess).authenticate({ password: Mocks.PASSWORD })
+        User(db, validator, userAccess, bcrypt).authenticate({ password: Mocks.PASSWORD })
             .then(() => {
                 done("Did not reject");
             })
@@ -627,7 +753,7 @@ describe('user authenticate', function () {
 
     it('rejects on missing password', function (done) {
 
-        User(db, validator, userAccess).authenticate({ email: Mocks.EMAIL })
+        User(db, validator, userAccess, bcrypt).authenticate({ email: Mocks.EMAIL })
             .then(() => {
                 done("Did not reject");
             })
@@ -638,9 +764,24 @@ describe('user authenticate', function () {
             .catch((err) => done(err));
     });
 
+    it('rejects on bad compare', function (done) {
+        let mockBcrypt = {
+            compare: (password, hashed, cb) => {cb(Mocks.BCRPYT_ERROR, null)}
+        }
+        User(db, validator, userAccess, mockBcrypt).authenticate({ email: Mocks.EMAIL, password: Mocks.PASSWORD })
+            .then(() => {
+                done("Did not reject");
+            })
+            .catch((err) => {
+                expect(err).to.equal(Mocks.BCRPYT_ERROR);
+                done();
+            })
+            .catch((err) => done(err));
+    });
+
     it('not authorized on incorrect password', function (done) {
         
-        User(mockDb, validator, userAccess).authenticate({ email: Mocks.EMAIL, password: 'wrong' })
+        User(mockDb, validator, userAccess, bcrypt).authenticate({ email: Mocks.EMAIL, password: 'wrong' })
         .then((result) => {
             expect(result).to.be.an('object');
             expect(result.isAuthorized).to.be.false;

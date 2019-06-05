@@ -1,8 +1,7 @@
-var _db, _UserAccess, _Validator;
-const bcrypt = require('bcrypt');
+var _db, _UserAccess, _Validator, _bcrypt;
 
-module.exports = (db, Validator, UserAccess) => {
-  _db = db, _UserAccess = UserAccess, _Validator = Validator;
+module.exports = (db, Validator, UserAccess, bcrypt) => {
+  _db = db, _UserAccess = UserAccess, _Validator = Validator, _bcrypt = bcrypt;
   return {
     findAll: () => {
       return new Promise((resolve, reject) => {
@@ -43,8 +42,7 @@ module.exports = (db, Validator, UserAccess) => {
               .catch((err) => {
                 reject(err);
               });
-          }
-          else if (data.email) {
+          } else {
             findOneByEmail(data.email)
               .then((result) => {
                 delete result.hashed_password;
@@ -67,8 +65,8 @@ module.exports = (db, Validator, UserAccess) => {
           })
           .then((hash) => {
             return _db.query(
-              'INSERT INTO users (name, email, hashed_password, created_at, updated_at) VALUES ($1, $2, $3, $4, $4) returning id',
-              [data.name, data.email, hash, time]);
+              'INSERT INTO users (name, email, hashed_password, requested_access_level, requested_reason, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $6) returning id',
+              [data.name, data.email, hash, data.requested_access_level, data.requested_reason, time]);
           })
           .then((result) => {
             resolve(result.rows[0]);
@@ -176,7 +174,7 @@ module.exports = (db, Validator, UserAccess) => {
             return validateAccessLevel(data)
           })
           .then(function () {
-            return _db.query('UPDATE users SET access_level = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning access_level', [data.id, data.access_level, time]);
+            return _db.query('UPDATE users SET access_level = $2, updated_at = $3, requested_access_level = NULL WHERE id = $1 and deleted_at = 0 returning access_level', [data.id, data.access_level, time]);
           })
           .then((result) => {
             resolve(result.rows[0]);
@@ -186,6 +184,22 @@ module.exports = (db, Validator, UserAccess) => {
           });
       });
     },
+
+    rejectRequestedAccessLevel: (data) => {
+      var time = new Date().getTime();
+      return new Promise((resolve, reject) => {
+        _Validator.validateColumns(data, ['id'])
+          .then(function () {
+            return _db.query('UPDATE users SET requested_access_level = NULL, updated_at = $2 WHERE id = $1 and deleted_at = 0 returning access_level', [data.id, time]);
+          })
+          .then((result) => {
+            resolve(result.rows[0]);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    }
   }
 };
 
@@ -225,12 +239,12 @@ function findOneByEmail(email) {
 
 function hashPassword(password) {
   return new Promise((resolve, reject) => {
-    bcrypt.genSalt(10, (err, salt) => {
+    _bcrypt.genSalt(10, (err, salt) => {
       if (err) {
         reject(err);
       }
       else {
-        bcrypt.hash(password, salt, (err, hash) => {
+        _bcrypt.hash(password, salt, (err, hash) => {
           if (err) {
             reject(err);
           }
@@ -246,13 +260,27 @@ function hashPassword(password) {
 function validateUserData(data) {
   return new Promise((resolve, reject) => {
     _Validator.validateColumns(data, ['email', 'password', 'name'])
-      .then(function () {
-        return validatePassword(data.password, 6)
+      .then(() => {
+        return validatePassword(data.password, 6);
       })
-      .then(function () {
+      .then(() => {
         return validateEmail(data.email);
       })
-      .then(function () {
+      .then(() => {
+        if (!('requested_access_level' in data)) {
+          data.requested_access_level = null;
+          return new Promise((resolve) => resolve());
+        }
+        return validateAccessLevel({access_level: data.requested_access_level});
+      })
+      .then(() => {
+        if (!('requested_reason' in data)) {
+          data.requested_reason = null;
+          return new Promise((resolve) => resolve());
+        }
+        return validateRequestedReason(data.requested_reason);
+      })
+      .then(() => {
         resolve();
       })
       .catch((err) => {
@@ -265,6 +293,9 @@ function validateEmail(email) {
   return new Promise((resolve, reject) => {
     if (typeof (email) !== 'string') {
       reject('email must be a string');
+    }
+    if (email.length > 255) {
+      reject('email must be less than 256 characters long');
     }
     else {
       var re = new RegExp(/[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/);
@@ -294,7 +325,7 @@ function validatePassword(password, minCharacters) {
 
 function verifyPassword(password, user) {
   return new Promise((resolve, reject) => {
-    bcrypt.compare(password, user.hashed_password, (err, result) => {
+    _bcrypt.compare(password, user.hashed_password, (err, result) => {
       if (err) {
         reject(err);
       }
@@ -314,5 +345,15 @@ function validateAccessLevel(data) {
       .catch((err) => {
         reject(err); // todo better error message
       })
+  })
+}
+
+function validateRequestedReason(requestedReason) {
+  return new Promise((resolve, reject) => {
+    if (requestedReason.length > 255) {
+      reject('requested reason must be less than 256 characters long');
+    } else {
+      resolve();
+    }
   })
 }
