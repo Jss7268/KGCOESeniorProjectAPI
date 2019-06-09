@@ -3,6 +3,7 @@ var _db, _UserAccess, _Validator, _bcrypt;
 const POSSIBLE_QUERY_PARAMS = [
   'name', 'email', 'access_level', 'requested_access_level', 'requested_reason'
 ];
+const DEVICE_ACCESS_LEVEL = 1;
 
 module.exports = (db, Validator, UserAccess, bcrypt) => {
   _db = db, _UserAccess = UserAccess, _Validator = Validator, _bcrypt = bcrypt;
@@ -270,7 +271,7 @@ function validateUserData(data) {
         return validatePassword(data.password, 6);
       })
       .then(() => {
-        return validateEmail(data.email);
+        return validateEmail(data.email, data.requested_access_level == DEVICE_ACCESS_LEVEL);
       })
       .then(() => {
         if (!('requested_access_level' in data)) {
@@ -295,23 +296,20 @@ function validateUserData(data) {
   });
 }
 
-function validateEmail(email) {
+function validateEmail(email, isDevice) {
   return new Promise((resolve, reject) => {
     if (typeof (email) !== 'string') {
       reject('email must be a string');
     }
     if (email.length > 255) {
       reject('email must be less than 256 characters long');
-    }
-    else {
+    } else if (!isDevice) {
       var re = new RegExp(/[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/);
-      if (re.test(email)) {
-        resolve();
-      }
-      else {
+      if (!re.test(email)) {
         reject('provided email does not match proper email format');
       }
     }
+    resolve();
   });
 }
 
