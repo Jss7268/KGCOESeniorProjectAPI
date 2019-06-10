@@ -187,6 +187,18 @@ describe('user create', function () {
             .catch((err) => done(err));
     });
 
+    it('resolves with bad email on device create', function (done) {
+        data.email = 'bad';
+        data.requested_access_level = 1;
+        User(db, validator, userAccess, bcrypt).create(data)
+            .then((result) => {
+                expect(result.paramList).to.be.an('array');
+                expect(result.paramList.length).to.be.equal(6);
+                done();
+            })
+            .catch((err) => done(err));
+    });
+
     it('resolves with missing requested_access_level', function (done) {
         delete data.requested_access_level;
         User(db, validator, userAccess, bcrypt).create(data)
