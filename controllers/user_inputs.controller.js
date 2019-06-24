@@ -2,8 +2,11 @@ module.exports = (UserInput, Verifier) => {
     return {
       createUserInput: (req, res) => {
         return new Promise((resolve) => {
-          Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
-            .then(() => {
+          hydrateReq(req, Verifier)
+          .then(
+            Verifier.verifyMinAccessName(req.decoded.accessLevel, 'elevated_user')
+          )
+          .then(() => {
               return UserInput.create(req.body)
             })
             .then((result) => {
@@ -142,4 +145,22 @@ module.exports = (UserInput, Verifier) => {
       },
     }
   };
+
+  function hydrateReq(req, Verifier) {
+    return new Promise((resolve, reject) => {
+      Verifier.verifyMinAccessName(req.decoded.accessLevel, 'admin_user')
+        .then(() => {
+          if (!('user_id' in req.body)) {
+            req.body.user_id = req.decoded.uid;
+          }
+        })
+        .catch(() => {
+          // only an admin can fake different users
+          req.body.user_id = req.decoded.uid;
+        })
+        .finally(() => {
+          resolve();
+        });
+    });
+  }
   
