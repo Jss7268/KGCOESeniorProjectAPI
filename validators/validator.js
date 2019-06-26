@@ -10,6 +10,8 @@ const SUFFIX_TO_OPERATOR = {
     'null': 'IS NULL',
     'nnull': 'IS NOT NULL',
     '!null': 'IS NOT NULL',
+    'in': 'IN',
+    '!in': 'NOT IN',
 
 }
 
