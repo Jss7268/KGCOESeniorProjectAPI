@@ -155,6 +155,30 @@ module.exports = (db, Validator, UserAccess, bcrypt) => {
       });
     },
 
+    requestAccess: (data) => {
+      var time = new Date().getTime();
+      return new Promise((resolve, reject) => {
+        _Validator.validateColumns(data, ['id', 'requested_access_level'])
+          .then(() => {
+            if (!('requested_reason' in data)) {
+              data.requested_reason = null;
+              return new Promise((resolve) => resolve());
+            }
+            return validateRequestedReason(data.requested_reason);
+          })
+          .then(() => {
+            return _db.query('UPDATE users SET requested_access_level = $2,  requested_reason = $3, updated_at = $4 WHERE id = $1 and deleted_at = 0 returning requested_access_level, requested_reason',
+              [data.id, data.requested_access_level, data.requested_reason, time])
+          })
+          .then((result) => {
+            resolve(result.rows[0]);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    },
+
     authenticate: (data) => {
       return new Promise((resolve, reject) => {
         _Validator.validateColumns(data, ['email', 'password'])
@@ -278,7 +302,7 @@ function validateUserData(data) {
           data.requested_access_level = null;
           return new Promise((resolve) => resolve());
         }
-        return validateAccessLevel({access_level: data.requested_access_level});
+        return validateAccessLevel({ access_level: data.requested_access_level });
       })
       .then(() => {
         if (!('requested_reason' in data)) {

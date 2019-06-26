@@ -83,6 +83,8 @@ module.exports = {
                 password: PASSWORD,
                 access_level: ACCESS_LEVEL,
                 name: NAME,
+                requested_access_level: ACCESS_LEVEL,
+                requested_reason: REQUESTED_REASON
 
             },
             decoded: {
@@ -196,5 +198,6 @@ module.exports = {
     REQUESTED_REASON,
     TOO_LONG,
     BCRPYT_ERROR,
+    REQUESTED_REASON,
 
 }

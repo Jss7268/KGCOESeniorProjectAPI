@@ -11,6 +11,7 @@ router.put('/users/:id/name', UsersController.changeName);
 router.put('/users/:id/password', UsersController.changePassword);
 router.put('/users/:id/email', UsersController.changeEmail);
 router.put('/users/:id/access', UsersController.changeAccess);
+router.put('/users/:id/request_access', UsersController.requestAccess);
 router.post('/users/:id/reject_requested_access', UsersController.rejectRequestedAccessLevel);
 
 router.delete('/users/:id', UsersController.deleteUser);
