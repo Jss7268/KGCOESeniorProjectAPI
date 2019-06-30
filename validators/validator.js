@@ -131,7 +131,24 @@ module.exports = (Generic) => {
             if (operator.endsWith('NULL')) {
                 additionalWhere += ` AND ${column} ${operator}`;
                 delete data[key];
-            } else {
+            }
+            else if (operator == 'IN') {
+                // if only 1 parameter is supplied we need to turn it into a list
+                if (typeof data[key] == 'string') {
+                    data[key] = [data[key]];
+                }
+                additionalWhere += ` AND ${column} = ANY($${i})`
+                i++;
+            }
+            else if (operator == 'NOT IN') {
+                // if only 1 parameter is supplied we need to turn it into a list
+                if (typeof data[key] == 'string') {
+                    data[key] = [data[key]];
+                }
+                additionalWhere += ` AND ${column} != ALL($${i})`
+                i++;
+            }
+             else {
                 additionalWhere += ` AND ${column} ${operator} $${i}`;
                 i++;
             }
