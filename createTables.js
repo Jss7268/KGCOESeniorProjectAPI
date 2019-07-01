@@ -44,7 +44,9 @@ async function createTables() {
 			ADD COLUMN requested_reason VARCHAR (255) DEFAULT NULL,
 			ADD FOREIGN KEY (requested_access_level) REFERENCES user_access (access_level)`)
 	} catch (err) {
-		console.log(err);
+		if (err.routine != "check_for_column_name_collision") {
+			console.log(err);
+		}
 	}
 
 	try {
@@ -100,6 +102,12 @@ async function createTables() {
 			FOREIGN KEY (device_id) REFERENCES users (id), 
 			FOREIGN KEY (output_type_id) REFERENCES output_types (id), 
 			FOREIGN KEY (experiment_id) REFERENCES experiments (id))`);
+	} catch (err) {
+		console.log(err);
+	}
+
+	try {
+		await db.query(`DROP TABLE user_inputs`);
 	} catch (err) {
 		console.log(err);
 	}
