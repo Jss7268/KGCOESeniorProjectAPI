@@ -107,11 +107,6 @@ async function createTables() {
 	}
 
 	try {
-		await db.query(`DROP TABLE user_inputs`);
-	} catch (err) {
-		console.log(err);
-	}
-	try {
 		await db.query(`CREATE TABLE IF NOT EXISTS user_inputs 
 			(id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (), 
 			description text NOT NULL, 
