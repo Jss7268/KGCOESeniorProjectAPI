@@ -40,7 +40,7 @@ module.exports = (UserInput, Verifier) => {
               });
             })
             .catch((err) => {
-              return res.status(err.status || 400).json({
+              return res.status(err.status || 400).json({                
                 message: err.message || err
               });
             })
@@ -163,4 +163,3 @@ module.exports = (UserInput, Verifier) => {
         });
     });
   }
-  

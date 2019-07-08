@@ -6,7 +6,7 @@ module.exports = (db, Validator) => {
         findAll: function () {
             return new Promise((resolve, reject) => {
                 _db.query(`SELECT *, user_inputs.* FROM user_inputs
-                INNER JOIN sanitized_users on (user_inputs.device_id = sanitized_users.id OR user_inputs.user_id = sanitized_users.id )
+                INNER JOIN sanitized_users on (user_inputs.device_id = sanitized_users.id AND user_inputs.user_id = sanitized_users.id )
                 INNER JOIN experiments on (user_inputs.experiment_id = experiments.id)
                 where user_inputs.deleted_at = 0 
                 ORDER BY user_inputs.timestamp ASC`, [])
@@ -27,8 +27,7 @@ module.exports = (db, Validator) => {
                     })
                     .then((result) => {
                         return _db.query(`SELECT *, user_inputs.* FROM user_inputs
-                        INNER JOIN sanitized_users on (user_inputs.device_id = sanitized_users.id 
-                            OR user_inputs.user_id = sanitized_users.id )
+                        INNER JOIN sanitized_users on (user_inputs.device_id = sanitized_users.id)
                         INNER JOIN experiments on (user_inputs.experiment_id = experiments.id) 
                         where user_inputs.device_id = $1 and user_inputs.deleted_at = 0
                         ORDER BY user_inputs.timestamp ASC`, [result.id])

@@ -100,6 +100,39 @@ function testHydrateReqUserId(fn) {
     });
 }
 
+function testHydrateReqUserIdUserInputs(fn) {
+    it('doesn\'t allow non-admins to set user id', function (done) {
+        req.decoded.accessLevel = Mocks.ACCESS_LEVELS.elevated_user;
+        fn(req, res)
+            .then(() => {
+                expect(req.params.user_id).to.equal(req.decoded.uid);
+                done();
+            })
+            .catch((err) => done(err));
+    });
+
+    it('allows admins to set user', function (done) {
+        req.decoded.accessLevel = Mocks.ACCESS_LEVELS.admin_user;
+        fn(req, res)
+            .then(() => {
+                expect(req.params.user_id).to.equal(Mocks.ID);
+                done();
+            })
+            .catch((err) => done(err));
+    });
+
+    it('allows admins to modify own access', function (done) {
+        req.decoded.accessLevel = Mocks.ACCESS_LEVELS.admin_user;
+        delete req.params.user_id;
+        fn(req, res)
+            .then(() => {
+                expect(req.params.user_id).to.equal(req.decoded.uid);
+                done();
+            })
+            .catch((err) => done(err));
+    });
+}
+
 function testBadVerifier(fn) {
     it('returns 400 status on bad verifier', function (done) {
         fn(req, res)
@@ -128,6 +161,7 @@ module.exports = {
     testHydrateReqDeviceId: testHydrateReqDeviceId,
     testHydrateReqCreatorId: testHydrateReqCreatorId,
     testHydrateReqUserId: testHydrateReqUserId,
+    testHydrateReqUserIdUserInputs: testHydrateReqUserIdUserInputs,
     testBadVerifier: testBadVerifier,
     testBadModel: testBadModel,
 }
