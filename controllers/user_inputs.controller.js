@@ -129,7 +129,7 @@ module.exports = (UserInput, Verifier) => {
   
       listUserInputs: (req, res) => {
         return new Promise((resolve) => {
-          UserInput.findAll()
+          UserInput.findAll(req.query)
             .then((result) => {
               return res.status(200).json(result);
             })
