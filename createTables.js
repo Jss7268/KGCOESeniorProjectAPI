@@ -44,7 +44,9 @@ async function createTables() {
 			ADD COLUMN requested_reason VARCHAR (255) DEFAULT NULL,
 			ADD FOREIGN KEY (requested_access_level) REFERENCES user_access (access_level)`)
 	} catch (err) {
-		console.log(err);
+		if (err.routine != "check_for_column_name_collision") {
+			console.log(err);
+		}
 	}
 
 	try {
@@ -103,6 +105,7 @@ async function createTables() {
 	} catch (err) {
 		console.log(err);
 	}
+
 	try {
 		await db.query(`CREATE TABLE IF NOT EXISTS user_inputs 
 			(id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (), 

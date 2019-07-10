@@ -17,6 +17,8 @@ const user = {
   findOne: ({ id }) => new Promise((resolve) => resolve({ id: id })),
   findByAccessLevel: (ignore) => new Promise((resolve) => resolve([Mocks.RESULT])),
   findAll: (ignore) => new Promise((resolve) => resolve([Mocks.RESULT])),
+  requestAccess: ({ id, requested_access_level, requested_reason }) => new Promise((resolve) =>
+    resolve({ id: id, requested_access_level: requested_access_level, requested_reason: requested_reason })),
 
 }
 const badUser = {
@@ -30,7 +32,7 @@ const badUser = {
   findOne: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
   findByAccessLevel: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
   findAll: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
-
+  requestAccess: (ignore) => new Promise((ignore, reject) => reject(Mocks.ERROR)),
 }
 const verifier = Mocks.verifier();
 const badVerifier = Mocks.badVerifier();
@@ -70,6 +72,26 @@ describe('changeName', () => {
         expect(res.status).to.have.been.calledWith(200);
         // user id because its changing current user
         expect(res.json).to.have.been.calledWith({ id: Mocks.USER_ID, name: Mocks.NAME });
+        done();
+      })
+      .catch((err) => done(err));
+  });
+});
+
+describe('requestAccess', () => {
+  TestGeneric.testHydrateReqUserId(UsersController(user, verifier).requestAccess);
+  TestGeneric.testBadModel(UsersController(badUser, verifier).requestAccess);
+
+  it('returns 200 status on success', function (done) {
+    UsersController(user, verifier).requestAccess(req, res)
+      .then(() => {
+        expect(res.status).to.have.been.calledWith(200);
+        // user id because its changing current user
+        expect(res.json).to.have.been.calledWith({
+          id: Mocks.USER_ID,
+          requested_access_level: Mocks.ACCESS_LEVEL,
+          requested_reason: Mocks.REQUESTED_REASON
+        });
         done();
       })
       .catch((err) => done(err));

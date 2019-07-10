@@ -321,7 +321,7 @@ describe('user create', function () {
 
     it('rejects on bad genSalt', function (done) {
         let mockBcrypt = {
-            genSalt: (ignore, cb) => {cb(Mocks.BCRPYT_ERROR, null)}
+            genSalt: (ignore, cb) => { cb(Mocks.BCRPYT_ERROR, null) }
         }
         User(db, validator, userAccess, mockBcrypt).create(data)
             .then(() => {
@@ -337,7 +337,7 @@ describe('user create', function () {
     it('rejects on bad hash', function (done) {
         let mockBcrypt = {
             genSalt: bcrypt.genSalt,
-            hash: (password, salt, cb) => {cb(Mocks.BCRPYT_ERROR, null)}
+            hash: (password, salt, cb) => { cb(Mocks.BCRPYT_ERROR, null) }
         }
         User(db, validator, userAccess, mockBcrypt).create(data)
             .then(() => {
@@ -613,6 +613,79 @@ describe('user updatePassword', function () {
     });
 });
 
+describe('user requestAccess', function () {
+    let data;
+
+    beforeEach(() =>
+        data = {
+            id: Mocks.USER_ID,
+            requested_access_level: Mocks.ACCESS_LEVEL,
+            requested_reason: Mocks.REQUESTED_REASON
+        });
+
+    it('resolves with data', function (done) {
+
+        User(db, validator, userAccess, bcrypt).requestAccess(data)
+            .then((result) => {
+                expect(result.paramList).to.be.an('array');
+                expect(result.paramList.length).to.be.equal(4);
+                done();
+            })
+            .catch((err) => done(err));
+    });
+
+    it('rejects on bad query', function (done) {
+
+        User(badDb, validator, userAccess, bcrypt).requestAccess(data)
+            .then(() => {
+                done("Did not reject");
+            })
+            .catch((err) => {
+                expect(err).to.equal(Mocks.DB_ERROR);
+                done();
+            })
+            .catch((err) => done(err));
+    });
+
+    it('rejects on missing id', function (done) {
+        delete data.id;
+        User(badDb, validator, userAccess, bcrypt).requestAccess(data)
+            .then(() => {
+                done("Did not reject");
+            })
+            .catch((err) => {
+                expect(err).to.equal('missing: id');
+                done();
+            })
+            .catch((err) => done(err));
+    });
+
+    it('rejects on missing requested_access_level', function (done) {
+        delete data.requested_access_level;
+        User(db, validator, userAccess, bcrypt).requestAccess(data)
+            .then(() => {
+                done("Did not reject");
+            })
+            .catch((err) => {
+                expect(err).to.equal('missing: requested_access_level');
+                done();
+            })
+            .catch((err) => done(err));
+    });
+
+    it('resolves with missing requested_reason', function (done) {
+        delete data.requested_reason;
+        User(db, validator, userAccess, bcrypt).requestAccess(data)
+            .then((result) => {
+                expect(result.paramList).to.be.an('array');
+                expect(result.paramList.length).to.be.equal(4);
+                expect(result.paramList[2]).to.be.null;
+                done();
+            })
+            .catch((err) => done(err));
+    });
+});
+
 describe('user updateAccess', function () {
     it('resolves with data', function (done) {
 
@@ -705,7 +778,7 @@ describe('user rejectRequestedAccessLevel', function () {
 
     it('rejects on missing id', function (done) {
 
-        User(db, validator, userAccess, bcrypt).rejectRequestedAccessLevel({ })
+        User(db, validator, userAccess, bcrypt).rejectRequestedAccessLevel({})
             .then(() => {
                 done("Did not reject");
             })
@@ -778,7 +851,7 @@ describe('user authenticate', function () {
 
     it('rejects on bad compare', function (done) {
         let mockBcrypt = {
-            compare: (password, hashed, cb) => {cb(Mocks.BCRPYT_ERROR, null)}
+            compare: (password, hashed, cb) => { cb(Mocks.BCRPYT_ERROR, null) }
         }
         User(db, validator, userAccess, mockBcrypt).authenticate({ email: Mocks.EMAIL, password: Mocks.PASSWORD })
             .then(() => {
@@ -792,16 +865,16 @@ describe('user authenticate', function () {
     });
 
     it('not authorized on incorrect password', function (done) {
-        
+
         User(mockDb, validator, userAccess, bcrypt).authenticate({ email: Mocks.EMAIL, password: 'wrong' })
-        .then((result) => {
-            expect(result).to.be.an('object');
-            expect(result.isAuthorized).to.be.false;
-            expect(result.id).to.be.equal(Mocks.USER_ID);
-            expect(result.accessLevel).to.be.equal(Mocks.ACCESS_LEVEL);
-            done();
-        })
-        .catch((err) => done(err));
+            .then((result) => {
+                expect(result).to.be.an('object');
+                expect(result.isAuthorized).to.be.false;
+                expect(result.id).to.be.equal(Mocks.USER_ID);
+                expect(result.accessLevel).to.be.equal(Mocks.ACCESS_LEVEL);
+                done();
+            })
+            .catch((err) => done(err));
     });
 
 });

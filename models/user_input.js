@@ -1,15 +1,22 @@
 var _db, _Validator;
 
+const POSSIBLE_QUERY_PARAMS = [
+    'experiment_id', 'device_id', 'description', 'user_id', 'timestamp'
+];
+
 module.exports = (db, Validator) => {
     _db = db, _Validator = Validator;
     return {
-        findAll: function () {
+        findAll: (data) => {
+            let { additionalWhere, queryParamList }
+                = _Validator.getWhereAndQueryParamList(data, POSSIBLE_QUERY_PARAMS);
             return new Promise((resolve, reject) => {
                 _db.query(`SELECT *, user_inputs.* FROM user_inputs
-                INNER JOIN sanitized_users on (user_inputs.user_id = sanitized_users.id )
-                INNER JOIN experiments on (user_inputs.experiment_id = experiments.id)
-                where user_inputs.deleted_at = 0 
-                ORDER BY user_inputs.timestamp ASC`, [])
+                        INNER JOIN sanitized_users on (user_inputs.user_id = sanitized_users.id )
+                        INNER JOIN experiments on (user_inputs.experiment_id = experiments.id)
+                        where user_inputs.deleted_at = 0 
+                        ${additionalWhere}
+                        ORDER BY user_inputs.timestamp ASC`, queryParamList)
                     .then((results) => {
                         resolve(results.rows);
                     })
@@ -119,7 +126,7 @@ module.exports = (db, Validator) => {
 
         updateDescription: (data) => {
             var time = new Date().getTime();
-            return new Promise((resolve, reject) => { 
+            return new Promise((resolve, reject) => {
                 _db.query('UPDATE user_inputs SET description = $2, updated_at = $3 WHERE id = $1 and deleted_at = 0 returning description',
                     [data.id, data.description, time])
                     .then((result) => {
@@ -136,22 +143,22 @@ module.exports = (db, Validator) => {
 
 function findOneById(id) {
     return new Promise((resolve, reject) => {
-      _db.query(`SELECT *, user_inputs.* FROM user_inputs
+        _db.query(`SELECT *, user_inputs.* FROM user_inputs
       INNER JOIN sanitized_users on (user_inputs.device_id = sanitized_users.id 
         OR user_inputs.user_id = sanitized_users.id )
       INNER JOIN experiments on (user_inputs.experiment_id = experiments.id)  
       WHERE user_inputs.id = $1 and user_inputs.deleted_at = 0`, [id])
-        .then((result) => {
-          if (result.rows[0]) {
-            resolve(result.rows[0]);
-          }
-          else {
-            reject('no user input found')
-          }
-        })
-        .catch((err) => {
-          reject(err);
-        });
+            .then((result) => {
+                if (result.rows[0]) {
+                    resolve(result.rows[0]);
+                }
+                else {
+                    reject('no user input found')
+                }
+            })
+            .catch((err) => {
+                reject(err);
+            });
     });
 }
 
@@ -160,26 +167,26 @@ function validateUserInputData(data) {
         if (!data.description) {
             reject('invalid input: description missing')
         }
-        else{
-            columns = ['user_id','device_id', 'description', 'experiment_id']
+        else {
+            columns = ['user_id', 'device_id', 'description', 'experiment_id']
             _Validator.validateColumns(data, columns)
-            .then(function () {
-                return _Validator.validateUserId(data.device_id)
-            })
-            .then(function () {
-                return _Validator.validateUserId(data.user_id)
-            })
-            .then(function() {
-                return _Validator.validateExperimentId(data.experiment_id)
-            })
-            .then(() => {
-                resolve();
-            })
-            .catch((err) => {
-                reject(err);
-            })
+                .then(function () {
+                    return _Validator.validateUserId(data.device_id)
+                })
+                .then(function () {
+                    return _Validator.validateUserId(data.user_id)
+                })
+                .then(function () {
+                    return _Validator.validateExperimentId(data.experiment_id)
+                })
+                .then(() => {
+                    resolve();
+                })
+                .catch((err) => {
+                    reject(err);
+                })
         }
-        
+
     });
 
 }
