@@ -86,9 +86,7 @@ module.exports = (User, Verifier) => {
       return new Promise((resolve) => {
         Verifier.verifyMinAccessName(req.decoded.accessLevel, 'admin_user')
           .then(() => {
-            if(req.body.access_level < 3) {
-              return User.updateAccess({ id: req.params.id, access_level: req.body.access_level })
-            }
+            return User.updateAccess({ id: req.params.id, access_level: req.body.access_level })
           })
           .then((result) => {
             return res.status(200).json(result);
