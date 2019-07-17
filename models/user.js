@@ -205,6 +205,9 @@ module.exports = (db, Validator, UserAccess, bcrypt) => {
             return validateAccessLevel(data)
           })
           .then(function () {
+            return validateNotAdmin(data)
+          })
+          .then(function () {
             return _db.query('UPDATE users SET access_level = $2, updated_at = $3, requested_access_level = NULL WHERE id = $1 and deleted_at = 0 returning access_level', [data.id, data.access_level, time]);
           })
           .then((result) => {
@@ -368,6 +371,21 @@ function validateAccessLevel(data) {
   return new Promise((resolve, reject) => {
     _UserAccess.findOne(data)
       .then(() => {
+        resolve();
+      })
+      .catch((err) => {
+        reject(err); // todo better error message
+      })
+  })
+}
+
+function validateNotAdmin(data) {
+  return new Promise((resolve, reject) => {
+    findOneById(data.id)
+      .then((user) => {
+        if(user.access_level == 3) {
+          throw new Error('cannot change admin access level');
+        }
         resolve();
       })
       .catch((err) => {
