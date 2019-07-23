@@ -1,4 +1,5 @@
 # EDCS Back-end
+[EDCS Frontend](https://github.com/Jss7268/KGCOESeniorProjectWeb)
 
 ## Prerequisites
 You need to install node/npm and postgresql
