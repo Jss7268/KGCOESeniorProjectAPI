@@ -73,6 +73,7 @@ To run quickly, just run the command:
 node server
 ```
 OR
+
 To start a daemon you can use [pm2](https://www.npmjs.com/package/pm2).
 ```
 npm install pm2 -g
@@ -82,4 +83,4 @@ To check the status
 ```
 pm2 status edcs
 ```
-
+To check if it is running properly, navigate to https://www.your-site.com:8080/, replacing `www.your-site.com` with your server address
