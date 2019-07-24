@@ -2,8 +2,9 @@
 [EDCS Frontend](https://github.com/Jss7268/KGCOESeniorProjectWeb)
 
 ## Prerequisites
-This README is assuming this is running on Ubuntu.
-You need to install node/npm and postgresql
+This is how to run the backend on Ubuntu.
+
+You need to install node/npm and postgresql.
 ```
 sudo apt-get update
 sudo apt-get install npm postgresql postgresql-contrib
