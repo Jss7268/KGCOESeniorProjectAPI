@@ -30,7 +30,7 @@ beforeEach(function () {
 
 describe('device_output findAll', function () {
     it('resolves with data', function (done) {
-        DeviceOutput(db, validator, deviceExperiment).findAll()
+        DeviceOutput(db, validator, deviceExperiment).findAll({})
             .then((result) => {
                 expect(result).to.be.an('array');
                 expect(result[0].paramList).to.deep.equal([]);
@@ -40,7 +40,7 @@ describe('device_output findAll', function () {
     });
 
     it('rejects on bad query', function (done) {
-        DeviceOutput(badDb, validator, deviceExperiment).findAll()
+        DeviceOutput(badDb, validator, deviceExperiment).findAll({})
             .then(() => {
                 done("Did not reject");
             })
