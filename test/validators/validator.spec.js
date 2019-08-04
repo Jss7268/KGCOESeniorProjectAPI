@@ -191,3 +191,60 @@ describe('validateGeneric', function () {
             .catch((err) => done(err));
     });
 });
+
+describe('getWhereAndQueryParamList', function () {
+    it('uses default', function (done) {
+        let {additionalWhere, queryParamList} = Validator(generic).getWhereAndQueryParamList({id: Mocks.ID}, ["id"]);
+        expect(additionalWhere).to.equal(' AND id = $1');
+        done();
+    });
+
+    it('uses eq', function (done) {
+        let {additionalWhere, queryParamList} = Validator(generic).getWhereAndQueryParamList({"id__eq": Mocks.ID}, ["id"]);
+        expect(additionalWhere).to.equal(' AND id = $1');
+        done();
+
+    });
+
+    it('uses !eq', function (done) {
+        let {additionalWhere, queryParamList} = Validator(generic).getWhereAndQueryParamList({"id__!eq": Mocks.ID}, ["id"]);
+        expect(additionalWhere).to.equal(' AND id <> $1');
+        done();
+
+    });
+
+    it('uses gt', function (done) {
+        let {additionalWhere, queryParamList} = Validator(generic).getWhereAndQueryParamList({"id__gt": Mocks.ID}, ["id"]);
+        expect(additionalWhere).to.equal(' AND id > $1');
+        done();
+
+    });
+
+    it('uses null', function (done) {
+        let {additionalWhere, queryParamList} = Validator(generic).getWhereAndQueryParamList({"id__null": Mocks.ID}, ["id"]);
+        expect(additionalWhere).to.equal(' AND id IS NULL');
+        done();
+
+    });
+
+    it('uses in', function (done) {
+        let {additionalWhere, queryParamList} = Validator(generic).getWhereAndQueryParamList({"id__in": Mocks.ID}, ["id"]);
+        expect(additionalWhere).to.equal(' AND id = ANY($1)');
+        done();
+
+    });
+
+    it('uses not in', function (done) {
+        let {additionalWhere, queryParamList} = Validator(generic).getWhereAndQueryParamList({"id__!in": Mocks.ID}, ["id"]);
+        expect(additionalWhere).to.equal(' AND id != ALL($1)');
+        done();
+
+    });
+
+    it('returns empty where on null data', function (done) {
+        let {additionalWhere, queryParamList} = Validator(generic).getWhereAndQueryParamList(null, ["id"]);
+        expect(additionalWhere).to.equal('');
+        done();
+
+    });
+});
