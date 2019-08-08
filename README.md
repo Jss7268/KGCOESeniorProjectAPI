@@ -1,6 +1,8 @@
 # EDCS Back-end
 [EDCS Frontend](https://github.com/Jss7268/KGCOESeniorProjectWeb)
 
+[EDCS Hardware](https://github.com/mll8657/KGCOESeniorProjectHardware)
+
 ## Prerequisites
 This is how to run the backend on Ubuntu.
 
