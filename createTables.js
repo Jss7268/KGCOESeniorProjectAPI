@@ -84,7 +84,7 @@ async function createTables() {
 			created_at bigint NOT NULL, 
 			updated_at bigint, 
 			deleted_at bigint NOT NULL DEFAULT 0, 
-			UNIQUE (output_type_name, deleted_at))`);
+			UNIQUE (output_type_name, units, deleted_at))`);
 	} catch (err) {
 		console.log(err);
 	}
